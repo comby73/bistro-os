@@ -1,57 +1,104 @@
 {
-  "name": "Bistro OS - Lead Capture Flow",
+  "name": "Bistro OS — Lead Capture",
   "nodes": [
     {
-      "id": "webhook-lead",
-      "name": "Webhook - Demo Request",
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "bistro-lead",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "node-webhook-001",
+      "name": "Webhook — Recibir Lead",
       "type": "n8n-nodes-base.webhook",
-      "notes": "Recibe datos del formulario /demo."
+      "typeVersion": 2,
+      "position": [240, 300],
+      "notes": "Recibe el POST de submitLead() (Server Action de Next.js). Path: /bistro-lead. Requiere responseMode responseNode para responder manualmente al final del flujo."
     },
     {
-      "id": "validate-fields",
+      "parameters": {
+        "jsCode": "// El webhook de n8n expone el body en $json.body (v1) o directo en $json (v2).\n// Este nodo normaliza ambos casos y limpia los valores.\nconst raw = $input.first().json.body ?? $input.first().json;\n\nreturn [{\n  json: {\n    restaurant_name: String(raw.restaurant_name ?? '').trim(),\n    owner_name:      String(raw.owner_name      ?? '').trim(),\n    email:           String(raw.email           ?? '').trim().toLowerCase(),\n    whatsapp:        String(raw.whatsapp        ?? '').trim(),\n    city:            String(raw.city            ?? '').trim(),\n    restaurant_type: String(raw.restaurant_type ?? '').trim(),\n    number_of_tables: Number(raw.number_of_tables) || 0,\n    plan_interest:   String(raw.plan_interest   ?? 'Starter').trim(),\n    message:         String(raw.message         ?? '').trim(),\n    submitted_at:    new Date().toISOString()\n  }\n}];"
+      },
+      "id": "node-normalize-002",
+      "name": "Normalize Lead Data",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [460, 300],
+      "notes": "Unifica el body independientemente de la versión de n8n. Convierte tipos y elimina espacios. Agrega submitted_at."
+    },
+    {
+      "parameters": {
+        "jsCode": "const lead = $input.first().json;\nconst required = ['restaurant_name', 'owner_name', 'email', 'whatsapp', 'plan_interest'];\nconst missing  = required.filter(f => !lead[f]);\n\nif (missing.length > 0) {\n  throw new Error(`Campos requeridos faltantes: ${missing.join(', ')}`);\n}\n\nif (!lead.email.includes('@') || !lead.email.includes('.')) {\n  throw new Error('Formato de email inválido.');\n}\n\nif (!['Starter', 'Pro', 'Enterprise'].includes(lead.plan_interest)) {\n  throw new Error(`plan_interest inválido: ${lead.plan_interest}`);\n}\n\nreturn [$input.first()];"
+      },
+      "id": "node-validate-003",
       "name": "Validate Required Fields",
-      "type": "n8n-nodes-base.function",
-      "notes": "Valida restaurant_name, owner_name, email, whatsapp y plan_interest."
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [680, 300],
+      "notes": "Valida presencia de campos obligatorios y formato de email. Si falla, lanza error — n8n registra la ejecución fallida. Configurar error workflow para responder al webhook en ese caso."
     },
     {
-      "id": "supabase-insert-lead",
-      "name": "Supabase - Insert Lead",
-      "type": "n8n-nodes-base.supabase",
-      "notes": "Inserta registro en tabla leads."
+      "parameters": {
+        "jsCode": "const lead = $input.first().json;\n\n// Clasificación sin IA — heurística por tamaño y plan de interés.\n// En Fase 3 reemplazar por llamada a OpenAI con prompts/agents/agente-comercial.md\nlet lead_score       = 'low';\nlet recommended_plan = lead.plan_interest;\nlet next_action      = 'send_info';\n\nif (lead.plan_interest === 'Enterprise' || lead.number_of_tables > 40) {\n  lead_score  = 'high';\n  next_action = 'schedule_call';\n} else if (lead.plan_interest === 'Pro' || lead.number_of_tables > 15) {\n  lead_score  = 'medium';\n  next_action = 'schedule_demo';\n}\n\nreturn [{\n  json: { ...lead, lead_score, recommended_plan, next_action }\n}];"
+      },
+      "id": "node-classify-004",
+      "name": "Classify Lead",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [900, 300],
+      "notes": "Clasifica el lead sin IA (heurística). En Fase 3 conectar aquí el nodo OpenAI con el prompt agente-comercial.md para clasificación real."
     },
     {
-      "id": "ai-classify-lead",
-      "name": "AI - Classify Lead",
-      "type": "n8n-nodes-base.openAi",
-      "notes": "Usa prompt prompts/agents/agente-comercial.md para clasificar el lead."
-    },
-    {
-      "id": "notify-internal",
-      "name": "Email - Notify Sales",
-      "type": "n8n-nodes-base.emailSend",
-      "notes": "Envía notificación interna al equipo comercial."
-    },
-    {
-      "id": "insert-event",
-      "name": "Supabase - Insert Event",
-      "type": "n8n-nodes-base.supabase",
-      "notes": "Registra evento lead_created en events."
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { received: true, lead_score: $json.lead_score, recommended_plan: $json.recommended_plan, next_action: $json.next_action } }}",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "id": "node-respond-005",
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1120, 300],
+      "notes": "Responde HTTP 200 con JSON al Server Action de Next.js. Next.js solo verifica response.ok — el body es ignorado por ahora pero está disponible para futuros usos."
     }
   ],
   "connections": {
-    "Webhook - Demo Request": [
-      "Validate Required Fields"
-    ],
-    "Validate Required Fields": [
-      "Supabase - Insert Lead"
-    ],
-    "Supabase - Insert Lead": [
-      "AI - Classify Lead"
-    ],
-    "AI - Classify Lead": [
-      "Email - Notify Sales",
-      "Supabase - Insert Event"
-    ]
+    "Webhook — Recibir Lead": {
+      "main": [
+        [{ "node": "Normalize Lead Data", "type": "main", "index": 0 }]
+      ]
+    },
+    "Normalize Lead Data": {
+      "main": [
+        [{ "node": "Validate Required Fields", "type": "main", "index": 0 }]
+      ]
+    },
+    "Validate Required Fields": {
+      "main": [
+        [{ "node": "Classify Lead", "type": "main", "index": 0 }]
+      ]
+    },
+    "Classify Lead": {
+      "main": [
+        [{ "node": "Respond to Webhook", "type": "main", "index": 0 }]
+      ]
+    }
   },
-  "credentials": "No incluir credenciales reales. Usar variables de entorno."
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "meta": {
+    "instanceId": "bistro-os-dev",
+    "templateId": "bistro-os-lead-capture-v1"
+  },
+  "_bistro_notes": {
+    "phase": "Fase 2B — sin Supabase ni OpenAI",
+    "next_phase": "Fase 3: agregar nodo Supabase Insert Lead después de Classify Lead, y nodo OpenAI dentro de Classify Lead",
+    "credentials_required": "Ninguna en esta fase. Fase 3 requiere: Supabase (service role key), OpenAI API key"
+  }
 }
