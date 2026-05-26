@@ -1,3 +1,5 @@
+"use server";
+
 import { leadSchema, type LeadFormValues } from "./schema";
 
 export type SubmitLeadResult =
