@@ -1,0 +1,12 @@
+{
+  "name": "Bistro OS - Order Notification Flow",
+  "purpose": "Enviar pedidos entrantes a cocina y registrar eventos.",
+  "steps": [
+    "Webhook recibe pedido",
+    "Validar order_items",
+    "Guardar order y order_items",
+    "Crear kitchen_tickets por station",
+    "Notificar cocina",
+    "Registrar event"
+  ]
+}

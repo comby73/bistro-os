@@ -1,0 +1,53 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: #0A0A0A;
+  color: #F4EFE6;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: #E8B863;
+  color: #0A0A0A;
+}
+
+@layer components {
+  .bistro-container {
+    @apply mx-auto w-full max-w-7xl px-6 lg:px-10;
+  }
+
+  .eyebrow {
+    @apply text-[11px] uppercase tracking-[0.18em] text-mute;
+  }
+
+  .card-premium {
+    @apply rounded-2xl border border-line bg-layer1/90 shadow-2xl shadow-black/20 transition duration-200;
+  }
+
+  .card-premium:hover {
+    @apply border-gold/30;
+  }
+
+  .btn-gold {
+    @apply inline-flex items-center justify-center rounded-full bg-gold px-5 py-3 text-sm font-semibold text-ink transition duration-200 hover:-translate-y-0.5 hover:bg-goldhi;
+  }
+
+  .btn-ghost {
+    @apply inline-flex items-center justify-center rounded-full border border-line bg-white/[0.02] px-5 py-3 text-sm font-medium text-paper transition duration-200 hover:border-gold/60 hover:bg-gold/5;
+  }
+
+  .gold-gradient-text {
+    @apply bg-gradient-to-b from-goldhi via-gold to-golddim bg-clip-text text-transparent;
+  }
+}

@@ -1,0 +1,870 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Bistró OS — El sistema operativo del restaurante moderno</title>
+<meta name="description" content="Pedidos, reservas por WhatsApp y operación de cocina, unificados. Bistró OS es la plataforma de gestión para restaurantes de gama alta en LATAM." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          ink:    '#0A0A0A',
+          layer1: '#111111',
+          layer2: '#1A1A1A',
+          layer3: '#232323',
+          line:   '#262626',
+          gold:   '#E8B863',
+          goldhi: '#F2D69B',
+          golddim:'#8A6B36',
+          mute:   '#8A8580',
+          paper:  '#F4EFE6',
+        },
+        fontFamily: {
+          sans:   ['Geist', 'ui-sans-serif', 'system-ui'],
+          mono:   ['Geist Mono', 'ui-monospace'],
+          serif:  ['"Instrument Serif"', 'ui-serif', 'Georgia'],
+        },
+        letterSpacing: { 'tightish': '-0.02em', 'tight2': '-0.035em', 'tight3': '-0.05em' }
+      }
+    }
+  };
+</script>
+<style>
+  :root { color-scheme: dark; }
+  html, body { background:#0A0A0A; color:#F4EFE6; }
+  body { font-family: 'Geist', system-ui, sans-serif; font-feature-settings: "ss01","cv11"; -webkit-font-smoothing: antialiased; }
+  ::selection { background:#E8B863; color:#0A0A0A; }
+
+  /* Subtle film grain overlay */
+  .grain::before{
+    content:""; position:fixed; inset:0; pointer-events:none; z-index:60; opacity:.05; mix-blend-mode:overlay;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)' opacity='0.7'/></svg>");
+  }
+
+  .hair { background: linear-gradient(90deg, transparent, #2a2622 18%, #3a3327 50%, #2a2622 82%, transparent); height:1px; }
+  .hair-v { background: linear-gradient(180deg, transparent, #2a2622 18%, #3a3327 50%, #2a2622 82%, transparent); width:1px; }
+
+  .gold-gradient-text {
+    background: linear-gradient(180deg, #F4DCA6 0%, #E8B863 55%, #A57F3D 100%);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+
+  .btn-gold {
+    background: linear-gradient(180deg, #F2D69B 0%, #E8B863 55%, #C99A4A 100%);
+    color: #1A140A;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.35), 0 1px 0 rgba(0,0,0,.4), 0 10px 30px -10px rgba(232,184,99,.35);
+    transition: transform .2s ease, box-shadow .2s ease, filter .2s ease;
+  }
+  .btn-gold:hover { transform: translateY(-1px); filter: brightness(1.05); box-shadow: inset 0 1px 0 rgba(255,255,255,.4), 0 1px 0 rgba(0,0,0,.4), 0 18px 40px -12px rgba(232,184,99,.45); }
+  .btn-gold:active { transform: translateY(0); }
+
+  .btn-ghost {
+    border: 1px solid #2a2622;
+    color: #F4EFE6;
+    background: rgba(255,255,255,.01);
+    transition: border-color .2s ease, background .2s ease, transform .2s ease;
+  }
+  .btn-ghost:hover { border-color:#E8B863; background: rgba(232,184,99,.05); }
+
+  .ring-gold { box-shadow: 0 0 0 1px rgba(232,184,99,.45), 0 0 60px -20px rgba(232,184,99,.35); }
+
+  .card {
+    background: linear-gradient(180deg, #131211 0%, #0F0E0D 100%);
+    border: 1px solid #1f1c19;
+    transition: border-color .2s ease, transform .2s ease, background .2s ease;
+  }
+  .card:hover { border-color:#3a3327; }
+
+  .num-display { font-family: 'Instrument Serif', serif; font-style: italic; }
+
+  /* Reveal on scroll */
+  .reveal { opacity:0; transform: translateY(14px); transition: opacity .8s ease, transform .8s ease; }
+  .reveal.in { opacity:1; transform:none; }
+
+  /* FAQ accordion */
+  details > summary { list-style: none; cursor:pointer; }
+  details > summary::-webkit-details-marker { display:none; }
+  details[open] .faq-icon { transform: rotate(45deg); }
+  .faq-icon { transition: transform .25s ease; }
+  details .faq-body { display:grid; grid-template-rows: 0fr; transition: grid-template-rows .35s ease; }
+  details[open] .faq-body { grid-template-rows: 1fr; }
+  .faq-body > div { overflow:hidden; }
+
+  /* Pricing highlight */
+  .pro-glow {
+    position:relative;
+    background: linear-gradient(180deg, #181613 0%, #110F0D 100%);
+    border: 1px solid rgba(232,184,99,.35);
+    box-shadow: 0 30px 80px -30px rgba(232,184,99,.25), inset 0 1px 0 rgba(232,184,99,.15);
+  }
+  .pro-glow::before {
+    content:""; position:absolute; inset:-1px; border-radius:inherit;
+    background: radial-gradient(120% 60% at 50% 0%, rgba(232,184,99,.22), transparent 60%);
+    pointer-events:none;
+  }
+
+  /* Hero ornament */
+  @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+  .shimmer-line {
+    height:1px;
+    background: linear-gradient(90deg, transparent, #E8B863 40%, #F2D69B 50%, #E8B863 60%, transparent);
+    background-size: 200% 100%;
+    animation: shimmer 6s linear infinite;
+  }
+
+  /* Marquee */
+  @keyframes marq { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+  .marquee-track { animation: marq 40s linear infinite; }
+
+  /* Plate / chip simulation */
+  .pulse-dot { animation: pulse 2s ease-in-out infinite; }
+  @keyframes pulse { 0%,100% { opacity:1; transform:scale(1);} 50% { opacity:.4; transform:scale(.85);} }
+
+  /* Smooth scroll */
+  html { scroll-behavior: smooth; }
+
+  /* Section side rule */
+  .sec-rule { position:relative; }
+  .sec-rule::before { content:""; position:absolute; left:0; top:0; bottom:0; width:1px; background:linear-gradient(180deg, transparent, #2a2622 20%, #2a2622 80%, transparent); }
+  .sec-rule::after { content:""; position:absolute; right:0; top:0; bottom:0; width:1px; background:linear-gradient(180deg, transparent, #2a2622 20%, #2a2622 80%, transparent); }
+
+  /* Hover lift utility */
+  .lift { transition: transform .2s ease; }
+  .lift:hover { transform: translateY(-2px); }
+
+  /* Mono label */
+  .eyebrow { font-family:'Geist Mono', ui-monospace, monospace; font-size:11px; letter-spacing:.18em; text-transform:uppercase; color:#8A8580; }
+
+  /* Subtle dot grid background */
+  .dotgrid {
+    background-image: radial-gradient(rgba(232,184,99,.07) 1px, transparent 1px);
+    background-size: 28px 28px;
+  }
+
+  /* Avatar initials chip */
+  .initials {
+    background: linear-gradient(160deg, #2a2520 0%, #161310 100%);
+    border:1px solid #2a2622;
+    color:#E8B863;
+  }
+
+  /* Code-ish mockup */
+  .mock-shadow { box-shadow: 0 60px 120px -40px rgba(0,0,0,.8), 0 30px 60px -30px rgba(232,184,99,.12); }
+</style>
+</head>
+<body class="grain antialiased">
+
+<!-- =================== NAV =================== -->
+<header class="fixed top-0 left-0 right-0 z-50 backdrop-blur-md bg-ink/70 border-b border-line/60">
+  <div class="max-w-[1280px] mx-auto px-6 lg:px-10 h-16 flex items-center justify-between">
+    <a href="#top" class="flex items-center gap-2.5 group">
+      <span class="relative inline-block w-6 h-6">
+        <span class="absolute inset-0 rounded-full border border-gold/70"></span>
+        <span class="absolute inset-1.5 rounded-full bg-gold"></span>
+      </span>
+      <span class="text-[15px] tracking-tightish"><span class="font-medium">Bistró</span> <span class="text-mute">OS</span></span>
+    </a>
+    <nav class="hidden md:flex items-center gap-9 text-[13.5px] text-paper/80">
+      <a href="#how" class="hover:text-paper transition-colors duration-200">Cómo funciona</a>
+      <a href="#features" class="hover:text-paper transition-colors duration-200">Plataforma</a>
+      <a href="#testimonials" class="hover:text-paper transition-colors duration-200">Clientes</a>
+      <a href="#pricing" class="hover:text-paper transition-colors duration-200">Precios</a>
+      <a href="#faq" class="hover:text-paper transition-colors duration-200">FAQ</a>
+    </nav>
+    <div class="flex items-center gap-3">
+      <a href="#" class="hidden sm:inline text-[13.5px] text-paper/80 hover:text-paper transition-colors">Ingresar</a>
+      <a href="#pricing" class="btn-gold rounded-full px-4 py-2 text-[13px] font-medium">Empezar gratis</a>
+    </div>
+  </div>
+</header>
+
+<main id="top" class="pt-16">
+
+<!-- =================== HERO =================== -->
+<section class="relative overflow-hidden">
+  <!-- ambient gold wash -->
+  <div aria-hidden="true" class="pointer-events-none absolute inset-0">
+    <div class="absolute -top-40 left-1/2 -translate-x-1/2 w-[1100px] h-[700px] rounded-full"
+         style="background: radial-gradient(closest-side, rgba(232,184,99,.18), rgba(232,184,99,0) 70%);"></div>
+    <div class="absolute inset-0 dotgrid opacity-60"></div>
+  </div>
+
+  <div class="relative max-w-[1280px] mx-auto px-6 lg:px-10 pt-20 md:pt-28 pb-16 md:pb-24">
+
+    <!-- eyebrow with crest -->
+    <div class="reveal flex items-center justify-center gap-3 mb-10">
+      <span class="hair w-12"></span>
+      <span class="eyebrow">Est. 2025 · Hospitalidad &middot; Software</span>
+      <span class="hair w-12"></span>
+    </div>
+
+    <!-- huge editorial headline -->
+    <h1 class="reveal text-center mx-auto max-w-[1040px] font-medium tracking-tight3 leading-[0.92]
+               text-[clamp(2.8rem,9vw,8rem)]">
+      La <span class="font-serif italic font-normal gold-gradient-text">armonía</span><br/>
+      detrás de cada<br class="hidden sm:block"/>
+      <span class="font-serif italic font-normal">servicio</span>.
+    </h1>
+
+    <p class="reveal mt-10 mx-auto max-w-[640px] text-center text-paper/70 text-[17px] md:text-[19px] leading-[1.55]">
+      Bistró OS unifica <span class="text-paper">pedidos en sala</span>, <span class="text-paper">reservas por WhatsApp</span>
+      y la <span class="text-paper">operación de cocina</span> en una sola plataforma —
+      pensada para restaurantes que se toman su oficio en serio.
+    </p>
+
+    <div class="reveal mt-10 flex flex-col sm:flex-row items-center justify-center gap-3">
+      <a href="#pricing" class="btn-gold rounded-full px-6 py-3.5 text-[14px] font-medium inline-flex items-center gap-2">
+        Probar 14 días gratis
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+      </a>
+      <a href="#demo" class="btn-ghost rounded-full px-6 py-3.5 text-[14px] font-medium inline-flex items-center gap-2">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7L8 5z"/></svg>
+        Ver demo de 2 minutos
+      </a>
+    </div>
+
+    <p class="reveal text-center mt-5 text-[12.5px] text-mute font-mono">Sin tarjeta · Configuración en 20 minutos · Soporte en español</p>
+
+    <!-- subtle ornament: a single thin gold rule with two serif numerals -->
+    <div class="reveal mt-20 md:mt-28 relative">
+      <div class="shimmer-line"></div>
+      <div class="flex items-end justify-between text-mute mt-4 font-mono text-[11px] tracking-[0.2em] uppercase">
+        <span>Vol. I &mdash; Servicio</span>
+        <span class="num-display text-[40px] md:text-[56px] leading-none text-paper/40 -mb-2">№ 001</span>
+        <span>Cap. 1 &mdash; Mise en place</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- marquee of restaurant types -->
+  <div class="border-y border-line/70 bg-layer1/40">
+    <div class="overflow-hidden whitespace-nowrap py-5">
+      <div class="marquee-track inline-flex items-center gap-12 text-paper/40">
+        <!-- Track repeated twice -->
+        <span class="font-serif italic text-2xl">Casa Yvonne</span>
+        <span class="text-gold">✦</span>
+        <span class="font-serif italic text-2xl">Pulpería del Puerto</span>
+        <span class="text-gold">✦</span>
+        <span class="font-serif italic text-2xl">Bistró Mileto</span>
+        <span class="text-gold">✦</span>
+        <span class="font-serif italic text-2xl">Atelier Mar</span>
+        <span class="text-gold">✦</span>
+        <span class="font-serif italic text-2xl">Don Sebastián</span>
+        <span class="text-gold">✦</span>
+        <span class="font-serif italic text-2xl">Salón Norte</span>
+        <span class="text-gold">✦</span>
+        <span class="font-serif italic text-2xl">La Mesa Larga</span>
+        <span class="text-gold">✦</span>
+        <span class="font-serif italic text-2xl">Casa Yvonne</span>
+        <span class="text-gold">✦</span>
+        <span class="font-serif italic text-2xl">Pulpería del Puerto</span>
+        <span class="text-gold">✦</span>
+        <span class="font-serif italic text-2xl">Bistró Mileto</span>
+        <span class="text-gold">✦</span>
+        <span class="font-serif italic text-2xl">Atelier Mar</span>
+        <span class="text-gold">✦</span>
+        <span class="font-serif italic text-2xl">Don Sebastián</span>
+        <span class="text-gold">✦</span>
+        <span class="font-serif italic text-2xl">Salón Norte</span>
+        <span class="text-gold">✦</span>
+        <span class="font-serif italic text-2xl">La Mesa Larga</span>
+        <span class="text-gold">✦</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =================== HOW IT WORKS =================== -->
+<section id="how" class="relative py-28 md:py-36">
+  <div class="max-w-[1280px] mx-auto px-6 lg:px-10">
+
+    <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-16 md:mb-20">
+      <div class="reveal">
+        <div class="eyebrow mb-4">— Cómo funciona</div>
+        <h2 class="text-[clamp(2rem,4.5vw,3.5rem)] tracking-tight2 leading-[1] font-medium max-w-[640px]">
+          Tres movimientos.<br/>
+          <span class="text-mute">Una operación entera</span>
+          <span class="font-serif italic gold-gradient-text">en sincronía</span>.
+        </h2>
+      </div>
+      <p class="reveal text-paper/60 max-w-[380px] text-[15px] leading-[1.6]">
+        Pensado para que el dueño, el chef y el equipo de salón compartan la misma visión del servicio —
+        sin hojas de cálculo, sin grupos de WhatsApp paralelos.
+      </p>
+    </div>
+
+    <!-- 3 steps -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-px bg-line/70 border border-line/70 rounded-2xl overflow-hidden">
+
+      <!-- Step 01 -->
+      <div class="reveal relative p-8 md:p-10 bg-layer1 min-h-[420px] flex flex-col">
+        <div class="flex items-center justify-between mb-10">
+          <span class="num-display text-[88px] leading-none gold-gradient-text">01</span>
+          <span class="eyebrow">Setup</span>
+        </div>
+        <h3 class="text-[22px] font-medium tracking-tightish mb-3">Conectá tu carta y tu equipo</h3>
+        <p class="text-paper/60 text-[14.5px] leading-[1.6] mb-8">
+          Importá tu menú, definí mesas, salones y horarios. Invitá al chef, al barman y al maître con permisos diferenciados.
+        </p>
+        <!-- Visual: faux menu card -->
+        <div class="mt-auto card rounded-xl p-5">
+          <div class="flex items-center justify-between mb-3 eyebrow">
+            <span>Menú · Almuerzo</span><span>v.12</span>
+          </div>
+          <div class="space-y-2.5 text-[13px]">
+            <div class="flex justify-between"><span>Tartar de atún rojo</span><span class="text-gold">$280</span></div>
+            <div class="hair"></div>
+            <div class="flex justify-between"><span>Risotto de hongos</span><span class="text-gold">$240</span></div>
+            <div class="hair"></div>
+            <div class="flex justify-between"><span>Cordero patagónico</span><span class="text-gold">$420</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 02 -->
+      <div class="reveal relative p-8 md:p-10 bg-layer1 min-h-[420px] flex flex-col">
+        <div class="flex items-center justify-between mb-10">
+          <span class="num-display text-[88px] leading-none gold-gradient-text">02</span>
+          <span class="eyebrow">Servicio</span>
+        </div>
+        <h3 class="text-[22px] font-medium tracking-tightish mb-3">Tus comensales reservan y piden por WhatsApp</h3>
+        <p class="text-paper/60 text-[14.5px] leading-[1.6] mb-8">
+          El agente Bistró atiende 24/7 — confirma reservas, sugiere maridajes y pasa pedidos directo a cocina.
+        </p>
+        <!-- Visual: chat bubble -->
+        <div class="mt-auto card rounded-xl p-4 space-y-2">
+          <div class="flex justify-end">
+            <div class="bg-[#1F2C20] text-paper/90 text-[12.5px] rounded-2xl rounded-br-sm px-3 py-2 max-w-[80%]">Hola, ¿mesa para 4 esta noche a las 21:30?</div>
+          </div>
+          <div class="flex justify-start">
+            <div class="bg-layer2 text-paper/85 text-[12.5px] rounded-2xl rounded-bl-sm px-3 py-2 max-w-[85%]">
+              Por supuesto. Les guardo la mesa 7, junto a la ventana. ¿Confirmás con tu nombre? <span class="text-gold">●</span>
+            </div>
+          </div>
+          <div class="flex justify-end">
+            <div class="bg-[#1F2C20] text-paper/90 text-[12.5px] rounded-2xl rounded-br-sm px-3 py-2 max-w-[80%]">Sofía Mendoza, gracias 🙏</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 03 -->
+      <div class="reveal relative p-8 md:p-10 bg-layer1 min-h-[420px] flex flex-col">
+        <div class="flex items-center justify-between mb-10">
+          <span class="num-display text-[88px] leading-none gold-gradient-text">03</span>
+          <span class="eyebrow">Cocina</span>
+        </div>
+        <h3 class="text-[22px] font-medium tracking-tightish mb-3">Cocina y caja reciben todo en tiempo real</h3>
+        <p class="text-paper/60 text-[14.5px] leading-[1.6] mb-8">
+          KDS por estación, control de stock y reportes de cierre Z. Vos solo te ocupás de cocinar bien.
+        </p>
+        <!-- Visual: KDS ticket -->
+        <div class="mt-auto card rounded-xl p-4">
+          <div class="flex items-center justify-between mb-3">
+            <span class="eyebrow">Ticket · Mesa 7</span>
+            <span class="inline-flex items-center gap-1.5 text-[11px] text-gold font-mono">
+              <span class="w-1.5 h-1.5 rounded-full bg-gold pulse-dot"></span> EN COCINA · 04:21
+            </span>
+          </div>
+          <ul class="text-[13px] space-y-1.5">
+            <li class="flex justify-between"><span>2× Tartar de atún</span><span class="text-mute">PASE</span></li>
+            <li class="flex justify-between"><span>1× Risotto hongos</span><span class="text-gold">→ Caliente</span></li>
+            <li class="flex justify-between"><span>1× Cordero · medio</span><span class="text-gold">→ Parrilla</span></li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- =================== FEATURES =================== -->
+<section id="features" class="relative py-28 md:py-36 border-t border-line/60 bg-layer1/30">
+  <div class="max-w-[1280px] mx-auto px-6 lg:px-10">
+
+    <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-16 md:mb-20">
+      <div class="reveal max-w-[680px]">
+        <div class="eyebrow mb-4">— La plataforma</div>
+        <h2 class="text-[clamp(2rem,4.5vw,3.5rem)] tracking-tight2 leading-[1] font-medium">
+          Todo lo que tu restaurante necesita.<br/>
+          <span class="text-mute">Nada</span> <span class="font-serif italic gold-gradient-text">de lo que no</span>.
+        </h2>
+      </div>
+      <a href="#pricing" class="reveal btn-ghost self-start md:self-end rounded-full px-5 py-2.5 text-[13.5px] font-medium inline-flex items-center gap-2">
+        Comparar planes
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+      </a>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-px bg-line/70 border border-line/70 rounded-2xl overflow-hidden">
+
+      <!-- 1 -->
+      <article class="card rounded-none p-8 lift">
+        <div class="flex items-center justify-between mb-8">
+          <div class="w-11 h-11 rounded-lg border border-line bg-layer2 flex items-center justify-center text-gold">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+          </div>
+          <span class="eyebrow">01 &middot; Sala</span>
+        </div>
+        <h3 class="text-[18px] font-medium mb-2">Pedidos unificados</h3>
+        <p class="text-paper/60 text-[14px] leading-[1.6]">Comandas desde sala, barra y delivery en un mismo flujo. Sin tickets perdidos, sin doble carga.</p>
+      </article>
+
+      <!-- 2 -->
+      <article class="card rounded-none p-8 lift">
+        <div class="flex items-center justify-between mb-8">
+          <div class="w-11 h-11 rounded-lg border border-line bg-layer2 flex items-center justify-center text-gold">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 14l3-3 3 3 5-6"/></svg>
+          </div>
+          <span class="eyebrow">02 &middot; Datos</span>
+        </div>
+        <h3 class="text-[18px] font-medium mb-2">Dashboard de ventas en vivo</h3>
+        <p class="text-paper/60 text-[14px] leading-[1.6]">Facturación por hora, ticket promedio, platos más rentables. Decisiones con números reales, no con corazonadas.</p>
+      </article>
+
+      <!-- 3 -->
+      <article class="card rounded-none p-8 lift">
+        <div class="flex items-center justify-between mb-8">
+          <div class="w-11 h-11 rounded-lg border border-line bg-layer2 flex items-center justify-center text-gold">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+          </div>
+          <span class="eyebrow">03 &middot; IA</span>
+        </div>
+        <h3 class="text-[18px] font-medium mb-2">Agente de WhatsApp</h3>
+        <p class="text-paper/60 text-[14px] leading-[1.6]">Atiende reservas, lista de espera y consultas frecuentes 24/7. Habla como tu maître — porque vos lo entrenás.</p>
+      </article>
+
+      <!-- 4 -->
+      <article class="card rounded-none p-8 lift">
+        <div class="flex items-center justify-between mb-8">
+          <div class="w-11 h-11 rounded-lg border border-line bg-layer2 flex items-center justify-center text-gold">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="14" rx="2"/><path d="M2 10h20M8 18v2M16 18v2"/></svg>
+          </div>
+          <span class="eyebrow">04 &middot; Cocina</span>
+        </div>
+        <h3 class="text-[18px] font-medium mb-2">KDS por estación</h3>
+        <p class="text-paper/60 text-[14px] leading-[1.6]">Pantallas de cocina divididas por caliente, frío, parrilla y pase. Tiempos de servicio que mejoran solos.</p>
+      </article>
+
+      <!-- 5 -->
+      <article class="card rounded-none p-8 lift">
+        <div class="flex items-center justify-between mb-8">
+          <div class="w-11 h-11 rounded-lg border border-line bg-layer2 flex items-center justify-center text-gold">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41 13.42 20.58a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><circle cx="7" cy="7" r="1.5"/></svg>
+          </div>
+          <span class="eyebrow">05 &middot; Stock</span>
+        </div>
+        <h3 class="text-[18px] font-medium mb-2">Inventario inteligente</h3>
+        <p class="text-paper/60 text-[14px] leading-[1.6]">Descuento automático por receta. Alertas cuando el rib-eye está por agotarse antes del sábado a la noche.</p>
+      </article>
+
+      <!-- 6 -->
+      <article class="card rounded-none p-8 lift">
+        <div class="flex items-center justify-between mb-8">
+          <div class="w-11 h-11 rounded-lg border border-line bg-layer2 flex items-center justify-center text-gold">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M9 13h6M9 17h4"/></svg>
+          </div>
+          <span class="eyebrow">06 &middot; Cierre</span>
+        </div>
+        <h3 class="text-[18px] font-medium mb-2">Reportes y cierre Z</h3>
+        <p class="text-paper/60 text-[14px] leading-[1.6]">Arqueo de caja, propinas, impuestos y exportación contable lista para tu estudio. En un click.</p>
+      </article>
+
+    </div>
+
+  </div>
+</section>
+
+<!-- =================== TESTIMONIALS =================== -->
+<section id="testimonials" class="relative py-28 md:py-36 border-t border-line/60">
+  <div class="max-w-[1280px] mx-auto px-6 lg:px-10">
+
+    <div class="text-center mb-16 md:mb-20">
+      <div class="reveal eyebrow mb-4">— Lo que dicen los anfitriones</div>
+      <h2 class="reveal text-[clamp(2rem,4.5vw,3.5rem)] tracking-tight2 leading-[1] font-medium max-w-[820px] mx-auto">
+        Restaurantes que cambiaron <span class="font-serif italic gold-gradient-text">su servicio</span> sin perder su alma.
+      </h2>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+      <!-- T1 -->
+      <figure class="reveal card rounded-2xl p-8 flex flex-col">
+        <div class="flex items-center gap-1 text-gold mb-6">
+          <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
+        </div>
+        <blockquote class="text-[16px] leading-[1.55] text-paper/85 mb-8">
+          “Pasamos de tres planillas y un grupo de WhatsApp caótico a <span class="text-paper">un solo tablero</span>. El agente nos confirma 40 reservas por día sin que nadie levante el teléfono.”
+        </blockquote>
+        <figcaption class="mt-auto flex items-center gap-3 pt-6 border-t border-line">
+          <div class="initials w-10 h-10 rounded-full flex items-center justify-center text-[13px] font-medium">SM</div>
+          <div>
+            <div class="text-[14px]">Sofía Mendoza</div>
+            <div class="text-[12px] text-mute font-mono">Chef-propietaria · Casa Yvonne · CDMX</div>
+          </div>
+        </figcaption>
+      </figure>
+
+      <!-- T2 -->
+      <figure class="reveal card rounded-2xl p-8 flex flex-col">
+        <div class="flex items-center gap-1 text-gold mb-6">
+          <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
+        </div>
+        <blockquote class="text-[16px] leading-[1.55] text-paper/85 mb-8">
+          “Bistró nos mostró que el <span class="text-paper">ticket de mediodía</span> rendía un 22% más cuando cambiábamos un solo plato del menú. Eso, antes, era imposible de ver.”
+        </blockquote>
+        <figcaption class="mt-auto flex items-center gap-3 pt-6 border-t border-line">
+          <div class="initials w-10 h-10 rounded-full flex items-center justify-center text-[13px] font-medium">TE</div>
+          <div>
+            <div class="text-[14px]">Tomás Errázuriz</div>
+            <div class="text-[12px] text-mute font-mono">Director · Pulpería del Puerto · Valparaíso</div>
+          </div>
+        </figcaption>
+      </figure>
+
+      <!-- T3 -->
+      <figure class="reveal card rounded-2xl p-8 flex flex-col">
+        <div class="flex items-center gap-1 text-gold mb-6">
+          <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
+        </div>
+        <blockquote class="text-[16px] leading-[1.55] text-paper/85 mb-8">
+          “Lo instalamos un martes. El viernes ya teníamos al equipo de cocina <span class="text-paper">sin imprimir un solo papel</span>. El KDS es lo mejor que probé en 12 años.”
+        </blockquote>
+        <figcaption class="mt-auto flex items-center gap-3 pt-6 border-t border-line">
+          <div class="initials w-10 h-10 rounded-full flex items-center justify-center text-[13px] font-medium">LB</div>
+          <div>
+            <div class="text-[14px]">Lucía Battaglia</div>
+            <div class="text-[12px] text-mute font-mono">Gerente · Bistró Mileto · Buenos Aires</div>
+          </div>
+        </figcaption>
+      </figure>
+
+    </div>
+
+    <!-- Metric strip -->
+    <div class="reveal mt-20 grid grid-cols-2 md:grid-cols-4 gap-px bg-line/70 border border-line/70 rounded-2xl overflow-hidden">
+      <div class="bg-layer1 p-8 text-center">
+        <div class="num-display text-[56px] leading-none gold-gradient-text">+38%</div>
+        <div class="eyebrow mt-3">Ticket promedio</div>
+      </div>
+      <div class="bg-layer1 p-8 text-center">
+        <div class="num-display text-[56px] leading-none gold-gradient-text">−6 min</div>
+        <div class="eyebrow mt-3">Tiempo de pase</div>
+      </div>
+      <div class="bg-layer1 p-8 text-center">
+        <div class="num-display text-[56px] leading-none gold-gradient-text">24/7</div>
+        <div class="eyebrow mt-3">Reservas activas</div>
+      </div>
+      <div class="bg-layer1 p-8 text-center">
+        <div class="num-display text-[56px] leading-none gold-gradient-text">820+</div>
+        <div class="eyebrow mt-3">Restaurantes en LATAM</div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- =================== PRICING =================== -->
+<section id="pricing" class="relative py-28 md:py-36 border-t border-line/60 bg-layer1/40">
+  <div class="max-w-[1280px] mx-auto px-6 lg:px-10">
+
+    <div class="text-center mb-16 md:mb-20">
+      <div class="reveal eyebrow mb-4">— Precios</div>
+      <h2 class="reveal text-[clamp(2rem,4.5vw,3.5rem)] tracking-tight2 leading-[1] font-medium max-w-[760px] mx-auto">
+        Un plan para cada momento <span class="font-serif italic gold-gradient-text">del oficio</span>.
+      </h2>
+      <p class="reveal mt-6 text-paper/60 text-[15px] max-w-[480px] mx-auto">
+        Empezás con 14 días gratis, sin tarjeta. Cambiás o cancelás cuando quieras.
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
+
+      <!-- Starter -->
+      <div class="reveal card rounded-2xl p-8 flex flex-col">
+        <div class="mb-8">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-[18px] font-medium">Starter</h3>
+            <span class="eyebrow">Para empezar</span>
+          </div>
+          <div class="flex items-baseline gap-1.5">
+            <span class="num-display text-[64px] leading-none">$49</span>
+            <span class="text-mute text-[14px]">/ mes</span>
+          </div>
+          <p class="text-paper/60 text-[13.5px] leading-[1.6] mt-4">Para restaurantes que están profesionalizando su operación. Hasta 1 local.</p>
+        </div>
+        <ul class="space-y-3 text-[14px] text-paper/80 mb-8 flex-1">
+          <li class="flex gap-2.5"><span class="text-gold mt-0.5">→</span> Pedidos en sala y barra</li>
+          <li class="flex gap-2.5"><span class="text-gold mt-0.5">→</span> Dashboard de ventas básico</li>
+          <li class="flex gap-2.5"><span class="text-gold mt-0.5">→</span> 1 estación KDS</li>
+          <li class="flex gap-2.5"><span class="text-gold mt-0.5">→</span> Hasta 3 usuarios</li>
+          <li class="flex gap-2.5"><span class="text-mute mt-0.5">—</span> <span class="text-mute">Agente de WhatsApp (extra)</span></li>
+        </ul>
+        <a href="#" class="btn-ghost rounded-full text-center py-3 text-[13.5px] font-medium">Probar 14 días</a>
+      </div>
+
+      <!-- Pro - HIGHLIGHTED -->
+      <div class="reveal pro-glow rounded-2xl p-8 flex flex-col lg:-mt-4 lg:mb-0">
+        <div class="flex items-center justify-between -mt-12 mb-6">
+          <span class="btn-gold rounded-full px-3 py-1 text-[11px] font-mono uppercase tracking-[.18em]">★ Más elegido</span>
+          <span class="eyebrow text-gold/80">Recomendado</span>
+        </div>
+        <div class="mb-8">
+          <h3 class="text-[18px] font-medium mb-4 flex items-center gap-2">
+            Pro
+            <span class="num-display italic text-mute text-[15px]">— el preferido del oficio</span>
+          </h3>
+          <div class="flex items-baseline gap-1.5">
+            <span class="num-display text-[72px] leading-none gold-gradient-text">$129</span>
+            <span class="text-mute text-[14px]">/ mes</span>
+          </div>
+          <p class="text-paper/70 text-[13.5px] leading-[1.6] mt-4">Para restaurantes con servicio constante que necesitan toda la plataforma funcionando junta.</p>
+        </div>
+        <ul class="space-y-3 text-[14px] text-paper/90 mb-8 flex-1">
+          <li class="flex gap-2.5"><span class="text-gold mt-0.5">→</span> <span><span class="text-paper">Todo en Starter</span>, más:</span></li>
+          <li class="flex gap-2.5"><span class="text-gold mt-0.5">→</span> Agente de WhatsApp incluido</li>
+          <li class="flex gap-2.5"><span class="text-gold mt-0.5">→</span> KDS multi-estación + tiempos de pase</li>
+          <li class="flex gap-2.5"><span class="text-gold mt-0.5">→</span> Inventario por receta + alertas</li>
+          <li class="flex gap-2.5"><span class="text-gold mt-0.5">→</span> Reportes avanzados + exportación contable</li>
+          <li class="flex gap-2.5"><span class="text-gold mt-0.5">→</span> Hasta 15 usuarios · 2 locales</li>
+        </ul>
+        <a href="#" class="btn-gold rounded-full text-center py-3 text-[13.5px] font-medium">Empezar con Pro</a>
+      </div>
+
+      <!-- Enterprise -->
+      <div class="reveal card rounded-2xl p-8 flex flex-col">
+        <div class="mb-8">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-[18px] font-medium">Enterprise</h3>
+            <span class="eyebrow">Grupos & cadenas</span>
+          </div>
+          <div class="flex items-baseline gap-1.5">
+            <span class="num-display text-[64px] leading-none">A medida</span>
+          </div>
+          <p class="text-paper/60 text-[13.5px] leading-[1.6] mt-4">Para grupos con múltiples marcas, hoteles o cadenas regionales. Integraciones, SLA y onboarding dedicado.</p>
+        </div>
+        <ul class="space-y-3 text-[14px] text-paper/80 mb-8 flex-1">
+          <li class="flex gap-2.5"><span class="text-gold mt-0.5">→</span> <span><span class="text-paper">Todo en Pro</span>, más:</span></li>
+          <li class="flex gap-2.5"><span class="text-gold mt-0.5">→</span> Locales y usuarios ilimitados</li>
+          <li class="flex gap-2.5"><span class="text-gold mt-0.5">→</span> SSO, auditoría y SLA 99.9%</li>
+          <li class="flex gap-2.5"><span class="text-gold mt-0.5">→</span> Integraciones con ERP y PMS hotelero</li>
+          <li class="flex gap-2.5"><span class="text-gold mt-0.5">→</span> Manager de cuenta dedicado</li>
+        </ul>
+        <a href="#" class="btn-ghost rounded-full text-center py-3 text-[13.5px] font-medium">Contactar ventas</a>
+      </div>
+
+    </div>
+
+    <p class="reveal text-center mt-10 text-[12.5px] text-mute font-mono">Precios en USD. Facturación mensual o anual (2 meses bonus). Sin costos de implementación.</p>
+  </div>
+</section>
+
+<!-- =================== FAQ =================== -->
+<section id="faq" class="relative py-28 md:py-36 border-t border-line/60">
+  <div class="max-w-[1100px] mx-auto px-6 lg:px-10">
+
+    <div class="grid md:grid-cols-[1fr,1.4fr] gap-12 md:gap-20">
+      <div class="reveal md:sticky md:top-28 self-start">
+        <div class="eyebrow mb-4">— Dudas frecuentes</div>
+        <h2 class="text-[clamp(2rem,4vw,3rem)] tracking-tight2 leading-[1] font-medium">
+          Lo que <span class="font-serif italic gold-gradient-text">nos preguntan</span> antes de probar.
+        </h2>
+        <p class="mt-6 text-paper/60 text-[15px] leading-[1.6]">
+          ¿No encontrás lo que buscás? Escribinos a
+          <a href="/cdn-cgi/l/email-protection#83ebecefe2c3e1eaf0f7f1ecaeecf0ade0ecee" class="text-gold hover:underline"><span class="__cf_email__" data-cfemail="4820272429082a213b3c3a2765273b662b2725">[email&#160;protected]</span></a>
+          y te respondemos el mismo día.
+        </p>
+      </div>
+
+      <div class="reveal divide-y divide-line">
+        <details class="group py-6">
+          <summary class="flex items-start justify-between gap-6">
+            <span class="text-[18px] font-medium tracking-tightish">¿Necesito hardware especial para empezar?</span>
+            <span class="faq-icon shrink-0 mt-1 w-6 h-6 rounded-full border border-line flex items-center justify-center text-gold">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+            </span>
+          </summary>
+          <div class="faq-body"><div class="pt-4 text-paper/70 text-[14.5px] leading-[1.7]">
+            No. Bistró OS corre en cualquier iPad, tablet Android, notebook o navegador moderno. Si tenés impresoras térmicas o cajones de dinero, los conectamos al setup inicial sin costo.
+          </div></div>
+        </details>
+
+        <details class="group py-6">
+          <summary class="flex items-start justify-between gap-6">
+            <span class="text-[18px] font-medium tracking-tightish">¿Cómo funciona el agente de WhatsApp?</span>
+            <span class="faq-icon shrink-0 mt-1 w-6 h-6 rounded-full border border-line flex items-center justify-center text-gold">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+            </span>
+          </summary>
+          <div class="faq-body"><div class="pt-4 text-paper/70 text-[14.5px] leading-[1.7]">
+            Te damos un número oficial de WhatsApp Business conectado a tu cuenta. El agente atiende reservas, lista de espera, consultas sobre el menú y horarios, y escala a un humano cuando hace falta. Lo entrenás con el tono de tu restaurante en menos de una hora.
+          </div></div>
+        </details>
+
+        <details class="group py-6">
+          <summary class="flex items-start justify-between gap-6">
+            <span class="text-[18px] font-medium tracking-tightish">¿Puedo cambiar o cancelar el plan en cualquier momento?</span>
+            <span class="faq-icon shrink-0 mt-1 w-6 h-6 rounded-full border border-line flex items-center justify-center text-gold">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+            </span>
+          </summary>
+          <div class="faq-body"><div class="pt-4 text-paper/70 text-[14.5px] leading-[1.7]">
+            Sí. Subís, bajás o pausás tu plan desde el panel. No hay permanencia mínima, ni cargos por cancelación. Si pagaste anual, prorrateamos lo que queda.
+          </div></div>
+        </details>
+
+        <details class="group py-6">
+          <summary class="flex items-start justify-between gap-6">
+            <span class="text-[18px] font-medium tracking-tightish">¿Qué pasa con mis datos si me voy?</span>
+            <span class="faq-icon shrink-0 mt-1 w-6 h-6 rounded-full border border-line flex items-center justify-center text-gold">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+            </span>
+          </summary>
+          <div class="faq-body"><div class="pt-4 text-paper/70 text-[14.5px] leading-[1.7]">
+            Son tuyos, siempre. Exportás ventas, clientes, recetas y reportes en CSV o por API en cualquier momento. Si cancelás, mantenemos tus datos 90 días por si volvés, y después se borran.
+          </div></div>
+        </details>
+
+        <details class="group py-6">
+          <summary class="flex items-start justify-between gap-6">
+            <span class="text-[18px] font-medium tracking-tightish">¿Ofrecen soporte en español y en mi país?</span>
+            <span class="faq-icon shrink-0 mt-1 w-6 h-6 rounded-full border border-line flex items-center justify-center text-gold">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+            </span>
+          </summary>
+          <div class="faq-body"><div class="pt-4 text-paper/70 text-[14.5px] leading-[1.7]">
+            Todo el equipo de soporte es nativo en español, con presencia en México, Argentina, Chile, Colombia y Perú. Atención por WhatsApp, mail y video, de 8 a 24h hora local — porque sabemos a qué hora abren las cocinas.
+          </div></div>
+        </details>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =================== FINAL CTA =================== -->
+<section class="relative py-28 md:py-36 border-t border-line/60 overflow-hidden">
+  <div aria-hidden="true" class="absolute inset-0 pointer-events-none">
+    <div class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[500px] rounded-full"
+         style="background: radial-gradient(closest-side, rgba(232,184,99,.18), rgba(232,184,99,0) 70%);"></div>
+  </div>
+  <div class="relative max-w-[900px] mx-auto px-6 lg:px-10 text-center">
+    <h2 class="reveal text-[clamp(2.4rem,6vw,5rem)] tracking-tight3 leading-[1] font-medium">
+      Tu próximo servicio puede empezar <span class="font-serif italic gold-gradient-text">distinto</span>.
+    </h2>
+    <p class="reveal mt-8 text-paper/65 text-[16px] max-w-[520px] mx-auto leading-[1.6]">
+      14 días para probarlo en vivo, con tu carta y tu equipo. Si no rinde, no pasa nada. Si rinde, no hay vuelta atrás.
+    </p>
+    <div class="reveal mt-10 flex flex-col sm:flex-row items-center justify-center gap-3">
+      <a href="#" class="btn-gold rounded-full px-6 py-3.5 text-[14px] font-medium inline-flex items-center gap-2">
+        Probar 14 días gratis
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+      </a>
+      <a href="#" class="btn-ghost rounded-full px-6 py-3.5 text-[14px] font-medium">Hablar con el equipo</a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- =================== FOOTER =================== -->
+<footer class="border-t border-line/60 bg-ink">
+  <div class="max-w-[1280px] mx-auto px-6 lg:px-10 py-16">
+
+    <div class="grid grid-cols-2 md:grid-cols-12 gap-10">
+      <div class="col-span-2 md:col-span-5">
+        <a href="#top" class="flex items-center gap-2.5">
+          <span class="relative inline-block w-7 h-7">
+            <span class="absolute inset-0 rounded-full border border-gold/70"></span>
+            <span class="absolute inset-1.5 rounded-full bg-gold"></span>
+          </span>
+          <span class="text-[18px] tracking-tightish"><span class="font-medium">Bistró</span> <span class="text-mute">OS</span></span>
+        </a>
+        <p class="mt-5 text-paper/60 text-[14px] leading-[1.6] max-w-[320px]">
+          El sistema operativo del restaurante moderno. Hecho en LATAM, para LATAM — y para cualquier cocina que se tome el oficio en serio.
+        </p>
+        <div class="mt-8 flex items-center gap-3">
+          <a href="#" aria-label="Instagram" class="w-9 h-9 rounded-full border border-line flex items-center justify-center text-paper/60 hover:text-gold hover:border-gold/60 transition-colors duration-200">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r=".8" fill="currentColor"/></svg>
+          </a>
+          <a href="#" aria-label="LinkedIn" class="w-9 h-9 rounded-full border border-line flex items-center justify-center text-paper/60 hover:text-gold hover:border-gold/60 transition-colors duration-200">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M4.98 3.5a2.5 2.5 0 1 1 0 5.001 2.5 2.5 0 0 1 0-5zM3 9h4v12H3zM10 9h3.8v1.7h.06c.53-1 1.83-2.05 3.77-2.05 4.03 0 4.77 2.65 4.77 6.09V21h-4v-5.4c0-1.29-.02-2.95-1.8-2.95-1.8 0-2.07 1.4-2.07 2.85V21h-4z"/></svg>
+          </a>
+          <a href="#" aria-label="X" class="w-9 h-9 rounded-full border border-line flex items-center justify-center text-paper/60 hover:text-gold hover:border-gold/60 transition-colors duration-200">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24h-6.65l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+          </a>
+        </div>
+      </div>
+
+      <div class="md:col-span-2">
+        <div class="eyebrow mb-5">Producto</div>
+        <ul class="space-y-3 text-[14px] text-paper/70">
+          <li><a href="#features" class="hover:text-gold transition-colors">Plataforma</a></li>
+          <li><a href="#how" class="hover:text-gold transition-colors">Cómo funciona</a></li>
+          <li><a href="#pricing" class="hover:text-gold transition-colors">Precios</a></li>
+          <li><a href="#" class="hover:text-gold transition-colors">Changelog</a></li>
+        </ul>
+      </div>
+
+      <div class="md:col-span-2">
+        <div class="eyebrow mb-5">Compañía</div>
+        <ul class="space-y-3 text-[14px] text-paper/70">
+          <li><a href="#" class="hover:text-gold transition-colors">Sobre nosotros</a></li>
+          <li><a href="#" class="hover:text-gold transition-colors">Clientes</a></li>
+          <li><a href="#" class="hover:text-gold transition-colors">Carreras</a></li>
+          <li><a href="#" class="hover:text-gold transition-colors">Prensa</a></li>
+        </ul>
+      </div>
+
+      <div class="md:col-span-3">
+        <div class="eyebrow mb-5">Boletín semanal</div>
+        <p class="text-[13.5px] text-paper/60 leading-[1.6] mb-4">Recetas de gestión, números reales y una idea por semana para mejorar tu servicio.</p>
+        <form class="flex items-center gap-2 bg-layer1 border border-line rounded-full p-1 pl-4 focus-within:border-gold/60 transition-colors">
+          <input type="email" placeholder="tucorreo@restaurante.com" class="bg-transparent flex-1 text-[13px] outline-none placeholder:text-mute" />
+          <button class="btn-gold rounded-full px-3.5 py-1.5 text-[12.5px] font-medium">Suscribirme</button>
+        </form>
+      </div>
+    </div>
+
+    <div class="hair mt-14"></div>
+    <div class="mt-6 flex flex-col md:flex-row gap-4 md:items-center md:justify-between text-[12.5px] text-mute font-mono">
+      <div>© 2026 Bistró OS — Hecho con cariño en Buenos Aires, CDMX y Santiago.</div>
+      <div class="flex flex-wrap gap-5">
+        <a href="#" class="hover:text-gold transition-colors">Términos</a>
+        <a href="#" class="hover:text-gold transition-colors">Privacidad</a>
+        <a href="#" class="hover:text-gold transition-colors">Estado del sistema</a>
+      </div>
+    </div>
+
+  </div>
+</footer>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+  // Reveal on scroll
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach((e) => {
+      if (e.isIntersecting) {
+        e.target.classList.add('in');
+        io.unobserve(e.target);
+      }
+    });
+  }, { rootMargin: '0px 0px -8% 0px', threshold: 0.05 });
+  document.querySelectorAll('.reveal').forEach((el) => io.observe(el));
+
+  // FAQ: close others when opening one
+  document.querySelectorAll('#faq details').forEach((d) => {
+    d.addEventListener('toggle', () => {
+      if (d.open) {
+        document.querySelectorAll('#faq details').forEach((o) => { if (o !== d) o.open = false; });
+      }
+    });
+  });
+</script>
+</body>
+</html>

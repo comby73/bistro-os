@@ -1,0 +1,13 @@
+{
+  "name": "Bistro OS - Reservation Flow",
+  "purpose": "Recibir reservas desde WhatsApp o formulario y guardarlas en Supabase.",
+  "steps": [
+    "Webhook recibe solicitud",
+    "Validar fecha, hora, nombre y cantidad de personas",
+    "Consultar disponibilidad",
+    "Guardar reservation",
+    "Registrar event",
+    "Responder confirmación o derivar a humano"
+  ],
+  "agent_prompt": "prompts/agents/whatsapp-reservas.md"
+}

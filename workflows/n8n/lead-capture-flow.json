@@ -1,0 +1,57 @@
+{
+  "name": "Bistro OS - Lead Capture Flow",
+  "nodes": [
+    {
+      "id": "webhook-lead",
+      "name": "Webhook - Demo Request",
+      "type": "n8n-nodes-base.webhook",
+      "notes": "Recibe datos del formulario /demo."
+    },
+    {
+      "id": "validate-fields",
+      "name": "Validate Required Fields",
+      "type": "n8n-nodes-base.function",
+      "notes": "Valida restaurant_name, owner_name, email, whatsapp y plan_interest."
+    },
+    {
+      "id": "supabase-insert-lead",
+      "name": "Supabase - Insert Lead",
+      "type": "n8n-nodes-base.supabase",
+      "notes": "Inserta registro en tabla leads."
+    },
+    {
+      "id": "ai-classify-lead",
+      "name": "AI - Classify Lead",
+      "type": "n8n-nodes-base.openAi",
+      "notes": "Usa prompt prompts/agents/agente-comercial.md para clasificar el lead."
+    },
+    {
+      "id": "notify-internal",
+      "name": "Email - Notify Sales",
+      "type": "n8n-nodes-base.emailSend",
+      "notes": "Envía notificación interna al equipo comercial."
+    },
+    {
+      "id": "insert-event",
+      "name": "Supabase - Insert Event",
+      "type": "n8n-nodes-base.supabase",
+      "notes": "Registra evento lead_created en events."
+    }
+  ],
+  "connections": {
+    "Webhook - Demo Request": [
+      "Validate Required Fields"
+    ],
+    "Validate Required Fields": [
+      "Supabase - Insert Lead"
+    ],
+    "Supabase - Insert Lead": [
+      "AI - Classify Lead"
+    ],
+    "AI - Classify Lead": [
+      "Email - Notify Sales",
+      "Supabase - Insert Event"
+    ]
+  },
+  "credentials": "No incluir credenciales reales. Usar variables de entorno."
+}
