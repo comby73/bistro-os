@@ -19,8 +19,8 @@ El foco actual ya no es la landing comercial, sino el sistema interno: roles dem
 |---|---|
 | `owner` | Ver dashboard, ventas/caja, pedidos, reservas, cocina y menú |
 | `admin` | Ver dashboard, ventas/caja, pedidos, reservas, cocina y menú |
-| `manager` | Ver dashboard, ventas/caja en solo lectura, pedidos y reservas |
-| `waiter` | Usar `/orders` en modo servicio para cargar pedidos y enviarlos a cocina |
+| `manager` | Ver dashboard, ventas/caja en solo lectura, pedidos, reservas y menú en supervisión |
+| `waiter` | Usar `/orders` en modo servicio y consultar `/menu` en formato rápido |
 | `kitchen` | Usar `/kitchen` como KDS con tickets grandes y acciones de avance |
 
 ## Rutas principales
@@ -33,7 +33,7 @@ El foco actual ya no es la landing comercial, sino el sistema interno: roles dem
 | `/orders` | Pedidos activos + creación de pedido demo |
 | `/kitchen` | KDS demo con avance de estados |
 | `/reservations` | Gestión operativa de reservas con store demo |
-| `/menu` | Carta digital / referencia operativa |
+| `/menu` | Carta operativa con disponibilidad persistida en demo |
 | `/sales` | Ventas y caja simulada |
 | `/demo` | Formulario comercial / lead demo |
 
@@ -47,7 +47,7 @@ El foco actual ya no es la landing comercial, sino el sistema interno: roles dem
 - Cocina.
 - Reservas.
 - Reservas operativas con filtros y estados.
-- Menú.
+- Menú operativo con disponibilidad y destacados persistidos en `localStorage`.
 - Ventas y caja simulada.
 - Captura de leads demo con automatización opcional.
 

@@ -7,7 +7,7 @@
 - `/orders` con modo servicio para mozo.
 - `/kitchen` con tablero KDS simple.
 - `/reservations` como módulo operativo con persistencia demo local.
-- `/menu` con datos mock.
+- `/menu` como carta operativa con disponibilidad persistida localmente.
 - `/sales` como ventas y caja operativa simulada.
 - `/dashboard` alimentado por stores demo de pedidos y reservas.
 - `localStorage` como persistencia temporal de demo.
@@ -27,6 +27,13 @@
 - Relacionar reservas con mesas, turnos y estados.
 - Mejorar la lectura operativa para manager y owner.
 - Mantener localStorage hasta Fase 4.
+
+## Fase 3D — Menú operativo
+
+- Convertir `/menu` en carta operativa por rol.
+- Compartir disponibilidad entre menú y toma de pedidos.
+- Permitir edición demo de disponibilidad y destacados para owner/admin.
+- Mantener a manager en modo supervisión y a waiter en modo consulta rápida.
 
 ## Fase 4 — Supabase real
 

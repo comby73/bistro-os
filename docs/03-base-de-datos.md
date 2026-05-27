@@ -74,6 +74,15 @@ La entidad `reservations` ya tiene equivalente funcional en la demo actual y est
 - `menu_items`
 - `menu_item_modifiers`
 
+Para el menú operativo actual, `menu_items` ya anticipa atributos como:
+
+- `available`
+- `featured`
+- `base_price`
+- relación con `menu_categories`
+
+Hoy esos flags viven en `localStorage` para demo y son consumidos tanto por `/menu` como por `/orders`.
+
 ### 3. Caja y ventas operativas
 
 - `sales`

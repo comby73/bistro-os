@@ -1,4 +1,5 @@
-import { menuItems } from "@/features/menu/mock-data";
+import { menuItems as seedMenuItems } from "@/features/menu/mock-data";
+import type { MenuItem } from "@/features/menu/types";
 import type { KitchenStation } from "@/features/kitchen/types";
 import { orders as seedOrders } from "./mock-data";
 import type {
@@ -55,7 +56,10 @@ export function getOrderTotal(order: Order): number {
   return order.items.reduce((sum, item) => sum + item.unit_price * item.quantity, 0);
 }
 
-export function buildOrderFromInput(input: CreateOrderInput): Order {
+export function buildOrderFromInput(
+  input: CreateOrderInput,
+  menuItems: MenuItem[] = seedMenuItems
+): Order {
   const normalizedItems = input.items
     .map((selectedItem) => {
       const menuItem = menuItems.find((item) => item.id === selectedItem.menu_item_id);

@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useSyncExternalStore } from "react";
+import { readMenuItemsSnapshot } from "@/features/menu/demo-store";
 import {
   buildOrderFromInput,
   getInitialOrders,
@@ -73,7 +74,7 @@ export function useDemoOrders() {
   }, []);
 
   const createOrder = useCallback((input: CreateOrderInput) => {
-    const nextOrder = buildOrderFromInput(input);
+    const nextOrder = buildOrderFromInput(input, readMenuItemsSnapshot());
     const currentOrders = readOrdersSnapshot();
 
     writeOrdersSnapshot(sortOrdersByNewest([nextOrder, ...currentOrders]));

@@ -19,6 +19,7 @@ La demo valida calidad con:
 - badges de reservas,
 - cálculos de reservas desacoplados de la UI,
 - cálculos de dashboard derivados de stores demo,
+- cálculos de menú para disponibilidad, filtros y agrupación,
 - permisos por rol,
 - cálculos de ventas,
 - cálculos de pedidos.
@@ -35,6 +36,7 @@ npm run build
 
 - que los contratos básicos de datos no se rompan,
 - que los roles mantengan sus permisos esperados,
+- que `/menu` conserve su lectura operativa por rol y sus cálculos base,
 - que `/sales` conserve sus cálculos mock,
 - que el flujo operativo siga compilando y pasando tipado.
 

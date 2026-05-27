@@ -18,6 +18,7 @@ describe("role configs", () => {
     expect(isRouteAllowed("owner", "/sales")).toBe(true);
     expect(isRouteAllowed("admin", "/sales")).toBe(true);
     expect(isRouteAllowed("manager", "/sales")).toBe(true);
+    expect(isRouteAllowed("manager", "/menu")).toBe(true);
     expect(isRouteAllowed("waiter", "/orders")).toBe(true);
     expect(isRouteAllowed("waiter", "/menu")).toBe(true);
     expect(isRouteAllowed("waiter", "/sales")).toBe(false);
@@ -33,7 +34,8 @@ describe("role configs", () => {
       "/dashboard",
       "/sales",
       "/reservations",
-      "/orders"
+      "/orders",
+      "/menu"
     ]);
     expect(roleConfigs.waiter.navigation.map((item) => item.href)).toEqual([
       "/orders",

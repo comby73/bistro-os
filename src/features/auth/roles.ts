@@ -41,8 +41,8 @@ export const roleConfigs: Record<RoleId, RoleConfig> = {
     id: "manager",
     label: "Jefe de sala",
     description: "Controla el servicio, el ritmo del salón y la gestión de reservas.",
-    allowedRoutes: ["/dashboard", "/sales", "/reservations", "/orders"],
-    navigation: [DASHBOARD_NAV, SALES_NAV, RESERVATIONS_NAV, ORDERS_NAV]
+    allowedRoutes: ["/dashboard", "/sales", "/reservations", "/orders", "/menu"],
+    navigation: [DASHBOARD_NAV, SALES_NAV, RESERVATIONS_NAV, ORDERS_NAV, MENU_NAV]
   },
   waiter: {
     id: "waiter",

@@ -13,7 +13,8 @@ export const menuItems: MenuItem[] = [
     name: "Tartar de atún rojo",
     description: "Palta, sésamo, soja cítrica.",
     price: 28,
-    available: true
+    available: true,
+    featured: true
   },
   {
     id: "item-2",
@@ -21,7 +22,8 @@ export const menuItems: MenuItem[] = [
     name: "Risotto de hongos",
     description: "Hongos de estación, parmesano, aceite de trufa.",
     price: 24,
-    available: true
+    available: true,
+    featured: false
   },
   {
     id: "item-4",
@@ -29,7 +31,8 @@ export const menuItems: MenuItem[] = [
     name: "Cordero patagónico",
     description: "Puré ahumado, jugo reducido, hierbas de temporada.",
     price: 38,
-    available: true
+    available: true,
+    featured: true
   },
   {
     id: "item-3",
@@ -37,6 +40,7 @@ export const menuItems: MenuItem[] = [
     name: "Negroni de la casa",
     description: "Gin, bitter, vermut rojo, naranja.",
     price: 12,
-    available: true
+    available: true,
+    featured: false
   }
 ];

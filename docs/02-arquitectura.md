@@ -44,7 +44,7 @@ La misma lógica de negocio puede renderizar experiencias distintas por rol sin 
 |---|---|
 | `owner` | dashboard, sales, orders, reservations, kitchen, menu |
 | `admin` | dashboard, sales, orders, reservations, kitchen, menu |
-| `manager` | dashboard, sales solo lectura, reservations, orders |
+| `manager` | dashboard, sales solo lectura, reservations, orders, menu supervisión |
 | `waiter` | orders, menu, dashboard contextual |
 | `kitchen` | kitchen, dashboard contextual |
 
@@ -67,7 +67,7 @@ La misma lógica de negocio puede renderizar experiencias distintas por rol sin 
 - `orders`: carga y seguimiento de pedidos.
 - `kitchen`: KDS demo y avance de estados.
 - `reservations`: módulo operativo con store demo, filtros y acciones de estado.
-- `menu`: carta digital operativa.
+- `menu`: carta operativa con disponibilidad y destacados persistidos en modo demo.
 - `sales`: ventas y caja simulada.
 - `leads`: formulario comercial con automatización opcional.
 
@@ -81,7 +81,9 @@ Como referencia conceptual, Bistró OS se alinea con la separación clásica ent
 Aplicado al estado actual del proyecto:
 
 - `waiter` opera FOH rápido desde `/orders`.
+- `waiter` consulta disponibilidad real del turno desde `/menu`.
 - `manager` coordina FOH desde dashboard, reservas y supervisión de pedidos.
+- `manager` supervisa la carta activa sin editarla.
 - `kitchen` opera BOH desde `/kitchen` como KDS.
 - `owner` y `admin` observan el conjunto con foco de gestión.
 

@@ -1,7 +1,8 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { menuCategories, menuItems } from "@/features/menu/mock-data";
+import { useDemoMenu } from "@/features/menu/demo-store";
+import { menuCategories } from "@/features/menu/mock-data";
 import { getOrderTotal } from "@/features/orders/calculations";
 import { useDemoOrders } from "@/features/orders/demo-store";
 import type { Order } from "@/features/orders/types";
@@ -15,6 +16,7 @@ function getDraftStation(categoryId: string, itemId: string) {
 
 export function OrderComposer({ defaultWaiterName }: { defaultWaiterName: string }) {
   const { createOrder, orders } = useDemoOrders();
+  const { items: menuItems } = useDemoMenu();
   const [table, setTable] = useState("");
   const [waiterName, setWaiterName] = useState(defaultWaiterName);
   const [notes, setNotes] = useState("");
@@ -31,7 +33,7 @@ export function OrderComposer({ defaultWaiterName }: { defaultWaiterName: string
           ...item,
           quantity: quantities[item.id]
         })),
-    [quantities]
+    [menuItems, quantities]
   );
 
   const visibleProducts = useMemo(() => {
@@ -46,7 +48,7 @@ export function OrderComposer({ defaultWaiterName }: { defaultWaiterName: string
 
       return item.available && matchesCategory && matchesSearch;
     });
-  }, [activeCategoryId, search]);
+  }, [activeCategoryId, menuItems, search]);
 
   const draftOrder = useMemo<Order>(
     () => ({
