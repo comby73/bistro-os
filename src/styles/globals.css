@@ -50,4 +50,51 @@ body {
   .gold-gradient-text {
     @apply bg-gradient-to-b from-goldhi via-gold to-golddim bg-clip-text text-transparent;
   }
+
+  .brand-logo-shell {
+    @apply relative inline-block overflow-hidden;
+  }
+
+  .brand-logo-shell::after {
+    content: "";
+    position: absolute;
+    inset: -20%;
+    background: linear-gradient(
+      115deg,
+      transparent 30%,
+      rgba(244, 239, 230, 0.05) 42%,
+      rgba(232, 184, 99, 0.36) 50%,
+      rgba(244, 239, 230, 0.08) 58%,
+      transparent 70%
+    );
+    transform: translateX(-145%) skewX(-18deg);
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .brand-logo-shell:hover::after {
+    opacity: 1;
+    animation: brand-logo-shine 880ms ease;
+  }
+
+  .brand-logo-image {
+    filter: drop-shadow(0 0 20px rgba(232, 184, 99, 0.08));
+  }
+}
+
+@keyframes brand-logo-shine {
+  0% {
+    transform: translateX(-145%) skewX(-18deg);
+  }
+
+  100% {
+    transform: translateX(145%) skewX(-18deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .brand-logo-shell:hover::after {
+    animation: none;
+    opacity: 0;
+  }
 }

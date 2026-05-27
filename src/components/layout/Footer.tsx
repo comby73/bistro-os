@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { BrandLogo } from "@/components/brand/BrandLogo";
 
 export function Footer() {
   return (
@@ -6,14 +7,8 @@ export function Footer() {
       <div className="bistro-container py-14">
         <div className="grid gap-10 md:grid-cols-12">
           <div className="md:col-span-5">
-            <Link href="/" className="flex items-center gap-2.5">
-              <span className="relative inline-block h-7 w-7">
-                <span className="absolute inset-0 rounded-full border border-gold/70" />
-                <span className="absolute inset-2 rounded-full bg-gold" />
-              </span>
-              <span className="text-lg tracking-tight">
-                <strong>Bistró</strong> <span className="text-mute">OS</span>
-              </span>
+            <Link href="/" className="inline-flex items-center">
+              <BrandLogo size="md" />
             </Link>
             <p className="mt-5 max-w-sm text-sm leading-6 text-paper/60">
               Sistema operativo para restaurantes modernos: pedidos, reservas, cocina,
