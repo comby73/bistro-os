@@ -57,6 +57,12 @@ El foco actual ya no es la landing comercial, sino el sistema interno: roles dem
 - **n8n**: integración opcional/no bloqueante.
 - **Facturación fiscal**: no implementada. `/sales` representa solo facturación operativa simulada.
 
+## Estado de backend
+
+- La app sigue usando `mock-data` + `localStorage`.
+- `supabase/schema.sql` ya modela el backend futuro de forma más completa.
+- La migración real a Supabase será incremental por módulo, no un reemplazo total de una vez.
+
 ## Cómo correr el proyecto
 
 ```bash

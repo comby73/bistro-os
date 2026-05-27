@@ -26,9 +26,12 @@ Rutas App Router
 → Componentes de UI
 → Features (tipos, cálculos, stores demo, acciones)
 → Persistencia local temporal
+→ Adaptadores de datos por módulo
 → Supabase futuro
 → Automatizaciones opcionales (n8n)
 ```
+
+La siguiente transición arquitectónica no reemplaza la UI: reemplaza gradualmente la fuente de datos por módulo.
 
 ## Modos visuales
 
@@ -108,3 +111,20 @@ Sin implementarlas todavía, la arquitectura deja espacio para:
 - La app debe operar aunque n8n no exista o falle.
 - Supabase todavía no persiste el estado operativo.
 - El patrón actual favorece reemplazar stores demo por Supabase en Fase 4 sin rehacer la UI completa.
+
+## Estrategia de migración a Supabase
+
+La migración prevista es incremental:
+
+1. mantener `src` operando con `localStorage` mientras se valida el modelo SQL,
+2. conectar primero módulos de bajo riesgo,
+3. dejar pedidos/cocina para cuando ya exista un patrón estable de lectura/escritura,
+4. formalizar auth real y RLS al final de la secuencia.
+
+Orden esperado:
+
+- Fase 4B: `menu`
+- Fase 4C: `reservations`
+- Fase 4D: `orders` + `kitchen`
+- Fase 4E: `dashboard`
+- Fase 4F: auth real + RLS multi-tenant serio
