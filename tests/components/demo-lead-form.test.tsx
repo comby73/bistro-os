@@ -29,7 +29,8 @@ describe("DemoLeadForm", () => {
     vi.spyOn(actions, "submitLead").mockResolvedValue({
       ok: true,
       message: "Solicitud recibida.",
-      data: mockData
+      data: mockData,
+      automationStatus: { status: "sent" }
     });
 
     render(<DemoLeadForm />);
@@ -44,7 +45,8 @@ describe("DemoLeadForm", () => {
     vi.spyOn(actions, "submitLead").mockResolvedValue({
       ok: false,
       message: "Revisá los campos del formulario.",
-      fieldErrors: { email: ["Ingresá un email válido."] }
+      fieldErrors: { email: ["Ingresá un email válido."] },
+      automationStatus: { status: "skipped", reason: "Validation failed before automation." }
     });
 
     render(<DemoLeadForm />);
@@ -59,7 +61,16 @@ describe("DemoLeadForm", () => {
     vi.spyOn(actions, "submitLead").mockImplementation(
       () =>
         new Promise((resolve) =>
-          setTimeout(() => resolve({ ok: true, message: "ok", data: mockData }), 100)
+          setTimeout(
+            () =>
+              resolve({
+                ok: true,
+                message: "ok",
+                data: mockData,
+                automationStatus: { status: "sent" }
+              }),
+            100
+          )
         )
     );
 

@@ -1,5 +1,13 @@
 # 04 — Automatizaciones n8n
 
+## Enfoque actual
+
+- n8n es una capa externa opcional para automatizaciones.
+- Bistró OS no depende de n8n para aceptar solicitudes de demo.
+- Si `N8N_LEAD_WEBHOOK_URL` no está definida, la app sigue operando y omite la notificación.
+- Si n8n falla, la Server Action devuelve éxito funcional y reporta `automationStatus` para debug.
+- En la fase futura con Supabase, la solicitud no se perderá aunque n8n esté caído porque el dato persistirá antes de automatizarse.
+
 ## Workflow principal: captura de lead
 
 ### Caso
@@ -28,6 +36,7 @@ Un restaurante solicita una demo desde la landing page de Bistró OS.
 ### Variables necesarias
 
 ```env
+# Opcional
 N8N_LEAD_WEBHOOK_URL=http://localhost:5678/webhook-test/bistro-lead
 ```
 
@@ -45,9 +54,11 @@ DemoLeadForm.tsx (Client Component)
        ▼
 actions.ts (Server Action — corre en Node.js)
   ├─ Valida con Zod
-  ├─ Lee process.env.N8N_LEAD_WEBHOOK_URL  ← solo disponible server-side
-  ├─ Si URL existe → POST al webhook de n8n
-  └─ Si URL no existe → mock con mensaje de desarrollo
+  ├─ Llama notifyLeadAutomation()
+  │    ├─ Si no hay URL → skipped
+  │    ├─ Si n8n responde OK → sent
+  │    └─ Si n8n falla → failed
+  └─ Devuelve éxito del submit aunque la automatización falle
 ```
 
 ### Por qué `"use server"` resuelve el problema
@@ -126,13 +137,19 @@ npm run dev
 
 ### Verificar la respuesta
 
-El Server Action de Next.js recibe la respuesta de n8n. Si HTTP 200, el formulario muestra "¡Gracias! Nos ponemos en contacto a la brevedad." Si el webhook no responde o devuelve error, el formulario muestra el mensaje de error correspondiente.
+El Server Action de Next.js siempre resuelve el submit si la validación del formulario fue correcta. La diferencia queda expuesta en `automationStatus`:
+
+| Estado | Significado |
+|---|---|
+| `skipped` | No hay `N8N_LEAD_WEBHOOK_URL` configurada |
+| `sent` | El webhook respondió HTTP 2xx |
+| `failed` | Hubo error de red o respuesta HTTP no exitosa |
 
 ---
 
 ## Formato del JSON que Next.js envía a n8n
 
-Payload del `POST` generado por `submitLead()` en `src/features/leads/actions.ts`:
+Payload del `POST` generado por `notifyLeadAutomation()` en [`src/lib/automation/n8n.ts`](/c:/Users/comby/OneDrive/Escritorio/bistro-os/src/lib/automation/n8n.ts):
 
 ```json
 {
@@ -151,7 +168,23 @@ Payload del `POST` generado por `submitLead()` en `src/features/leads/actions.ts
 Campos obligatorios: `restaurant_name`, `owner_name`, `email`, `whatsapp`, `plan_interest`.  
 Campo opcional: `message`.
 
-## Formato del JSON que n8n devuelve a Next.js
+## Formato del resultado de automatización que vuelve a la app
+
+La app no depende del body de n8n para completar el submit. Internamente maneja este contrato:
+
+```json
+{ "status": "skipped", "reason": "N8N_LEAD_WEBHOOK_URL is not configured." }
+```
+
+```json
+{ "status": "sent" }
+```
+
+```json
+{ "status": "failed", "reason": "n8n webhook responded with HTTP 500." }
+```
+
+## Formato del JSON que n8n puede devolver a Next.js
 
 Respuesta del nodo **"Respond to Webhook"**:
 
@@ -169,7 +202,7 @@ Respuesta del nodo **"Respond to Webhook"**:
 | `lead_score` | `"low"`, `"medium"`, `"high"` | Enterprise o > 40 mesas → high; Pro o > 15 → medium; resto → low |
 | `next_action` | `"send_info"`, `"schedule_demo"`, `"schedule_call"` | Coincide con lead_score |
 
-> Next.js solo verifica `response.ok` (HTTP 2xx). El body de respuesta no es procesado todavía, pero está disponible para Fase 3 (guardar clasificación en Supabase).
+> La app solo verifica `response.ok` (HTTP 2xx). El body de respuesta no es procesado todavía, pero puede aprovecharse en una fase futura.
 
 ---
 
@@ -177,10 +210,10 @@ Respuesta del nodo **"Respond to Webhook"**:
 
 | Entorno | `N8N_LEAD_WEBHOOK_URL` | Comportamiento |
 |---|---|---|
-| Desarrollo sin n8n | no definida | Mock: respuesta simulada en 300 ms |
-| Desarrollo con n8n local (test) | `webhook-test/bistro-lead` | POST real, workflow visible en pantalla |
-| Desarrollo con n8n local (activo) | `webhook/bistro-lead` | POST real, workflow activado |
-| Producción | URL de instancia n8n en la nube | POST real en producción |
+| Desarrollo sin n8n | no definida | Submit exitoso + `automationStatus: skipped` |
+| Desarrollo con n8n local (test) | `webhook-test/bistro-lead` | Submit exitoso + POST real al workflow en prueba |
+| Desarrollo con n8n local (activo) | `webhook/bistro-lead` | Submit exitoso + POST real al workflow activado |
+| Producción | URL de instancia n8n en la nube | Submit exitoso; n8n actúa como integración externa |
 
 ---
 
@@ -189,7 +222,7 @@ Respuesta del nodo **"Respond to Webhook"**:
 | Fase | Estado | Descripción |
 |---|---|---|
 | Fase 2B | ✅ Actual | Webhook → Normalizar → Validar → Clasificar heurística → Responder |
-| Fase 3 | Pendiente | Agregar nodo Supabase Insert Lead después de Classify Lead |
+| Fase 3 | Pendiente | Persistir lead en Supabase antes de automatizaciones externas |
 | Fase 3 | Pendiente | Reemplazar Classify Lead heurístico por llamada a OpenAI (`prompts/agents/agente-comercial.md`) |
 | Fase 3 | Pendiente | Agregar Email Notify Sales después de clasificación |
 | Fase 3 | Pendiente | Agregar Supabase Insert Event al final del flujo |
