@@ -8,6 +8,7 @@ El foco actual ya no es la landing comercial, sino el sistema interno: roles dem
 - App interna para operación de restaurante.
 - Navegación y acceso por rol demo.
 - Módulos funcionales conectados entre sí con datos mock.
+- Modos visuales diferenciados para gestión, servicio y cocina.
 - Integraciones reales todavía desacopladas:
   - Supabase queda preparado como persistencia futura.
   - n8n queda como automatización opcional y no bloqueante.
@@ -19,8 +20,8 @@ El foco actual ya no es la landing comercial, sino el sistema interno: roles dem
 | `owner` | Ver dashboard, ventas/caja, pedidos, reservas, cocina y menú |
 | `admin` | Ver dashboard, ventas/caja, pedidos, reservas, cocina y menú |
 | `manager` | Ver dashboard, ventas/caja en solo lectura, pedidos y reservas |
-| `waiter` | Crear pedidos en `/orders` y consultar menú |
-| `kitchen` | Operar cocina en `/kitchen` |
+| `waiter` | Usar `/orders` en modo servicio para cargar pedidos y enviarlos a cocina |
+| `kitchen` | Usar `/kitchen` como KDS con tickets grandes y acciones de avance |
 
 ## Rutas principales
 

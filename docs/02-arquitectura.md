@@ -30,6 +30,14 @@ Rutas App Router
 → Automatizaciones opcionales (n8n)
 ```
 
+## Modos visuales
+
+- Modo Gestión: `owner`, `admin`, `manager`.
+- Modo Servicio: `waiter` en `/orders`.
+- Modo Cocina: `kitchen` en `/kitchen`.
+
+La misma lógica de negocio puede renderizar experiencias distintas por rol sin duplicar el store demo.
+
 ## Roles implementados
 
 | Rol | Rutas / módulos actuales |

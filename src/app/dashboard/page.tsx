@@ -61,11 +61,27 @@ export default async function DashboardPage() {
 
             <div className="grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">
               <OrdersTable />
-              <section className="card-premium p-6">
-                <p className="eyebrow mb-4">Lectura ejecutiva</p>
-                <h3 className="mb-4 text-lg font-semibold">Resumen del servicio</h3>
-                <p className="text-sm leading-7 text-paper/62">{operationalSummary}</p>
-              </section>
+              <div className="space-y-6">
+                <section className="card-premium p-6">
+                  <p className="eyebrow mb-4">Lectura ejecutiva</p>
+                  <h3 className="mb-4 text-lg font-semibold">Resumen del servicio</h3>
+                  <p className="text-sm leading-7 text-paper/62">{operationalSummary}</p>
+                </section>
+                <div className="grid gap-4 md:grid-cols-2">
+                  <QuickAccessCard
+                    title="Ver pedidos"
+                    description="Entrá al tablero operativo para seguir comandas, mozos y tiempos del turno."
+                    href="/orders"
+                    cta="Abrir pedidos"
+                  />
+                  <QuickAccessCard
+                    title="Abrir cocina"
+                    description="Chequeá el KDS y el avance entre recibido, en preparación y listo."
+                    href="/kitchen"
+                    cta="Abrir cocina"
+                  />
+                </div>
+              </div>
             </div>
           </>
         )}

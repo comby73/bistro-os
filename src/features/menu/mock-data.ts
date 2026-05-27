@@ -24,6 +24,14 @@ export const menuItems: MenuItem[] = [
     available: true
   },
   {
+    id: "item-4",
+    category_id: "cat-2",
+    name: "Cordero patagónico",
+    description: "Puré ahumado, jugo reducido, hierbas de temporada.",
+    price: 38,
+    available: true
+  },
+  {
     id: "item-3",
     category_id: "cat-3",
     name: "Negroni de la casa",
