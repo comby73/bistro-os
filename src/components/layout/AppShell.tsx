@@ -2,6 +2,7 @@ import Link from "next/link";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { DemoSessionControls } from "@/components/auth/DemoSessionControls";
+import { BrandLogo } from "@/components/brand/BrandLogo";
 import { DEMO_ROLE_COOKIE, parseDemoRole } from "@/features/auth/demo-session";
 import {
   getDefaultRouteForRole,
@@ -31,14 +32,8 @@ export async function AppShell({ currentPath, children }: AppShellProps) {
       <div className="grid min-h-screen lg:grid-cols-[280px_1fr]">
         <aside className="border-b border-line bg-layer1/50 lg:border-b-0 lg:border-r">
           <div className="flex h-full flex-col p-6">
-            <Link href={getDefaultRouteForRole(roleId)} className="flex items-center gap-3">
-              <span className="relative inline-block h-8 w-8">
-                <span className="absolute inset-0 rounded-full border border-gold/70" />
-                <span className="absolute inset-2 rounded-full bg-gold" />
-              </span>
-              <span className="text-lg tracking-tight">
-                <strong>Bistró</strong> <span className="text-mute">OS</span>
-              </span>
+            <Link href={getDefaultRouteForRole(roleId)} className="inline-flex items-center">
+              <BrandLogo size="sm" />
             </Link>
 
             <div className="mt-8 rounded-3xl border border-line bg-ink/70 p-5">
