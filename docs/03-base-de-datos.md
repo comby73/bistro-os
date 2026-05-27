@@ -375,6 +375,26 @@ La migración se hará de menor riesgo a mayor riesgo:
 4. dashboard,
 5. auth real y RLS serio.
 
+## Estado concreto de Fase 4B
+
+El primer módulo en abrir esta transición es `menu`.
+
+Se decidió un adaptador con dos comportamientos:
+
+- **modo local**: sigue usando `mock-data` + `localStorage`,
+- **modo Supabase**: se activa solo cuando existen:
+  - `NEXT_PUBLIC_SUPABASE_URL`
+  - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+  - `SUPABASE_SERVICE_ROLE_KEY`
+
+Razón de esta decisión:
+
+- evita medias configuraciones difíciles de depurar,
+- impide depender de credenciales para correr la demo local,
+- mantiene reversible la migración del catálogo.
+
+Además, `/orders` no migra todavía como módulo, pero sí consume el mismo catálogo ya resuelto por el adaptador de `menu` para no desalinear disponibilidad ni precios.
+
 La razón es simple:
 
 - menú tiene menos mutaciones críticas,

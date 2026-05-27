@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useTransition } from "react";
 import type { RoleId } from "@/features/auth/roles";
 import {
   filterMenuItems,
@@ -8,15 +8,28 @@ import {
   groupMenuItemsByCategory
 } from "@/features/menu/calculations";
 import { useDemoMenu } from "@/features/menu/demo-store";
-import { menuCategories } from "@/features/menu/mock-data";
+import type { MenuCatalog, MenuDataSource } from "@/features/menu/types";
 import { MenuCategoryTabs } from "./MenuCategoryTabs";
 import { MenuItemCard } from "./MenuItemCard";
 import { MenuSummaryCards } from "./MenuSummaryCards";
 
-export function MenuWorkspace({ roleId }: { roleId: RoleId }) {
-  const { items, toggleAvailability, toggleFeatured } = useDemoMenu();
+export function MenuWorkspace({
+  roleId,
+  initialCatalog,
+  dataSource,
+  persistAvailability,
+  persistFeatured
+}: {
+  roleId: RoleId;
+  initialCatalog?: MenuCatalog;
+  dataSource: MenuDataSource;
+  persistAvailability?: (itemId: string, available: boolean) => Promise<unknown>;
+  persistFeatured?: (itemId: string, featured: boolean) => Promise<unknown>;
+}) {
+  const { categories, items, toggleAvailability, toggleFeatured } = useDemoMenu(initialCatalog);
   const [activeCategoryId, setActiveCategoryId] = useState("");
   const [search, setSearch] = useState("");
+  const [isPending, startTransition] = useTransition();
   const canEdit = roleId === "owner" || roleId === "admin";
   const isWaiter = roleId === "waiter";
   const summary = useMemo(() => getMenuSummary(items), [items]);
@@ -25,13 +38,39 @@ export function MenuWorkspace({ roleId }: { roleId: RoleId }) {
     [activeCategoryId, items, search]
   );
   const groupedItems = useMemo(
-    () => groupMenuItemsByCategory(menuCategories, filteredItems),
-    [filteredItems]
+    () => groupMenuItemsByCategory(categories, filteredItems),
+    [categories, filteredItems]
   );
   const featuredItems = useMemo(
     () => items.filter((item) => item.featured && item.available).slice(0, 3),
     [items]
   );
+
+  function handleAvailabilityToggle(itemId: string) {
+    const currentItem = items.find((item) => item.id === itemId);
+    if (!currentItem) return;
+
+    toggleAvailability(itemId);
+
+    if (dataSource === "supabase" && persistAvailability) {
+      startTransition(() => {
+        void persistAvailability(itemId, !currentItem.available);
+      });
+    }
+  }
+
+  function handleFeaturedToggle(itemId: string) {
+    const currentItem = items.find((item) => item.id === itemId);
+    if (!currentItem) return;
+
+    toggleFeatured(itemId);
+
+    if (dataSource === "supabase" && persistFeatured) {
+      startTransition(() => {
+        void persistFeatured(itemId, !currentItem.featured);
+      });
+    }
+  }
 
   return (
     <section className="mx-auto max-w-[1320px] space-y-6">
@@ -45,7 +84,9 @@ export function MenuWorkspace({ roleId }: { roleId: RoleId }) {
               </h3>
               <p className="mt-3 max-w-2xl text-sm leading-7 text-paper/58">
                 {canEdit
-                  ? "Ajustá disponibilidad y destacados en modo demo. Los cambios persisten en localStorage y afectan la toma de pedidos."
+                  ? dataSource === "supabase"
+                    ? "La carta lee desde Supabase y mantiene una copia local sincronizada para no romper la demo."
+                    : "Ajustá disponibilidad y destacados en modo demo. Los cambios persisten en localStorage y afectan la toma de pedidos."
                   : isWaiter
                     ? "Consultá carta, disponibilidad y productos destacados antes de cargar una mesa."
                     : "Supervisá la carta activa del turno sin editar precios ni disponibilidad."}
@@ -67,7 +108,7 @@ export function MenuWorkspace({ roleId }: { roleId: RoleId }) {
 
           <div className="mt-5">
             <MenuCategoryTabs
-              categories={menuCategories}
+              categories={categories}
               activeCategoryId={activeCategoryId}
               onSelect={setActiveCategoryId}
             />
@@ -82,6 +123,11 @@ export function MenuWorkspace({ roleId }: { roleId: RoleId }) {
               <p className="mt-3 text-sm leading-7 text-paper/58">
                 Este corte resume cuántos productos están en servicio, fuera de carta o destacados para el turno.
               </p>
+              {isPending && (
+                <p className="mt-3 text-xs uppercase tracking-[0.18em] text-paper/42">
+                  Sincronizando cambios del menú...
+                </p>
+              )}
               <div className="mt-5">
                 <MenuSummaryCards summary={summary} />
               </div>
@@ -154,8 +200,8 @@ export function MenuWorkspace({ roleId }: { roleId: RoleId }) {
                   item={item}
                   canEdit={canEdit}
                   compact={isWaiter}
-                  onToggleAvailability={toggleAvailability}
-                  onToggleFeatured={toggleFeatured}
+                  onToggleAvailability={handleAvailabilityToggle}
+                  onToggleFeatured={handleFeaturedToggle}
                 />
               ))}
             </div>

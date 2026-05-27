@@ -62,6 +62,7 @@ El foco actual ya no es la landing comercial, sino el sistema interno: roles dem
 - La app sigue usando `mock-data` + `localStorage`.
 - `supabase/schema.sql` ya modela el backend futuro de forma más completa.
 - La migración real a Supabase será incremental por módulo, no un reemplazo total de una vez.
+- Fase 4B deja `menu` preparado para leer/escribir en Supabase solo si las variables están completas; si no, el fallback local sigue siendo el comportamiento por defecto.
 
 ## Cómo correr el proyecto
 
@@ -94,6 +95,8 @@ Valores importantes hoy:
 
 - `DEMO_AUTH_BYPASS=true` para navegar la demo sin auth real.
 - `N8N_LEAD_WEBHOOK_URL` es opcional.
+- `NEXT_PUBLIC_SUPABASE_URL` y `NEXT_PUBLIC_SUPABASE_ANON_KEY` habilitan lectura pública potencial.
+- `SUPABASE_SERVICE_ROLE_KEY` se usa solo server-side para activar la escritura segura del módulo `menu`.
 
 ## Validación de calidad
 

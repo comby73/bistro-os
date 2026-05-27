@@ -1,12 +1,26 @@
-import { menuCategories, menuItems as seedMenuItems } from "./mock-data";
-import type { MenuCategory, MenuItem, MenuSummary } from "./types";
+import { menuCategories as seedMenuCategories, menuItems as seedMenuItems } from "./mock-data";
+import type { MenuCatalog, MenuCategory, MenuItem, MenuSummary } from "./types";
 
-export function getInitialMenuItems(): MenuItem[] {
-  return sortMenuItems(seedMenuItems);
+export function sortMenuCategories(categories: MenuCategory[]): MenuCategory[] {
+  return [...categories].sort((left, right) => {
+    const leftPosition = left.position ?? Number.MAX_SAFE_INTEGER;
+    const rightPosition = right.position ?? Number.MAX_SAFE_INTEGER;
+
+    if (leftPosition !== rightPosition) {
+      return leftPosition - rightPosition;
+    }
+
+    return left.name.localeCompare(right.name, "es");
+  });
 }
 
-export function sortMenuItems(items: MenuItem[]): MenuItem[] {
-  const categoryOrder = new Map(menuCategories.map((category, index) => [category.id, index]));
+export function sortMenuItems(
+  items: MenuItem[],
+  categories: MenuCategory[] = seedMenuCategories
+): MenuItem[] {
+  const categoryOrder = new Map(
+    sortMenuCategories(categories).map((category, index) => [category.id, index])
+  );
 
   return [...items].sort((left, right) => {
     const leftCategory = categoryOrder.get(left.category_id) ?? Number.MAX_SAFE_INTEGER;
@@ -17,6 +31,23 @@ export function sortMenuItems(items: MenuItem[]): MenuItem[] {
     }
 
     return left.name.localeCompare(right.name, "es");
+  });
+}
+
+export function normalizeMenuCatalog(catalog: MenuCatalog): MenuCatalog {
+  const categories = sortMenuCategories(catalog.categories);
+  const items = sortMenuItems(catalog.items, categories);
+
+  return {
+    categories,
+    items
+  };
+}
+
+export function getInitialMenuCatalog(): MenuCatalog {
+  return normalizeMenuCatalog({
+    categories: seedMenuCategories,
+    items: seedMenuItems
   });
 }
 
@@ -64,7 +95,7 @@ export function groupMenuItemsByCategory(
   categories: MenuCategory[],
   items: MenuItem[]
 ): Array<MenuCategory & { items: MenuItem[] }> {
-  return categories
+  return sortMenuCategories(categories)
     .map((category) => ({
       ...category,
       items: items.filter((item) => item.category_id === category.id)

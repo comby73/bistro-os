@@ -1,9 +1,9 @@
 import type { MenuCategory, MenuItem } from "./types";
 
 export const menuCategories: MenuCategory[] = [
-  { id: "cat-1", name: "Entradas" },
-  { id: "cat-2", name: "Principales" },
-  { id: "cat-3", name: "Coctelería" }
+  { id: "cat-1", name: "Entradas", position: 1 },
+  { id: "cat-2", name: "Principales", position: 2 },
+  { id: "cat-3", name: "Coctelería", position: 3 }
 ];
 
 export const menuItems: MenuItem[] = [
@@ -13,6 +13,7 @@ export const menuItems: MenuItem[] = [
     name: "Tartar de atún rojo",
     description: "Palta, sésamo, soja cítrica.",
     price: 28,
+    station: "cold",
     available: true,
     featured: true
   },
@@ -22,6 +23,7 @@ export const menuItems: MenuItem[] = [
     name: "Risotto de hongos",
     description: "Hongos de estación, parmesano, aceite de trufa.",
     price: 24,
+    station: "hot",
     available: true,
     featured: false
   },
@@ -31,6 +33,7 @@ export const menuItems: MenuItem[] = [
     name: "Cordero patagónico",
     description: "Puré ahumado, jugo reducido, hierbas de temporada.",
     price: 38,
+    station: "grill",
     available: true,
     featured: true
   },
@@ -40,6 +43,7 @@ export const menuItems: MenuItem[] = [
     name: "Negroni de la casa",
     description: "Gin, bitter, vermut rojo, naranja.",
     price: 12,
+    station: "bar",
     available: true,
     featured: false
   }

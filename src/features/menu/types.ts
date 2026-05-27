@@ -1,6 +1,9 @@
+import type { KitchenStation } from "@/features/kitchen/types";
+
 export interface MenuCategory {
   id: string;
   name: string;
+  position?: number;
 }
 
 export interface MenuItem {
@@ -9,6 +12,7 @@ export interface MenuItem {
   name: string;
   description: string;
   price: number;
+  station: KitchenStation;
   available: boolean;
   featured: boolean;
 }
@@ -19,3 +23,10 @@ export interface MenuSummary {
   unavailable: number;
   featured: number;
 }
+
+export interface MenuCatalog {
+  categories: MenuCategory[];
+  items: MenuItem[];
+}
+
+export type MenuDataSource = "local" | "supabase";

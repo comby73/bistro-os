@@ -1,41 +1,45 @@
 "use client";
 
 import { useCallback, useEffect, useSyncExternalStore } from "react";
-import { getInitialMenuItems, sortMenuItems } from "./calculations";
-import type { MenuItem } from "./types";
+import { getInitialMenuCatalog, normalizeMenuCatalog } from "./calculations";
+import type { MenuCatalog, MenuItem } from "./types";
 
 const STORAGE_KEY = "bistro-demo-menu-v1";
 const STORAGE_EVENT = "bistro-demo-menu-change";
-const initialMenuSnapshot = getInitialMenuItems();
+const initialMenuSnapshot = getInitialMenuCatalog();
 
-let cachedMenuItems: MenuItem[] = initialMenuSnapshot;
-let cachedSerializedMenuItems = JSON.stringify(initialMenuSnapshot);
+let cachedMenuCatalog: MenuCatalog = initialMenuSnapshot;
+let cachedSerializedMenuCatalog = JSON.stringify(initialMenuSnapshot);
 
-function updateMenuCache(nextItems: MenuItem[]) {
-  const sortedItems = sortMenuItems(nextItems);
-  cachedMenuItems = sortedItems;
-  cachedSerializedMenuItems = JSON.stringify(sortedItems);
+function updateMenuCache(nextCatalog: MenuCatalog) {
+  const normalizedCatalog = normalizeMenuCatalog(nextCatalog);
+  cachedMenuCatalog = normalizedCatalog;
+  cachedSerializedMenuCatalog = JSON.stringify(normalizedCatalog);
 }
 
-export function readMenuItemsSnapshot(): MenuItem[] {
-  if (typeof window === "undefined") return cachedMenuItems;
+export function readMenuCatalogSnapshot(): MenuCatalog {
+  if (typeof window === "undefined") return cachedMenuCatalog;
 
-  const storedItems = window.localStorage.getItem(STORAGE_KEY);
+  const storedCatalog = window.localStorage.getItem(STORAGE_KEY);
 
-  if (!storedItems) return cachedMenuItems;
-  if (storedItems === cachedSerializedMenuItems) return cachedMenuItems;
+  if (!storedCatalog) return cachedMenuCatalog;
+  if (storedCatalog === cachedSerializedMenuCatalog) return cachedMenuCatalog;
 
   try {
-    updateMenuCache(JSON.parse(storedItems) as MenuItem[]);
-    return cachedMenuItems;
+    updateMenuCache(JSON.parse(storedCatalog) as MenuCatalog);
+    return cachedMenuCatalog;
   } catch {
-    return cachedMenuItems;
+    return cachedMenuCatalog;
   }
 }
 
-function writeMenuSnapshot(nextItems: MenuItem[]) {
-  updateMenuCache(nextItems);
-  window.localStorage.setItem(STORAGE_KEY, cachedSerializedMenuItems);
+export function readMenuItemsSnapshot(): MenuItem[] {
+  return readMenuCatalogSnapshot().items;
+}
+
+function writeMenuSnapshot(nextCatalog: MenuCatalog) {
+  updateMenuCache(nextCatalog);
+  window.localStorage.setItem(STORAGE_KEY, cachedSerializedMenuCatalog);
   window.dispatchEvent(new Event(STORAGE_EVENT));
 }
 
@@ -53,37 +57,59 @@ function subscribe(listener: () => void) {
   };
 }
 
-export function useDemoMenu() {
-  const items = useSyncExternalStore(subscribe, readMenuItemsSnapshot, () => cachedMenuItems);
+export function useDemoMenu(initialCatalog?: MenuCatalog) {
+  const catalog = useSyncExternalStore(
+    subscribe,
+    readMenuCatalogSnapshot,
+    () => cachedMenuCatalog
+  );
 
   useEffect(() => {
     if (typeof window === "undefined") return;
 
     if (!window.localStorage.getItem(STORAGE_KEY)) {
-      writeMenuSnapshot(cachedMenuItems);
+      writeMenuSnapshot(cachedMenuCatalog);
     }
   }, []);
 
-  const toggleAvailability = useCallback((itemId: string) => {
-    const currentItems = readMenuItemsSnapshot();
-    const nextItems = currentItems.map((item) =>
-      item.id === itemId ? { ...item, available: !item.available } : item
-    );
+  useEffect(() => {
+    if (!initialCatalog || typeof window === "undefined") return;
 
-    writeMenuSnapshot(nextItems);
+    const normalizedInitial = normalizeMenuCatalog(initialCatalog);
+    const serializedInitial = JSON.stringify(normalizedInitial);
+
+    if (serializedInitial !== cachedSerializedMenuCatalog) {
+      writeMenuSnapshot(normalizedInitial);
+    }
+  }, [initialCatalog]);
+
+  const toggleAvailability = useCallback((itemId: string) => {
+    const currentCatalog = readMenuCatalogSnapshot();
+    const nextCatalog = {
+      ...currentCatalog,
+      items: currentCatalog.items.map((item) =>
+        item.id === itemId ? { ...item, available: !item.available } : item
+      )
+    };
+
+    writeMenuSnapshot(nextCatalog);
   }, []);
 
   const toggleFeatured = useCallback((itemId: string) => {
-    const currentItems = readMenuItemsSnapshot();
-    const nextItems = currentItems.map((item) =>
-      item.id === itemId ? { ...item, featured: !item.featured } : item
-    );
+    const currentCatalog = readMenuCatalogSnapshot();
+    const nextCatalog = {
+      ...currentCatalog,
+      items: currentCatalog.items.map((item) =>
+        item.id === itemId ? { ...item, featured: !item.featured } : item
+      )
+    };
 
-    writeMenuSnapshot(nextItems);
+    writeMenuSnapshot(nextCatalog);
   }, []);
 
   return {
-    items,
+    categories: catalog.categories,
+    items: catalog.items,
     toggleAvailability,
     toggleFeatured
   };

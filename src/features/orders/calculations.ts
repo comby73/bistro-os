@@ -1,19 +1,11 @@
 import { menuItems as seedMenuItems } from "@/features/menu/mock-data";
 import type { MenuItem } from "@/features/menu/types";
-import type { KitchenStation } from "@/features/kitchen/types";
 import { orders as seedOrders } from "./mock-data";
 import type {
   CreateOrderInput,
   Order,
   OrderStatus
 } from "./types";
-
-const MENU_STATIONS: Record<string, KitchenStation> = {
-  "item-1": "cold",
-  "item-2": "hot",
-  "item-3": "bar",
-  "item-4": "grill"
-};
 
 export const KITCHEN_ACTIVE_STATUSES: OrderStatus[] = [
   "received",
@@ -70,7 +62,7 @@ export function buildOrderFromInput(
         menu_item_id: menuItem.id,
         name: menuItem.name,
         quantity: selectedItem.quantity,
-        station: MENU_STATIONS[menuItem.id] ?? "pass",
+        station: menuItem.station,
         unit_price: menuItem.price
       };
     })

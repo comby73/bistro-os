@@ -2,27 +2,26 @@
 
 import { useMemo, useState } from "react";
 import { useDemoMenu } from "@/features/menu/demo-store";
-import { menuCategories } from "@/features/menu/mock-data";
+import type { MenuCatalog } from "@/features/menu/types";
 import { getOrderTotal } from "@/features/orders/calculations";
 import { useDemoOrders } from "@/features/orders/demo-store";
 import type { Order } from "@/features/orders/types";
 
-function getDraftStation(categoryId: string, itemId: string) {
-  if (categoryId === "cat-1") return "cold" as const;
-  if (categoryId === "cat-3") return "bar" as const;
-  if (itemId === "item-4") return "grill" as const;
-  return "hot" as const;
-}
-
-export function OrderComposer({ defaultWaiterName }: { defaultWaiterName: string }) {
+export function OrderComposer({
+  defaultWaiterName,
+  initialMenuCatalog
+}: {
+  defaultWaiterName: string;
+  initialMenuCatalog?: MenuCatalog;
+}) {
   const { createOrder, orders } = useDemoOrders();
-  const { items: menuItems } = useDemoMenu();
+  const { categories, items: menuItems } = useDemoMenu(initialMenuCatalog);
   const [table, setTable] = useState("");
   const [waiterName, setWaiterName] = useState(defaultWaiterName);
   const [notes, setNotes] = useState("");
   const [quantities, setQuantities] = useState<Record<string, number>>({});
   const [error, setError] = useState("");
-  const [activeCategoryId, setActiveCategoryId] = useState(menuCategories[0]?.id ?? "");
+  const [activeCategoryId, setActiveCategoryId] = useState(categories[0]?.id ?? "");
   const [search, setSearch] = useState("");
 
   const selectedProducts = useMemo(
@@ -62,7 +61,7 @@ export function OrderComposer({ defaultWaiterName }: { defaultWaiterName: string
         menu_item_id: item.id,
         name: item.name,
         quantity: item.quantity,
-        station: getDraftStation(item.category_id, item.id),
+        station: item.station,
         unit_price: item.price
       }))
     }),
@@ -143,7 +142,7 @@ export function OrderComposer({ defaultWaiterName }: { defaultWaiterName: string
           </div>
 
           <div className="flex flex-wrap items-center gap-3">
-            {menuCategories.map((category) => (
+            {categories.map((category) => (
               <button
                 key={category.id}
                 type="button"

@@ -39,6 +39,15 @@ No incluye:
 - persistir `available` y `featured`,
 - mantener `/orders` consumiendo la misma fuente.
 
+### Estado actual de implementación
+
+Fase 4B quedó preparada con un adaptador reversible:
+
+- `repository.ts` decide entre `local` y `supabase`,
+- si faltan variables, el sistema sigue en modo local,
+- si la configuración está completa, `/menu` puede leer desde Supabase y persistir cambios de forma server-side,
+- `/orders` reutiliza ese catálogo resuelto sin migrar todavía su propio dominio.
+
 ### Motivo
 
 `menu` es el módulo menos riesgoso para abrir la migración:
@@ -52,6 +61,7 @@ No incluye:
 - crear adaptador `menu repository`,
 - mantener fallback temporal a mock/localStorage si fuera necesario,
 - no tocar el diseño de `/menu`.
+- copiar el catálogo remoto a la store local para no romper la demo ni la consulta en otras pantallas.
 
 ## Fase 4C — Conectar `reservations`
 

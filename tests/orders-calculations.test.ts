@@ -26,6 +26,30 @@ describe("orders calculations", () => {
     });
   });
 
+  it("respeta la estación del catálogo recibido sin depender de ids hardcodeados", () => {
+    const order = buildOrderFromInput(
+      {
+        table: "Mesa 4",
+        waiter_name: "Mozo",
+        items: [{ menu_item_id: "remote-item", quantity: 1 }]
+      },
+      [
+        {
+          id: "remote-item",
+          category_id: "remote-cat",
+          name: "Spritz especial",
+          description: "Cítrico",
+          price: 18,
+          station: "bar",
+          available: true,
+          featured: false
+        }
+      ]
+    );
+
+    expect(order.items[0]?.station).toBe("bar");
+  });
+
   it("calcula transiciones de estado y agrupación de cocina", () => {
     expect(getNextOrderStatus("received")).toBe("preparing");
     expect(getNextOrderStatus("preparing")).toBe("ready");
