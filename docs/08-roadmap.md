@@ -9,6 +9,7 @@
 - `/reservations` como módulo operativo con persistencia demo local.
 - `/menu` con datos mock.
 - `/sales` como ventas y caja operativa simulada.
+- `/dashboard` alimentado por stores demo de pedidos y reservas.
 - `localStorage` como persistencia temporal de demo.
 - n8n opcional y no bloqueante.
 - Supabase todavía no conectado a la operación real.

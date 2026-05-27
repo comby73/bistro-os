@@ -63,6 +63,7 @@ La misma lógica de negocio puede renderizar experiencias distintas por rol sin 
 ## Módulos implementados
 
 - `auth`: roles demo, selector y control de acceso.
+- `dashboard`: centro de control vivo derivado de stores demo y cálculos reutilizables.
 - `orders`: carga y seguimiento de pedidos.
 - `kitchen`: KDS demo y avance de estados.
 - `reservations`: módulo operativo con store demo, filtros y acciones de estado.

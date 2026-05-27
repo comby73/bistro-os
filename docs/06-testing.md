@@ -18,6 +18,7 @@ La demo valida calidad con:
 - formulario demo,
 - badges de reservas,
 - cálculos de reservas desacoplados de la UI,
+- cálculos de dashboard derivados de stores demo,
 - permisos por rol,
 - cálculos de ventas,
 - cálculos de pedidos.

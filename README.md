@@ -42,6 +42,7 @@ El foco actual ya no es la landing comercial, sino el sistema interno: roles dem
 - Sistema de roles demo.
 - `AppShell` interno con navegación por rol.
 - Dashboard contextual por rol.
+- Dashboard vivo derivado de pedidos, reservas y ventas simuladas.
 - Pedidos.
 - Cocina.
 - Reservas.
