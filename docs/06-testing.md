@@ -1,24 +1,43 @@
 # 06 — Testing
 
-## Estrategia
+## Estrategia actual
 
-El MVP incluye tests básicos de validación:
+La demo valida calidad con:
 
-- Lead válido.
-- Email inválido.
-- Reserva con cantidad inválida.
-- Pedido sin items.
+- tests de validación,
+- tests de componentes básicos,
+- tests de configuración de roles,
+- tests de cálculos operativos.
 
-## Herramienta
+## Cobertura relevante hoy
 
-Vitest.
+- esquema de leads,
+- esquema de reservas,
+- esquema de pedidos,
+- formulario demo,
+- badges de reservas,
+- permisos por rol,
+- cálculos de ventas,
+- cálculos de pedidos.
 
-## Comando
+## Comandos de calidad
 
 ```bash
-npm run test
+npm run lint
+npm test
+npm run build
 ```
 
-## Por qué testear
+## Qué garantizan hoy
 
-La validación evita que los workflows reciban datos rotos y ayuda a defender el proyecto como mantenible.
+- que los contratos básicos de datos no se rompan,
+- que los roles mantengan sus permisos esperados,
+- que `/sales` conserve sus cálculos mock,
+- que el flujo operativo siga compilando y pasando tipado.
+
+## Qué falta en fases futuras
+
+- tests del store demo de pedidos/cocina,
+- tests de integración de rutas por rol,
+- tests E2E de flujo operativo,
+- tests sobre persistencia real con Supabase.

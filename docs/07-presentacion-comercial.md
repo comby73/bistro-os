@@ -2,24 +2,46 @@
 
 ## Pitch corto
 
-Bistró OS ayuda a restaurantes de gama media-alta a ordenar reservas, pedidos, cocina y ventas en una sola plataforma.  
-En lugar de depender de WhatsApp, planillas y tickets dispersos, el restaurante trabaja con un sistema modular que centraliza la operación y permite tomar decisiones con datos.
+Bistró OS evolucionó de una idea comercial a una demo funcional de sistema operativo para restaurantes.  
+Hoy permite mostrar cómo distintos roles trabajan dentro de una misma aplicación: dueño, administrador, jefe de sala, mozo y cocina.
 
-## Propuesta de valor
+## Qué se puede demostrar hoy
 
-Para restaurantes que pierden tiempo coordinando reservas, cocina y ventas en herramientas separadas, Bistró OS ofrece una plataforma SaaS que unifica la operación diaria y agrega automatizaciones con IA para reducir fricción y mejorar control.
+- acceso por rol demo,
+- navegación interna contextual,
+- dashboard por perfil,
+- flujo operativo Mozo → Pedido → Cocina,
+- reservas mock,
+- menú operativo,
+- ventas y caja simulada,
+- automatización comercial opcional.
 
-## Modelo de precios
+## Aclaración importante sobre `/sales`
 
-- Starter: USD 49/mes + setup desde USD 149.
-- Pro: USD 129/mes + setup desde USD 299.
-- Enterprise: a medida.
+El módulo **Ventas y caja**:
 
-## Evolución futura
+- muestra ventas del día,
+- medios de pago,
+- pendientes de cobro,
+- propinas estimadas,
+- cierre de caja simulado.
 
-- WhatsApp real.
-- Pagos online.
-- Multi-sucursal.
-- Stock por receta.
-- Integración con impresoras.
-- Analítica predictiva.
+No implementa facturación fiscal real ni integración homologada.
+
+## Propuesta de valor actual
+
+Más que una landing, Bistró OS hoy demuestra arquitectura y flujo operativo defendible:
+
+- una sola app interna,
+- módulos separados,
+- permisos por rol,
+- preparación para persistencia real,
+- automatizaciones desacopladas.
+
+## Roadmap narrable en demo
+
+1. Fase 3A: flujo Mozo → Pedido → Cocina.
+2. Fase 3B: reservas operativas.
+3. Fase 4: Supabase real.
+4. Fase 5: automatización n8n opcional.
+5. Fase 6: defensa y presentación final.

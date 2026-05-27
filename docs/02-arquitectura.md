@@ -2,46 +2,68 @@
 
 ## Stack
 
-- Next.js + TypeScript para frontend/app.
-- Tailwind CSS para UI.
-- Supabase PostgreSQL para datos.
-- n8n como integración opcional para workflows externos.
-- LLM como capa asistiva documentada.
+- Next.js + TypeScript para app y UI.
+- Tailwind CSS para la interfaz.
+- `localStorage` + stores demo para persistencia local temporal.
+- Supabase PostgreSQL preparado para persistencia real futura.
+- n8n como integración opcional para automatizaciones externas.
+- LLM como capa asistiva documentada, no crítica.
 
 ## Principios
 
-1. Modularidad.
-2. Separación UI / negocio / datos.
-3. Datos mock hasta integración real.
-4. Variables de entorno para credenciales.
-5. Integraciones externas no bloqueantes.
-6. Prompts centralizados.
-7. Testing básico de validaciones.
+1. Modularidad por dominio.
+2. Separación UI / negocio / estado demo / datos futuros.
+3. Roles explícitos y navegación contextual.
+4. Integraciones externas no bloqueantes.
+5. Mocks primero, persistencia real después.
+6. Testing básico sobre validaciones y cálculos.
 
 ## Capas
 
 ```txt
-Landing / App UI
-→ Features modules
-→ Validations / actions
-→ Supabase
-→ Integraciones opcionales (n8n)
-→ Agentes IA
+Rutas App Router
+→ AppShell y navegación por rol
+→ Componentes de UI
+→ Features (tipos, cálculos, stores demo, acciones)
+→ Persistencia local temporal
+→ Supabase futuro
+→ Automatizaciones opcionales (n8n)
 ```
+
+## Roles implementados
+
+| Rol | Rutas / módulos actuales |
+|---|---|
+| `owner` | dashboard, sales, orders, reservations, kitchen, menu |
+| `admin` | dashboard, sales, orders, reservations, kitchen, menu |
+| `manager` | dashboard, sales solo lectura, reservations, orders |
+| `waiter` | orders, menu, dashboard contextual |
+| `kitchen` | kitchen, dashboard contextual |
+
+## Rutas actuales
+
+- `/`
+- `/login`
+- `/dashboard`
+- `/orders`
+- `/kitchen`
+- `/reservations`
+- `/menu`
+- `/sales`
+- `/demo`
+
+## Módulos implementados
+
+- `auth`: roles demo, selector y control de acceso.
+- `orders`: carga y seguimiento de pedidos.
+- `kitchen`: KDS demo y avance de estados.
+- `reservations`: reservas mock.
+- `menu`: carta digital operativa.
+- `sales`: ventas y caja simulada.
+- `leads`: formulario comercial con automatización opcional.
 
 ## Integraciones
 
-- La app debe operar aunque n8n no esté disponible o no esté configurado.
-- Las Server Actions validan y resuelven la solicitud principal antes de depender de automatizaciones externas.
-- En una fase futura, Supabase será la capa durable y n8n actuará como consumidor secundario para automatizaciones.
-
-## Módulos
-
-- leads
-- restaurants
-- reservations
-- orders
-- menu
-- kitchen
-- analytics
-- ai
+- La app debe operar aunque n8n no exista o falle.
+- Supabase todavía no persiste el estado operativo.
+- El patrón actual favorece reemplazar stores demo por Supabase en Fase 4 sin rehacer la UI completa.

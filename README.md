@@ -1,71 +1,103 @@
 # Bistró OS
 
-**Bistró OS** es un prototipo SaaS para restaurantes de gama media-alta en LATAM.  
-Centraliza reservas, pedidos, cocina, ventas y automatizaciones con IA en una plataforma modular.
+**Bistró OS** es una demo funcional de aplicación operativa para restaurantes.  
+El foco actual ya no es la landing comercial, sino el sistema interno: roles demo, pedidos, cocina, reservas, menú, dashboard y ventas/caja simulada.
 
-## Objetivo del proyecto
+## Qué es ahora
 
-Construir un proyecto final profesional aplicando Vibe Coding:
+- App interna para operación de restaurante.
+- Navegación y acceso por rol demo.
+- Módulos funcionales conectados entre sí con datos mock.
+- Integraciones reales todavía desacopladas:
+  - Supabase queda preparado como persistencia futura.
+  - n8n queda como automatización opcional y no bloqueante.
 
-- Landing comercial premium.
-- Captura de leads para demo.
-- Dashboard operativo MVP.
-- Módulos de reservas, pedidos, menú y cocina.
-- Base de datos Supabase preparada.
-- Workflows n8n documentados.
-- Prompts/agentes IA centralizados.
-- Testing básico.
-- Documentación técnica y comercial.
+## Roles demo
 
-## Stack
+| Rol | Qué puede hacer hoy |
+|---|---|
+| `owner` | Ver dashboard, ventas/caja, pedidos, reservas, cocina y menú |
+| `admin` | Ver dashboard, ventas/caja, pedidos, reservas, cocina y menú |
+| `manager` | Ver dashboard, ventas/caja en solo lectura, pedidos y reservas |
+| `waiter` | Crear pedidos en `/orders` y consultar menú |
+| `kitchen` | Operar cocina en `/kitchen` |
 
-- Next.js App Router
-- TypeScript
-- Tailwind CSS
-- Supabase
-- n8n
-- OpenAI/LLM como capa asistiva
-- Vitest para pruebas básicas
+## Rutas principales
 
-## Instalación
+| Ruta | Estado |
+|---|---|
+| `/` | Landing existente, no prioritaria |
+| `/login` | Selector de rol demo |
+| `/dashboard` | Vista interna adaptada por rol |
+| `/orders` | Pedidos activos + creación de pedido demo |
+| `/kitchen` | KDS demo con avance de estados |
+| `/reservations` | Gestión mock de reservas |
+| `/menu` | Carta digital / referencia operativa |
+| `/sales` | Ventas y caja simulada |
+| `/demo` | Formulario comercial / lead demo |
+
+## Módulos implementados
+
+- Sistema de roles demo.
+- `AppShell` interno con navegación por rol.
+- Dashboard contextual por rol.
+- Pedidos.
+- Cocina.
+- Reservas.
+- Menú.
+- Ventas y caja simulada.
+- Captura de leads demo con automatización opcional.
+
+## Estado de integraciones
+
+- **Supabase**: todavía no conectado como persistencia real.
+- **n8n**: integración opcional/no bloqueante.
+- **Facturación fiscal**: no implementada. `/sales` representa solo facturación operativa simulada.
+
+## Cómo correr el proyecto
 
 ```bash
 npm install
 npm run dev
 ```
 
-Luego abrir:
+Abrir:
 
 ```txt
 http://localhost:3000
 ```
 
+Para entrar al sistema interno:
+
+```txt
+http://localhost:3000/login
+```
+
 ## Variables de entorno
 
-Copiar `.env.example` a `.env.local` y completar:
+Copiar `.env.example` a `.env.local`:
 
 ```bash
 cp .env.example .env.local
 ```
 
-## Rutas principales
+Valores importantes hoy:
 
-| Ruta | Descripción |
-|---|---|
-| `/` | Landing comercial |
-| `/demo` | Formulario de solicitud de demo |
-| `/dashboard` | Panel operativo MVP |
-| `/reservations` | Gestión de reservas |
-| `/orders` | Gestión de pedidos |
-| `/kitchen` | Panel de cocina tipo KDS |
-| `/menu` | Menú digital/admin básico |
+- `DEMO_AUTH_BYPASS=true` para navegar la demo sin auth real.
+- `N8N_LEAD_WEBHOOK_URL` es opcional.
 
-## Estado actual
+## Validación de calidad
 
-Este scaffold está preparado para trabajar en Claude Code/OpenClaude.  
-La integración real con Supabase, n8n y WhatsApp queda preparada por documentación, schema y placeholders seguros.
+```bash
+npm run lint
+npm test
+npm run build
+```
 
-## Decisión de arquitectura
+## Roadmap inmediato
 
-El proyecto se organiza por módulos funcionales en `src/features` y componentes visuales reutilizables en `src/components`.  
-Esto evita componentes gigantes, reduce acoplamiento y facilita escalar el MVP.
+1. Fase 3A: flujo Mozo → Pedido → Cocina.
+2. Fase 3B: reservas operativas.
+3. Fase 4: Supabase real.
+4. Fase 5: automatización n8n opcional.
+5. Fase 6: preparación de defensa/presentación.
