@@ -6,7 +6,12 @@ import {
   getInitialReservations,
   sortReservations
 } from "./calculations";
-import type { CreateReservationInput, Reservation, ReservationStatus } from "./types";
+import type {
+  CreateReservationInput,
+  Reservation,
+  ReservationsDataSource,
+  ReservationStatus
+} from "./types";
 
 const STORAGE_KEY = "bistro-demo-reservations-v1";
 const STORAGE_EVENT = "bistro-demo-reservations-change";
@@ -16,8 +21,9 @@ let cachedReservations: Reservation[] = initialReservationsSnapshot;
 let cachedSerializedReservations = JSON.stringify(initialReservationsSnapshot);
 
 function updateReservationsCache(nextReservations: Reservation[]) {
-  cachedReservations = nextReservations;
-  cachedSerializedReservations = JSON.stringify(nextReservations);
+  const sortedReservations = sortReservations(nextReservations);
+  cachedReservations = sortedReservations;
+  cachedSerializedReservations = JSON.stringify(sortedReservations);
 }
 
 function readReservationsSnapshot(): Reservation[] {
@@ -29,10 +35,7 @@ function readReservationsSnapshot(): Reservation[] {
   if (storedReservations === cachedSerializedReservations) return cachedReservations;
 
   try {
-    const parsedReservations = sortReservations(
-      JSON.parse(storedReservations) as Reservation[]
-    );
-    updateReservationsCache(parsedReservations);
+    updateReservationsCache(JSON.parse(storedReservations) as Reservation[]);
     return cachedReservations;
   } catch {
     return cachedReservations;
@@ -40,9 +43,18 @@ function readReservationsSnapshot(): Reservation[] {
 }
 
 function writeReservationsSnapshot(nextReservations: Reservation[]) {
-  updateReservationsCache(sortReservations(nextReservations));
+  updateReservationsCache(nextReservations);
   window.localStorage.setItem(STORAGE_KEY, cachedSerializedReservations);
   window.dispatchEvent(new Event(STORAGE_EVENT));
+}
+
+function replaceReservationSnapshot(tempId: string, nextReservation: Reservation) {
+  const currentReservations = readReservationsSnapshot();
+  const nextReservations = currentReservations.map((reservation) =>
+    reservation.id === tempId ? nextReservation : reservation
+  );
+
+  writeReservationsSnapshot(nextReservations);
 }
 
 function subscribe(listener: () => void) {
@@ -59,7 +71,24 @@ function subscribe(listener: () => void) {
   };
 }
 
-export function useDemoReservations() {
+export function useDemoReservations({
+  initialReservations,
+  dataSource = "local",
+  persistCreate,
+  persistStatus,
+  persistTable,
+  persistCancel
+}: {
+  initialReservations?: Reservation[];
+  dataSource?: ReservationsDataSource;
+  persistCreate?: (input: CreateReservationInput) => Promise<{ reservation?: Reservation }>;
+  persistStatus?: (
+    reservationId: string,
+    status: ReservationStatus
+  ) => Promise<unknown>;
+  persistTable?: (reservationId: string, tableAssigned: string) => Promise<unknown>;
+  persistCancel?: (reservationId: string) => Promise<unknown>;
+} = {}) {
   const reservations = useSyncExternalStore(
     subscribe,
     readReservationsSnapshot,
@@ -74,12 +103,34 @@ export function useDemoReservations() {
     }
   }, []);
 
-  const createReservation = useCallback((input: CreateReservationInput) => {
-    const nextReservation = buildReservationFromInput(input);
-    const currentReservations = readReservationsSnapshot();
+  useEffect(() => {
+    if (!initialReservations || typeof window === "undefined") return;
 
-    writeReservationsSnapshot([...currentReservations, nextReservation]);
-  }, []);
+    const sortedInitialReservations = sortReservations(initialReservations);
+    const serializedInitialReservations = JSON.stringify(sortedInitialReservations);
+
+    if (serializedInitialReservations !== cachedSerializedReservations) {
+      writeReservationsSnapshot(sortedInitialReservations);
+    }
+  }, [initialReservations]);
+
+  const createReservation = useCallback(
+    (input: CreateReservationInput) => {
+      const nextReservation = buildReservationFromInput(input);
+      const currentReservations = readReservationsSnapshot();
+
+      writeReservationsSnapshot([...currentReservations, nextReservation]);
+
+      if (dataSource === "supabase" && persistCreate) {
+        void persistCreate(input).then((result) => {
+          if (result?.reservation) {
+            replaceReservationSnapshot(nextReservation.id, result.reservation);
+          }
+        });
+      }
+    },
+    [dataSource, persistCreate]
+  );
 
   const updateReservationStatus = useCallback(
     (reservationId: string, status: ReservationStatus) => {
@@ -89,8 +140,19 @@ export function useDemoReservations() {
       );
 
       writeReservationsSnapshot(nextReservations);
+
+      if (dataSource === "supabase") {
+        if (status === "cancelled" && persistCancel) {
+          void persistCancel(reservationId);
+          return;
+        }
+
+        if (persistStatus) {
+          void persistStatus(reservationId, status);
+        }
+      }
     },
-    []
+    [dataSource, persistCancel, persistStatus]
   );
 
   const assignReservationTable = useCallback(
@@ -106,8 +168,12 @@ export function useDemoReservations() {
       );
 
       writeReservationsSnapshot(nextReservations);
+
+      if (dataSource === "supabase" && persistTable) {
+        void persistTable(reservationId, tableAssigned);
+      }
     },
-    []
+    [dataSource, persistTable]
   );
 
   return {

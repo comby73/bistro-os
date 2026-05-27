@@ -18,6 +18,7 @@ La demo valida calidad con:
 - formulario demo,
 - badges de reservas,
 - cálculos de reservas desacoplados de la UI,
+- repositorio de reservas con fallback local validado,
 - cálculos de dashboard derivados de stores demo,
 - cálculos de menú para disponibilidad, filtros y agrupación,
 - permisos por rol,
@@ -37,6 +38,7 @@ npm run build
 - que los contratos básicos de datos no se rompan,
 - que los roles mantengan sus permisos esperados,
 - que `/menu` conserve su lectura operativa por rol y sus cálculos base,
+- que `/reservations` mantenga fallback local aunque Supabase no esté configurado,
 - que `/sales` conserve sus cálculos mock,
 - que el flujo operativo siga compilando y pasando tipado.
 

@@ -28,3 +28,9 @@ export interface CreateReservationInput {
 }
 
 export type ReservationFilter = "all" | ReservationStatus;
+
+export interface ReservationsSnapshot {
+  reservations: Reservation[];
+}
+
+export type ReservationsDataSource = "local" | "supabase";

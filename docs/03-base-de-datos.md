@@ -395,6 +395,30 @@ Razón de esta decisión:
 
 Además, `/orders` no migra todavía como módulo, pero sí consume el mismo catálogo ya resuelto por el adaptador de `menu` para no desalinear disponibilidad ni precios.
 
+## Estado concreto de Fase 4C
+
+El segundo módulo en abrir esta transición es `reservations`.
+
+Se sigue el mismo criterio de seguridad:
+
+- **modo local** por defecto,
+- **modo Supabase** solo con variables completas,
+- escrituras remotas solo desde server actions,
+- UI y UX sin rediseño.
+
+La lectura remota usa la tabla `reservations` del schema preparado y mapea solo los campos que hoy ya usa la app:
+
+- cliente,
+- contacto,
+- fecha,
+- hora,
+- cantidad,
+- estado,
+- notas,
+- mesa asignada.
+
+La mesa asignada queda persistida en esta fase dentro de `metadata.table_assigned_label`, para no bloquear la migración por depender todavía de una gestión completa de mesas reales.
+
 La razón es simple:
 
 - menú tiene menos mutaciones críticas,

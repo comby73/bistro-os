@@ -1,10 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { useDemoReservations } from "@/features/reservations/demo-store";
+import type { CreateReservationInput } from "@/features/reservations/types";
 
-export function ReservationComposer() {
-  const { createReservation } = useDemoReservations();
+export function ReservationComposer({
+  createReservation
+}: {
+  createReservation: (input: CreateReservationInput) => void;
+}) {
   const [customerName, setCustomerName] = useState("");
   const [contactPhone, setContactPhone] = useState("");
   const [date, setDate] = useState("");

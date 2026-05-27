@@ -11,14 +11,51 @@ import {
   sortReservations
 } from "@/features/reservations/calculations";
 import { useDemoReservations } from "@/features/reservations/demo-store";
-import type { ReservationFilter, ReservationStatus } from "@/features/reservations/types";
+import type {
+  CreateReservationInput,
+  Reservation,
+  ReservationFilter,
+  ReservationsDataSource,
+  ReservationStatus
+} from "@/features/reservations/types";
 import { ReservationCard } from "./ReservationCard";
 import { ReservationComposer } from "./ReservationComposer";
 import { ReservationFilters } from "./ReservationFilters";
 
-export function ReservationsWorkspace({ roleId }: { roleId: RoleId }) {
-  const { reservations, updateReservationStatus, assignReservationTable } =
-    useDemoReservations();
+export function ReservationsWorkspace({
+  roleId,
+  initialReservations,
+  dataSource,
+  persistCreate,
+  persistStatus,
+  persistTable,
+  persistCancel
+}: {
+  roleId: RoleId;
+  initialReservations?: Reservation[];
+  dataSource: ReservationsDataSource;
+  persistCreate?: (input: CreateReservationInput) => Promise<{ reservation?: Reservation }>;
+  persistStatus?: (
+    reservationId: string,
+    status: ReservationStatus
+  ) => Promise<unknown>;
+  persistTable?: (reservationId: string, tableAssigned: string) => Promise<unknown>;
+  persistCancel?: (reservationId: string) => Promise<unknown>;
+}) {
+  const {
+    reservations,
+    createReservation,
+    updateReservationStatus,
+    assignReservationTable
+  } =
+    useDemoReservations({
+      initialReservations,
+      dataSource,
+      persistCreate,
+      persistStatus,
+      persistTable,
+      persistCancel
+    });
   const currentTime = useDemoClock();
   const [activeFilter, setActiveFilter] = useState<ReservationFilter>("all");
   const canManage = roleId === "owner" || roleId === "admin" || roleId === "manager";
@@ -59,7 +96,7 @@ export function ReservationsWorkspace({ roleId }: { roleId: RoleId }) {
     <section className="mx-auto max-w-[1320px] space-y-6">
       {canManage && (
         <div className="grid gap-6 xl:grid-cols-[420px_1fr]">
-          <ReservationComposer />
+          <ReservationComposer createReservation={createReservation} />
           <section className="card-premium p-6">
             <div className="flex items-start justify-between gap-4">
               <div>

@@ -2,7 +2,9 @@ import { describe, expect, it } from "vitest";
 import {
   buildReservationFromInput,
   filterReservations,
+  getReservationCounts,
   getReservationStatusLabel,
+  getTodayReservations,
   sortReservations
 } from "../src/features/reservations/calculations";
 import { reservations } from "../src/features/reservations/mock-data";
@@ -33,6 +35,18 @@ describe("reservations calculations", () => {
     expect(getReservationStatusLabel("pending")).toBe("Pendiente");
     expect(getReservationStatusLabel("confirmed")).toBe("Confirmada");
     expect(getReservationStatusLabel("seated")).toBe("Sentada");
+    expect(getReservationStatusLabel("cancelled")).toBe("Cancelada");
     expect(getReservationStatusLabel("completed")).toBe("Completada");
+  });
+
+  it("resume estados y recorta reservas del día", () => {
+    const counts = getReservationCounts(reservations);
+
+    expect(counts.pending).toBe(1);
+    expect(counts.confirmed).toBe(1);
+    expect(counts.seated).toBe(1);
+
+    const todayReservations = getTodayReservations(reservations, reservations[0].date);
+    expect(todayReservations.length).toBeGreaterThan(0);
   });
 });

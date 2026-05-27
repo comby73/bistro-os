@@ -72,6 +72,16 @@ Fase 4B quedó preparada con un adaptador reversible:
 - persistir asignación de mesa,
 - mantener filtros y UX actual.
 
+### Estado actual de implementación
+
+Fase 4C quedó preparada con un adaptador equivalente al de `menu`:
+
+- `repository.ts` decide entre `local` y `supabase`,
+- si faltan variables, `/reservations` sigue operando con `localStorage`,
+- si la configuración está completa, la lectura del listado viene desde Supabase,
+- las escrituras remotas se hacen vía server actions,
+- la store local sigue existiendo como capa de resiliencia y demostración.
+
 ### Riesgos
 
 - normalización de fecha/hora,

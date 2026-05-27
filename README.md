@@ -63,6 +63,7 @@ El foco actual ya no es la landing comercial, sino el sistema interno: roles dem
 - `supabase/schema.sql` ya modela el backend futuro de forma más completa.
 - La migración real a Supabase será incremental por módulo, no un reemplazo total de una vez.
 - Fase 4B deja `menu` preparado para leer/escribir en Supabase solo si las variables están completas; si no, el fallback local sigue siendo el comportamiento por defecto.
+- Fase 4C hace lo mismo para `reservations`: lectura y escritura remota opcional con fallback local garantizado.
 
 ## Cómo correr el proyecto
 
