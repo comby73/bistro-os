@@ -64,6 +64,8 @@ Tomando como referencia sistemas profesionales de gestión gastronómica, el mod
 - `order_items`
 - `payments`
 
+La entidad `reservations` ya tiene equivalente funcional en la demo actual y está preparada para evolucionar desde `localStorage` a persistencia relacional real en Fase 4.
+
 ### 2. Operación BOH
 
 - `kitchen_tickets`

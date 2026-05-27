@@ -65,7 +65,7 @@ La misma lógica de negocio puede renderizar experiencias distintas por rol sin 
 - `auth`: roles demo, selector y control de acceso.
 - `orders`: carga y seguimiento de pedidos.
 - `kitchen`: KDS demo y avance de estados.
-- `reservations`: reservas mock.
+- `reservations`: módulo operativo con store demo, filtros y acciones de estado.
 - `menu`: carta digital operativa.
 - `sales`: ventas y caja simulada.
 - `leads`: formulario comercial con automatización opcional.

@@ -13,6 +13,11 @@ describe("ReservationStatusBadge", () => {
     expect(screen.getByText("Confirmada")).toBeInTheDocument();
   });
 
+  it("muestra 'Sentada' para status seated", () => {
+    render(<ReservationStatusBadge status="seated" />);
+    expect(screen.getByText("Sentada")).toBeInTheDocument();
+  });
+
   it("muestra 'Cancelada' para status cancelled", () => {
     render(<ReservationStatusBadge status="cancelled" />);
     expect(screen.getByText("Cancelada")).toBeInTheDocument();

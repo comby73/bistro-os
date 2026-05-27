@@ -32,7 +32,7 @@ El foco actual ya no es la landing comercial, sino el sistema interno: roles dem
 | `/dashboard` | Vista interna adaptada por rol |
 | `/orders` | Pedidos activos + creación de pedido demo |
 | `/kitchen` | KDS demo con avance de estados |
-| `/reservations` | Gestión mock de reservas |
+| `/reservations` | Gestión operativa de reservas con store demo |
 | `/menu` | Carta digital / referencia operativa |
 | `/sales` | Ventas y caja simulada |
 | `/demo` | Formulario comercial / lead demo |
@@ -45,6 +45,7 @@ El foco actual ya no es la landing comercial, sino el sistema interno: roles dem
 - Pedidos.
 - Cocina.
 - Reservas.
+- Reservas operativas con filtros y estados.
 - Menú.
 - Ventas y caja simulada.
 - Captura de leads demo con automatización opcional.

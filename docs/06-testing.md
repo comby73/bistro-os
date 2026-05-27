@@ -7,8 +7,8 @@ La demo valida calidad con:
 - tests de validación,
 - tests de componentes básicos,
 - tests de configuración de roles,
-- tests de cálculos operativos.
-- La UX de pedidos/cocina puede iterar sin romper la lógica base ya cubierta.
+- tests de cálculos operativos,
+- margen para iterar UX sin romper la lógica base ya cubierta.
 
 ## Cobertura relevante hoy
 
@@ -17,6 +17,7 @@ La demo valida calidad con:
 - esquema de pedidos,
 - formulario demo,
 - badges de reservas,
+- cálculos de reservas desacoplados de la UI,
 - permisos por rol,
 - cálculos de ventas,
 - cálculos de pedidos.

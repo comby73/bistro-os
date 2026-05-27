@@ -6,7 +6,8 @@
 - `AppShell` interno y navegación contextual.
 - `/orders` con modo servicio para mozo.
 - `/kitchen` con tablero KDS simple.
-- `/reservations` y `/menu` con datos mock.
+- `/reservations` como módulo operativo con persistencia demo local.
+- `/menu` con datos mock.
 - `/sales` como ventas y caja operativa simulada.
 - `localStorage` como persistencia temporal de demo.
 - n8n opcional y no bloqueante.
@@ -21,9 +22,10 @@
 
 ## Fase 3B — Reservas operativas
 
-- Llevar reservas desde mock simple a flujo más realista.
+- Convertir reservas en flujo operativo local.
 - Relacionar reservas con mesas, turnos y estados.
 - Mejorar la lectura operativa para manager y owner.
+- Mantener localStorage hasta Fase 4.
 
 ## Fase 4 — Supabase real
 

@@ -1,8 +1,12 @@
+import { cookies } from "next/headers";
 import { AppShell } from "@/components/layout/AppShell";
-import { ReservationCard } from "@/components/reservations/ReservationCard";
-import { reservations } from "@/features/reservations/mock-data";
+import { ReservationsWorkspace } from "@/components/reservations/ReservationsWorkspace";
+import { DEMO_ROLE_COOKIE, parseDemoRole } from "@/features/auth/demo-session";
 
-export default function ReservationsPage() {
+export default async function ReservationsPage() {
+  const cookieStore = await cookies();
+  const roleId = parseDemoRole(cookieStore.get(DEMO_ROLE_COOKIE)?.value);
+
   return (
     <AppShell currentPath="/reservations">
       <section>
@@ -13,11 +17,13 @@ export default function ReservationsPage() {
           </h2>
         </div>
 
-        <div className="grid gap-5 xl:grid-cols-3">
-          {reservations.map((reservation) => (
-            <ReservationCard key={reservation.id} reservation={reservation} />
-          ))}
-        </div>
+        {roleId ? (
+          <ReservationsWorkspace roleId={roleId} />
+        ) : (
+          <div className="card-premium p-6 text-sm text-paper/60">
+            Seleccioná un rol demo para operar reservas.
+          </div>
+        )}
       </section>
     </AppShell>
   );
