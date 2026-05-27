@@ -27,8 +27,8 @@ export function Hero() {
           <Link href="/demo" className="btn-gold">
             Probar 14 días gratis
           </Link>
-          <Link href="/dashboard" className="btn-ghost">
-            Ver demo
+          <Link href="/login" className="btn-ghost">
+            Entrar al sistema demo
           </Link>
         </div>
 
