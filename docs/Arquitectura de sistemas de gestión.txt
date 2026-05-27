@@ -1,0 +1,444 @@
+Arquitectura de sistemas de gestión gastronómica: modelos de referencia para el diseño y réplica de software educativo
+La selección de un sistema de gestión de restaurantes (RMS - Restaurant Management System) como modelo para el diseño curricular de un curso de desarrollo de software ofrece un entorno de aprendizaje idóneo para los estudiantes. Este dominio integra desafíos transaccionales complejos, como la sincronización en tiempo real entre el salón y la cocina, la gestión de inventarios con deducción automatizada a nivel de ingrediente y la interoperabilidad con servicios de pasarelas de pago y plataformas de reparto externas. Para estructurar un curso riguroso y progresivo, es fundamental analizar las plataformas comerciales más avanzadas del mercado, identificar sus patrones arquitectónicos y proporcionar una hoja de ruta técnica que permita replicar estos modelos a menor escala.   
+
+Análisis comparativo de los sistemas líderes del mercado gastronómico
+El análisis de la oferta tecnológica actual revela dos aproximaciones arquitectónicas diferenciadas: las soluciones globales integradas para restaurantes de alta complejidad y los sistemas modulares diseñados para mercados emergentes que priorizan la agilidad y las integraciones de pago locales.
+
+Toast POS: el estándar de oro en sistemas empresariales gastronómicos
+A nivel global, Toast POS representa el ecosistema de administración gastronómica más robusto y mejor valorado del mercado. En plataformas de análisis comparativo como G2, Toast lidera con una puntuación de satisfacción de 88 sobre 100, superando a competidores consolidados como Lightspeed, que promedia 76 puntos. Esta diferencia radica en que Toast fue diseñado exclusivamente para la industria gastronómica desde sus cimientos, evitando adaptar sistemas genéricos de venta minorista (retail) que suelen presentar fricciones operativas en el entorno de un restaurante.   
+
+La arquitectura de Toast abarca de manera cohesiva el front-of-house (FOH), el back-of-house (BOH) y la gestión corporativa multipropiedad. Entre sus características de diseño más destacadas para la replicación académica se encuentra su resiliencia operativa: posee un modo sin conexión (offline mode) sumamente fiable que continúa procesando comandas y transacciones de pago durante caídas de conectividad a internet, sincronizando el almacén de datos una vez que se restablece la comunicación.   
+
+Fudo: el modelo de agilidad y digitalización en Latinoamérica
+En el ámbito latinoamericano, Fudo destaca como la plataforma de gestión SaaS más extendida, con más de 30.000 clientes activos. Su ventaja competitiva reside en una infraestructura flexible basada en la nube que elimina el requisito de utilizar hardware especializado, permitiendo operar desde cualquier navegador convencional o dispositivo móvil. Fudo simplifica la administración mediante la unificación de los canales de venta física con herramientas de entrega a domicilio (delivery) y un agente de inteligencia artificial integrado para procesar pedidos de WhatsApp de manera automatizada.   
+
+A pesar de su éxito comercial, los análisis de usuario de Fudo revelan ciertas deficiencias operativas que los estudiantes de un curso técnico pueden abordar como oportunidades de mejora. Entre estas destacan la inestabilidad en la facturación electrónica localizada para ciertos países de la región, la pérdida ocasional de la sesión de usuario activa al cargar el primer pedido del día y la falta de visibilidad en tiempo real de los niveles de stock durante la toma de comandas móviles.   
+
+Alternativas híbridas y de código abierto como marcos de desarrollo
+Existen otros sistemas con enfoques de diseño relevantes que complementan el espectro tecnológico para un curso:
+
+Tango Restô / Maxirest: Referentes consolidados en la región argentina que destacan por su control fiscal local riguroso, la administración de cuentas corrientes de clientes y una estrecha integración con pasarelas de pago electrónico como Mercado Pago mediante códigos QR dinámicos.   
+
+TastyIgniter: Un sistema de gestión gastronómica de código abierto basado en el framework PHP Laravel que expone una estructura modular ideal para el análisis de código. Su diseño basado en controladores, vistas reemplazables y componentes extensibles permite a los estudiantes comprender cómo se estructuran las reservas y el procesamiento de comandas en entornos de producción reales.   
+
+BalanceIQ: Una aplicación de escritorio de código abierto construida con Electron, React y SQLite. Es un referente excepcional para proyectos estudiantiles individuales que requieran operar completamente fuera de línea (offline-first), garantizando la propiedad local de los datos y la auto-recuperación ante fallas mediante copias de seguridad automáticas en formato JSON.   
+
+Estructura funcional de Toast POS como modelo de API para el curso
+Para que los estudiantes comprendan la magnitud de un sistema de producción, el curso puede utilizar el catálogo de APIs de Toast POS como mapa de servicios de referencia. La plataforma de Toast expone un modelo de datos segmentado en 17 servicios especializados que interactúan mediante solicitudes de lectura (GET) y escritura (POST, PUT, PATCH, DELETE), así como flujos salientes (outbound) basados en webhooks para integrar programas de fidelización y gift cards.   
+
+La siguiente tabla describe de manera detallada el catálogo de APIs de Toast POS, indicando su funcionalidad principal, métodos de acceso y aplicabilidad educativa :   
+
+Servicio de API	
+Propósito funcional en producción 
+
+Métodos HTTP permitidos 
+
+Valor pedagógico para el estudiante
+Analytics (era)	
+Proporciona acceso a métricas consolidadas de rendimiento operativo, ventas e informes financieros avanzados.
+
+GET, POST	
+Enseña el diseño de tableros de control de datos (dashboards) y la generación de reportes basados en agregaciones complejas.
+
+Cash Management (cashmgmt)	
+Registra eventos del cajón de dinero, depósitos, ingresos manuales y egresos de caja no asociados a ventas.
+
+GET	
+Introduce la lógica contable de auditoría física de efectivo contra transacciones digitales del POS.
+
+Configuration (config)	
+Expone configuraciones generales del local, como centros de ingresos, opciones de pago y Dining Options.
+
+GET	
+Enseña el uso de identificadores globales únicos (GUIDs) para asociar entidades relacionales complejas.
+
+Credit Cards (ccpartner)	
+Autoriza cobros con tarjetas de crédito que luego son aplicados a las cuentas creadas en el sistema de órdenes.
+
+PUT	
+Enseña los protocolos seguros para el procesamiento transaccional de pagos externos.
+
+Gift Cards	
+API de salida que delega el procesamiento y consumo de tarjetas de regalo a proveedores externos.
+
+Outbound POST	
+Introduce la creación de integraciones asíncronas basadas en endpoints externos configurables.
+
+Kitchen (kitchen)	
+Administra la asignación y visualización de comandas digitales en estaciones de preparación del local.
+
+GET	
+Permite modelar el flujo de transiciones de estado de los platos de comida en tiempo real.
+
+Labor (labor)	
+Controla registros de empleados, asignación de turnos, puestos de trabajo e historial de asistencia.
+
+GET, POST, PUT, PATCH, DELETE	
+Enseña la implementación de sistemas de control de asistencia y liquidación básica de salarios por turnos.
+
+Loyalty	
+API saliente para verificar clientes y sumar puntos de programas de fidelización externos en cada pago.
+
+Outbound POST	
+Enseña el desarrollo de servicios desacoplados basados en la arquitectura de microservicios.
+
+Menus (menus)	
+Recupera la estructura jerárquica de la carta gastronómica configurada y resuelta para la sucursal.
+
+GET	
+Modela la estructuración eficiente de catálogos con jerarquías anidadas (Menú -> Grupo -> Ítem -> Modificadores).
+
+Orders (orders)	
+Servicio principal que permite crear, actualizar y saldar comandas, cuentas físicas de mesa y cobros.
+
+GET, POST, PATCH	
+Constituye el núcleo operativo de cualquier POS; expone las transacciones de lectura y escritura concurrentes.
+
+Order Management (ordermgmt-config)	
+Almacena los horarios habilitados y las restricciones de los servicios de pedidos en línea.
+
+GET	
+Introduce la lógica de control temporal y de disponibilidad operativa en el backend de servicios.
+
+Packaging (packaging)	
+Define preferencias y empaquetados sugeridos para pedidos con envío a domicilio o retiro.
+
+GET	
+Ejemplifica la configuración personalizada de logística de despacho físico de productos terminados.
+
+Partners (partners)	
+Enumera los restaurantes habilitados y autorizados para el cliente API dentro del grupo de gestión.
+
+GET	
+Enseña el diseño de aplicaciones multi-inquilino (multi-tenant) con aislamiento de datos.
+
+Restaurant Availability	
+Indica el estado de aceptación de pedidos en línea de la cocina en tiempo real.
+
+GET	
+Modela el manejo de disponibilidad de servicios dinámicos en entornos web transaccionales.
+
+Restaurants (restaurants)	
+Expone detalles estáticos de la sucursal como dirección, teléfono, coordenadas geográficas e impuestos locales.
+
+GET	
+Proporciona datos de configuración global que alimentan las pantallas de cobro y los tickets de facturación.
+
+Stock (stock)	
+Gestiona la disponibilidad física inmediata de productos y modificadores del menú.
+
+GET, POST, PUT	
+Enseña la implementación de mecanismos de parada de emergencia (stockout) para evitar la venta de platos sin insumos.
+
+Tender	
+API de salida que informa al sistema de tesorería externo cada vez que se procesa un cobro o una devolución.
+
+Outbound POST	
+Introduce conceptos de reconciliación financiera automática de fin de jornada.
+
+  
+Modularización educativa basada en la progresión de Fudo
+Replicar el ecosistema completo de Toast POS en un curso cuatrimestral puede resultar inabordable para los estudiantes. Por ello, se recomienda adoptar un esquema de desarrollo ágil incremental inspirado en la estructura comercial de Fudo. Al segmentar los módulos del sistema según los planes de facturación tradicionales, los instructores pueden programar entregas de software progresivas que aumenten el nivel de complejidad del sistema.   
+
+La siguiente tabla propone una equivalencia curricular directa entre los planes funcionales de Fudo y los hitos de entrega (sprints) del curso gastronómico :   
+
+Plan funcional (Fudo)	
+Características del sistema real 
+
+Objetivo de desarrollo académico (Sprints del curso)
+Plan Inicial	
+Enfocado en ventas directas por mostrador, arqueos básicos de caja, impresión analógica de comandas y aplicación de descuentos estáticos.
+
+Sprint 1: Núcleo Transaccional (POS y Caja). Desarrollo del catálogo del menú, facturación por mostrador y lógica básica de cobro manual.
+
+Plan Avanzado	
+Incorpora el control de inventario de materias primas, configuración de recetas (fórmulas de platos), cuentas corrientes de clientes y reportes de rentabilidad.
+
+Sprint 2: Gestión Administrativa (Back of House). Programación del módulo de recetas, deducción de stock por venta y generación de reportes financieros.
+
+Plan Pro	
+Desbloquea la gestión multi-caja en simultáneo, múltiples turnos de personal, listas de precios segmentadas y arqueos de caja ciegos de seguridad.
+
+Sprint 3: Seguridad, Auditoría y Escalabilidad. Control de acceso por roles, persistencia transaccional aislada para múltiples cajas y turnos de personal.
+
+  
+Diseño del modelo de datos de persistencia (PostgreSQL ERD)
+Para construir un sistema sólido, el curso debe hacer hincapié en un modelo de base de datos relacional normalizado en Tercera Forma Normal (3FN), garantizando que las llaves primarias, foráneas y restricciones lógicas impidan estados de datos inconsistentes.   
+
+Un aspecto crítico de diseño que los estudiantes deben incorporar es la denominación de la tabla de cabecera de pedidos. Es una excelente práctica docente prohibir el uso del término genérico order como nombre de tabla, ya que constituye una palabra clave reservada en SQL estándar (asociada a la cláusula ORDER BY), sugiriendo en su lugar alternativas como placed_orders. Asimismo, para el diseño de la carta, los estudiantes pueden optar por esquemas simplificados de relación jerárquica con columnas enteras para categorías, o implementar llaves primarias compuestas (menu_id, id) para restringir que los platos pertenezcan de manera estricta al ámbito de un único menú activo.   
+
+Script de generación física de la base de datos relacional
+El siguiente código SQL escrito para PostgreSQL proporciona el punto de partida físico del almacén de datos transaccional, con tipos de datos adecuados, claves foráneas, restricciones de control y la indexación requerida para un rendimiento de producción :   
+
+SQL
+-- Definición de tipos ENUM propios del dominio de negocio gastronómico
+CREATE TYPE rol_empleado AS ENUM ('administrador', 'cajero', 'mozo', 'cocinero');
+CREATE TYPE estado_mesa AS ENUM ('disponible', 'ocupada', 'reservada', 'limpieza');
+CREATE TYPE estado_pedido AS ENUM ('pendiente', 'preparacion', 'listo', 'entregado', 'cerrado', 'cancelado');
+CREATE TYPE metodo_pago AS ENUM ('efectivo', 'tarjeta_debito', 'tarjeta_credito', 'qr_mercadopago', 'delivery_app');
+
+-- 1. Tabla de Clientes
+CREATE TABLE customers (
+    customer_id SERIAL PRIMARY KEY,
+    first_name VARCHAR(100) NOT NULL,
+    last_name VARCHAR(100) NOT NULL,
+    phone_number VARCHAR(20),
+    email VARCHAR(150) UNIQUE,
+    signup_date DATE DEFAULT CURRENT_DATE NOT NULL
+);
+
+-- 2. Tabla de Empleados
+CREATE TABLE employees (
+    employee_id SERIAL PRIMARY KEY,
+    first_name VARCHAR(100) NOT NULL,
+    last_name VARCHAR(100) NOT NULL,
+    role_type rol_empleado NOT NULL,
+    phone_number VARCHAR(20),
+    salary DECIMAL(10, 2) CHECK (salary >= 0) NOT NULL,
+    is_active BOOLEAN DEFAULT TRUE NOT NULL
+);
+
+-- 3. Tabla de Mesas del Salón
+CREATE TABLE restaurant_tables (
+    table_id SERIAL PRIMARY KEY,
+    table_number INTEGER UNIQUE NOT NULL,
+    capacity INTEGER CHECK (capacity > 0) NOT NULL,
+    current_status estado_mesa DEFAULT 'disponible' NOT NULL,
+    location_zone VARCHAR(100) NOT NULL -- Ej: 'Salón Principal', 'Terraza'
+);
+
+-- 4. Tabla de Reservas de Mesa
+CREATE TABLE reservations (
+    reservation_id SERIAL PRIMARY KEY,
+    customer_id INTEGER REFERENCES customers(customer_id) ON DELETE RESTRICT NOT NULL,
+    table_id INTEGER REFERENCES restaurant_tables(table_id) ON DELETE RESTRICT NOT NULL,
+    reservation_date DATE NOT NULL,
+    reservation_time TIME NOT NULL,
+    number_of_guests INTEGER CHECK (number_of_guests > 0) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+-- 5. Tabla de Categorías de la Carta
+CREATE TABLE menu_categories (
+    category_id SERIAL PRIMARY KEY,
+    category_name VARCHAR(100) NOT NULL UNIQUE,
+    description TEXT
+);
+
+-- 6. Tabla de Ítems del Menú (Platos y Bebidas)
+CREATE TABLE menu_items (
+    menu_item_id SERIAL PRIMARY KEY,
+    category_id INTEGER REFERENCES menu_categories(category_id) ON DELETE RESTRICT NOT NULL,
+    item_name VARCHAR(150) NOT NULL,
+    description TEXT,
+    price DECIMAL(10, 2) CHECK (price >= 0) NOT NULL,
+    estimated_prep_time INTERVAL NOT NULL,
+    is_active BOOLEAN DEFAULT TRUE NOT NULL
+);
+
+-- 7. Tabla de Ingredientes (Materia Prima en Almacén)
+CREATE TABLE ingredients (
+    ingredient_id SERIAL PRIMARY KEY,
+    ingredient_name VARCHAR(150) NOT NULL UNIQUE,
+    quantity_available DECIMAL(10, 3) CHECK (quantity_available >= 0) NOT NULL,
+    unit_of_measure VARCHAR(20) NOT NULL, -- Ej: 'kg', 'lt', 'unidades'
+    reorder_level DECIMAL(10, 3) CHECK (reorder_level >= 0) NOT NULL, -- Umbral de notificación
+    unit_cost DECIMAL(10, 2) CHECK (unit_cost >= 0) NOT NULL
+);
+
+-- 8. Tabla de Recetas (Relación N:M entre Menú e Ingredientes)
+CREATE TABLE recipe_ingredients (
+    menu_item_id INTEGER REFERENCES menu_items(menu_item_id) ON DELETE CASCADE,
+    ingredient_id INTEGER REFERENCES ingredients(ingredient_id) ON DELETE RESTRICT,
+    quantity_required DECIMAL(10, 3) CHECK (quantity_required > 0) NOT NULL,
+    PRIMARY KEY (menu_item_id, ingredient_id)
+);
+
+-- 9. Tabla de Pedidos (Cabecera Principal)
+CREATE TABLE placed_orders (
+    order_id SERIAL PRIMARY KEY,
+    customer_id INTEGER REFERENCES customers(customer_id) ON DELETE SET NULL,
+    employee_id INTEGER REFERENCES employees(employee_id) ON DELETE RESTRICT NOT NULL,
+    table_id INTEGER REFERENCES restaurant_tables(table_id) ON DELETE RESTRICT, -- Nulo si es Delivery o Mostrador
+    order_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    current_status estado_pedido DEFAULT 'pendiente' NOT NULL,
+    delivery_address TEXT, -- Solo si aplica a reparto a domicilio
+    total_amount DECIMAL(10, 2) DEFAULT 0.00 CHECK (total_amount >= 0) NOT NULL
+);
+
+-- 10. Tabla de Detalles del Pedido (Comanda Desglozada)
+CREATE TABLE order_items (
+    order_item_id SERIAL PRIMARY KEY,
+    order_id INTEGER REFERENCES placed_orders(order_id) ON DELETE CASCADE NOT NULL,
+    menu_item_id INTEGER REFERENCES menu_items(menu_item_id) ON DELETE RESTRICT NOT NULL,
+    quantity INTEGER CHECK (quantity > 0) NOT NULL,
+    unit_price DECIMAL(10, 2) CHECK (unit_price >= 0) NOT NULL,
+    customer_notes TEXT -- Modificadores ej: 'sin aderezo', 'carne bien cocida'
+);
+
+-- 11. Tabla de Pagos Realizados
+CREATE TABLE payments (
+    payment_id SERIAL PRIMARY KEY,
+    order_id INTEGER REFERENCES placed_orders(order_id) ON DELETE RESTRICT NOT NULL,
+    payment_type metodo_pago NOT NULL,
+    amount_paid DECIMAL(10, 2) CHECK (amount_paid > 0) NOT NULL,
+    payment_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+-- Creación de índices lógicos para acelerar operaciones de agregación y reportes frecuentes [3]
+CREATE INDEX idx_placed_orders_status ON placed_orders(current_status);
+CREATE INDEX idx_placed_orders_date ON placed_orders(order_date);
+CREATE INDEX idx_order_items_order ON order_items(order_id);
+Integraciones y comunicación: diseño de API y Webhooks
+Un software moderno debe interoperar con servicios externos de manera segura y controlada. Por ende, el backend de la réplica desarrollada por los estudiantes debe exponer contratos de API REST claros y ofrecer mecanismos asíncronos para comunicar los cambios en el estado de las comandas a la cocina o a plataformas externas como PedidosYa o Rappi.   
+
+Endpoint de Creación de Pedido (POST /api/v1/orders)
+Este contrato JSON describe la inyección de una comanda al POS desde un terminal móvil de camarero o una aplicación de e-commerce externa :   
+
+JSON
+{
+  "customer_id": 48,
+  "employee_id": 3,
+  "table_id": 12,
+  "delivery_address": null,
+  "items":,
+  "discounts": {
+    "type": "porcentual",
+    "value": 15.00
+  }
+}
+Integración asíncrona mediante Webhooks de eventos
+Cuando la cocina finaliza la preparación de los platos asociados a una comanda, el monitor de visualización (KDS) emite un evento transaccional. El servidor procesa este cambio y despacha un webhook con firma SHA-256 en las cabeceras hacia las aplicaciones del local o el servicio de reparto asignado, notificando que los productos se encuentran listos para despacho.   
+
+Carga útil de Webhook: Evento ORDER-READY-TO-DELIVER
+JSON
+{
+  "event_type": "ORDER-READY-TO-DELIVER",
+  "event_timestamp": "2026-05-27T08:42:15Z",
+  "client_id": "cli_fudo_delivery_99182",
+  "data": {
+    "order_id": 8847,
+    "table_number": 12,
+    "dispatcher_employee": "Roberto Paz",
+    "shipping_cost": 3.50,
+    "preparation_duration_seconds": 1080,
+    "items_to_deliver": [
+      {
+        "item_name": "Hamburguesa Completa",
+        "quantity": 1
+      },
+      {
+        "item_name": "Limonada de Menta",
+        "quantity": 2
+      }
+    ]
+  }
+}
+Teoría operativa de Back of House: fórmulas de costeo e inventario
+El desarrollo del módulo de gestión de cocina y costeo ofrece a los estudiantes una excelente oportunidad para aplicar principios lógicos y matemáticos a problemas reales del comercio de alimentos. El software debe monitorear el costo de producción y advertir si los márgenes de ganancia se contraen debido a la inflación de insumos de proveedores.   
+
+Para implementar esto de manera correcta en el código del backend, los estudiantes deben aplicar los siguientes modelos matemáticos:
+
+Costo de preparación de una receta (
+C 
+P
+​
+ 
+)
+
+Determina el costo real de las materias primas consumidas para confeccionar un plato específico del menú. Se calcula sumando la cantidad requerida de cada ingrediente multiplicada por su respectivo costo de adquisición unitario del proveedor registrado en base de datos :   
+
+C 
+P
+​
+ = 
+i=1
+∑
+n
+​
+ (Q 
+required,i
+​
+ ×U 
+cost,i
+​
+ )
+Donde:
+
+Q 
+required,i
+​
+ 
+es la cantidad exacta de la materia prima
+
+i
+ especificada en la receta.   
+
+U 
+cost,i
+​
+ 
+es el precio unitario del ingrediente
+
+i
+ actualizado tras la última carga de compras al proveedor.   
+
+Margen de rentabilidad bruta de plato (
+M 
+RP
+​
+ 
+)
+
+Este indicador cuantifica la viabilidad financiera de cada plato de la carta de cara a sostener los gastos fijos del local gastronómico :   
+
+M 
+RP
+​
+ =( 
+P 
+sale
+​
+ 
+P 
+sale
+​
+ −C 
+P
+​
+ 
+​
+ )×100
+Donde:
+
+P 
+sale
+​
+ 
+ es el precio final de cara al público asociado al ítem del menú.   
+
+C 
+P
+​
+ 
+ es el costo neto de preparación derivado de la receta activa.   
+
+El software desarrollado por los estudiantes puede emitir alertas visuales automáticas cuando el valor de
+
+M 
+RP
+​
+ 
+descienda por debajo de un umbral aceptable (usualmente fijado en el
+
+65%
+o
+
+70%
+ en la restauración profesional), sugiriendo de manera automatizada ajustar el valor de venta del plato o cotizar insumos con proveedores alternativos.   
+
+Conclusiones para la implementación curricular
+El desarrollo de una versión educativa de un sistema de gestión de restaurantes constituye un proyecto integrador idóneo para culminar un ciclo de formación técnica. Al contrastar el enfoque nativo y robusto de Toast POS con el dinamismo y accesibilidad multiplataforma de Fudo, el cuerpo docente cuenta con modelos conceptuales idóneos para plantear soluciones de software escalables, transaccionales y con un alto nivel de resiliencia ante caídas de servicio.   
+
+Replicar de manera guiada estos esquemas transaccionales, el costeo automatizado de inventarios y la mensajería asíncrona mediante webhooks faculta a los estudiantes a egresar del aula dominando no solo conceptos teóricos de bases de datos o APIs, sino destrezas de ingeniería aplicada indispensables para insertarse con éxito en la industria contemporánea del desarrollo de software.
+

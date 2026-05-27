@@ -45,3 +45,19 @@ Más que una landing, Bistró OS hoy demuestra arquitectura y flujo operativo de
 3. Fase 4: Supabase real.
 4. Fase 5: automatización n8n opcional.
 5. Fase 6: defensa y presentación final.
+
+## Evolución profesional del producto
+
+Bistró OS puede explicarse como una evolución progresiva desde una demo operativa hacia un sistema de gestión gastronómica más profesional:
+
+- **Etapa actual**: MVP funcional con roles, pedidos, cocina, reservas, menú y ventas/caja simulada.
+- **Etapa transaccional**: persistencia real en Supabase para pedidos, reservas, kitchen tickets y caja.
+- **Etapa de integración**: APIs internas y webhooks opcionales para automatizaciones o terceros.
+- **Etapa BOH avanzada**: stock, recetas, costeo y alertas operativas.
+
+Este camino permite defender que el producto ya tiene una base arquitectónica consistente, aunque todavía no implemente:
+
+- facturación fiscal real,
+- pagos externos reales,
+- delivery,
+- inventario y costeo productivo.

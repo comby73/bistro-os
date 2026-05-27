@@ -70,6 +70,36 @@ La misma lógica de negocio puede renderizar experiencias distintas por rol sin 
 - `sales`: ventas y caja simulada.
 - `leads`: formulario comercial con automatización opcional.
 
+## Modelo operativo de referencia
+
+Como referencia conceptual, Bistró OS se alinea con la separación clásica entre:
+
+- **FOH (Front of House)**: salón, toma de pedidos, reservas, atención de mesa, caja operativa.
+- **BOH (Back of House)**: cocina, preparación, control interno, stock futuro, costeo futuro.
+
+Aplicado al estado actual del proyecto:
+
+- `waiter` opera FOH rápido desde `/orders`.
+- `manager` coordina FOH desde dashboard, reservas y supervisión de pedidos.
+- `kitchen` opera BOH desde `/kitchen` como KDS.
+- `owner` y `admin` observan el conjunto con foco de gestión.
+
+Este modelo ayuda a ordenar el producto en módulos transaccionales claros:
+
+- **Pedidos** como núcleo de operación entre salón y cocina.
+- **KDS / cocina** como reflejo del avance del pedido en tiempo real.
+- **Ventas y caja** como cierre operativo del turno.
+- **Menú** como catálogo jerárquico de productos, categorías y disponibilidad.
+
+## Integraciones futuras de referencia
+
+Sin implementarlas todavía, la arquitectura deja espacio para:
+
+- APIs REST internas para pedidos, reservas, menú y caja.
+- Webhooks salientes para eventos como `order.ready` o resúmenes operativos.
+- Disponibilidad dinámica de cocina y menú.
+- Stock y costeo como módulos BOH de una fase posterior.
+
 ## Integraciones
 
 - La app debe operar aunque n8n no exista o falle.
