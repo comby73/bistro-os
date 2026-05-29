@@ -21,14 +21,11 @@ export function HeroCarousel({
   const [current, setCurrent] = useState(0);
   const [fade, setFade] = useState(true);
 
-  /* Genera candidatos: primero las del restaurante, luego genéricas como fallback */
-  const candidates = Array.from({ length: MAX_SLIDES }, (_, i) => i + 1).flatMap((n) => {
-    const specific = slug ? [`/${slug}-hero${n}.jpg`] : [];
-    const generic  = [`/restaurant-hero${n}.jpg`];
-    return [...specific, ...generic];
-  });
-  // deduplicar manteniendo orden
-  const STATIC_SLIDES = [...new Set(candidates)];
+  // Si hay slug → solo imágenes de ese restaurante (sin fallback genérico)
+  // Si no hay slug → imágenes genéricas
+  const STATIC_SLIDES = Array.from({ length: MAX_SLIDES }, (_, i) => i + 1).map((n) =>
+    slug ? `/${slug}-hero${n}.jpg` : `/restaurant-hero${n}.jpg`
+  );
 
   /* detecta qué imágenes existen cargándolas en background */
   useEffect(() => {
