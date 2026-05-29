@@ -2,11 +2,11 @@ import Link from "next/link";
 import { BrandLogo } from "@/components/brand/BrandLogo";
 
 const links = [
-  { href: "#how", label: "Cómo funciona" },
-  { href: "#features", label: "Plataforma" },
-  { href: "#testimonials", label: "Clientes" },
-  { href: "#pricing", label: "Precios" },
-  { href: "#faq", label: "FAQ" }
+  { href: "/#how", label: "Cómo funciona" },
+  { href: "/#features", label: "Plataforma" },
+  { href: "/#testimonials", label: "Clientes" },
+  { href: "/#pricing", label: "Precios" },
+  { href: "/#faq", label: "FAQ" }
 ];
 
 export function Navbar() {

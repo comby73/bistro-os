@@ -4,10 +4,12 @@ import { OrdersWorkspace } from "@/components/orders/OrdersWorkspace";
 import { DEMO_ROLE_COOKIE, parseDemoRole } from "@/features/auth/demo-session";
 import { getRoleConfig } from "@/features/auth/roles";
 import { getMenuCatalog } from "@/features/menu/repository";
+import { getActiveRestaurantSession } from "@/features/restaurants/session";
 
 export default async function OrdersPage() {
   const cookieStore = await cookies();
   const roleId = parseDemoRole(cookieStore.get(DEMO_ROLE_COOKIE)?.value);
+  const restaurantSession = getActiveRestaurantSession(cookieStore);
   const role = roleId ? getRoleConfig(roleId) : null;
   const menuCatalog = await getMenuCatalog();
   const initialMenuCatalog =
@@ -33,6 +35,7 @@ export default async function OrdersPage() {
             roleId={roleId}
             roleLabel={role.label}
             initialMenuCatalog={initialMenuCatalog}
+            restaurantId={restaurantSession?.restaurantId}
           />
         ) : (
           <div className="card-premium p-6 text-sm text-paper/60">

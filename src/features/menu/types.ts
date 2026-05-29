@@ -8,6 +8,7 @@ export interface MenuCategory {
 
 export interface MenuItem {
   id: string;
+  restaurant_id: string;
   category_id: string;
   name: string;
   description: string;

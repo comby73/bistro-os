@@ -45,13 +45,17 @@ function QuickAccessCard({
 
 export function DashboardWorkspace({
   roleId,
-  roleLabel
+  roleLabel,
+  restaurantId,
+  restaurantName
 }: {
   roleId: RoleId;
   roleLabel: string;
+  restaurantId?: string;
+  restaurantName?: string;
 }) {
-  const { orders } = useDemoOrders();
-  const { reservations } = useDemoReservations();
+  const { orders } = useDemoOrders(restaurantId);
+  const { reservations } = useDemoReservations({ restaurantId });
   const currentTime = useDemoClock();
   const effectiveNow = currentTime > 0 ? currentTime : FALLBACK_NOW;
   const today = new Date(effectiveNow).toISOString().slice(0, 10);
@@ -87,6 +91,11 @@ export function DashboardWorkspace({
         <h2 className="text-4xl font-bold tracking-[-0.05em] text-paper md:text-6xl">
           Vista interna para {roleLabel}.
         </h2>
+        {restaurantName && (
+          <p className="mt-3 text-[15px] text-paper/65">
+            Operando en <span className="font-semibold text-gold">{restaurantName}</span>
+          </p>
+        )}
       </div>
 
       {(roleId === "owner" || roleId === "admin") && (

@@ -8,17 +8,25 @@ import { OrdersManagementBoard } from "./OrdersManagementBoard";
 export function OrdersWorkspace({
   roleId,
   roleLabel,
-  initialMenuCatalog
+  initialMenuCatalog,
+  restaurantId
 }: {
   roleId: RoleId;
   roleLabel: string;
   initialMenuCatalog?: MenuCatalog;
+  restaurantId?: string;
 }) {
   const canCreate = roleId === "waiter";
 
   if (canCreate) {
-    return <OrderComposer defaultWaiterName={roleLabel} initialMenuCatalog={initialMenuCatalog} />;
+    return (
+      <OrderComposer
+        defaultWaiterName={roleLabel}
+        initialMenuCatalog={initialMenuCatalog}
+        restaurantId={restaurantId}
+      />
+    );
   }
 
-  return <OrdersManagementBoard />;
+  return <OrdersManagementBoard restaurantId={restaurantId} />;
 }

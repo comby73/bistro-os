@@ -37,8 +37,8 @@ const statusConfig = [
   }
 ] as const;
 
-export function KitchenBoard({ roleId }: { roleId: RoleId }) {
-  const { orders, advanceOrderStatus } = useDemoOrders();
+export function KitchenBoard({ roleId, restaurantId }: { roleId: RoleId; restaurantId?: string }) {
+  const { orders, advanceOrderStatus } = useDemoOrders(restaurantId);
   const currentTime = useDemoClock();
   const groupedOrders = useMemo(
     () => groupOrdersByStatus(orders.filter((order) => KITCHEN_ACTIVE_STATUSES.includes(order.status))),

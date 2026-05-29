@@ -7,7 +7,8 @@ const PROTECTED_ROUTES = [
   "/orders",
   "/reservations",
   "/kitchen",
-  "/menu"
+  "/menu",
+  "/users"
 ];
 
 /**

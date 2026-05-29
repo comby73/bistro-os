@@ -7,6 +7,7 @@ function minutesAgo(minutes: number): string {
 export const orders: Order[] = [
   {
     id: "ORD-1042",
+    restaurant_id: "rest-bistro",
     table: "Mesa 7",
     status: "preparing",
     created_at: minutesAgo(12),
@@ -31,6 +32,7 @@ export const orders: Order[] = [
   },
   {
     id: "ORD-1043",
+    restaurant_id: "rest-bistro",
     table: "Mesa 11",
     status: "received",
     created_at: minutesAgo(4),

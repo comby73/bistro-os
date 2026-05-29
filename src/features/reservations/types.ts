@@ -7,6 +7,8 @@ export type ReservationStatus =
 
 export interface Reservation {
   id: string;
+  restaurant_id?: string;
+  branch_id?: string;
   customer_name: string;
   contact_phone: string;
   date: string;

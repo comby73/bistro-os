@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, startTransition } from "react";
 import { QRCodeSVG } from "qrcode.react";
 import { QrCode, Copy, Check, ExternalLink, Printer } from "lucide-react";
 
@@ -9,7 +9,7 @@ export function QRPanel() {
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
-    setOrigin(window.location.origin);
+    startTransition(() => setOrigin(window.location.origin));
   }, []);
 
   const cartaUrl = `${origin}/carta`;

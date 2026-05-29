@@ -77,7 +77,8 @@ export function useDemoReservations({
   persistCreate,
   persistStatus,
   persistTable,
-  persistCancel
+  persistCancel,
+  restaurantId
 }: {
   initialReservations?: Reservation[];
   dataSource?: ReservationsDataSource;
@@ -88,12 +89,17 @@ export function useDemoReservations({
   ) => Promise<unknown>;
   persistTable?: (reservationId: string, tableAssigned: string) => Promise<unknown>;
   persistCancel?: (reservationId: string) => Promise<unknown>;
+  restaurantId?: string;
 } = {}) {
-  const reservations = useSyncExternalStore(
+  const allReservations = useSyncExternalStore(
     subscribe,
     readReservationsSnapshot,
     () => cachedReservations
   );
+
+  const reservations = restaurantId
+    ? allReservations.filter((reservation) => reservation.restaurant_id === restaurantId)
+    : allReservations;
 
   useEffect(() => {
     if (typeof window === "undefined") return;

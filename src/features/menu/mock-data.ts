@@ -9,6 +9,7 @@ export const menuCategories: MenuCategory[] = [
 export const menuItems: MenuItem[] = [
   {
     id: "item-1",
+    restaurant_id: "rest-bistro",
     category_id: "cat-1",
     name: "Tartar de atún rojo",
     description: "Palta cremosa, sésamo tostado y soja cítrica. Una entrada fresca que despierta el paladar con textura y profundidad marina.",
@@ -20,6 +21,7 @@ export const menuItems: MenuItem[] = [
   },
   {
     id: "item-2",
+    restaurant_id: "rest-bistro",
     category_id: "cat-2",
     name: "Risotto de hongos",
     description: "Hongos de estación salteados a fuego vivo, fundidos en arroz cremoso con parmesano añejo y un hilo de aceite de trufa. Reconfortante y elegante.",
@@ -31,6 +33,7 @@ export const menuItems: MenuItem[] = [
   },
   {
     id: "item-4",
+    restaurant_id: "rest-bistro",
     category_id: "cat-2",
     name: "Cordero patagónico",
     description: "Cocción lenta para una carne que se deshace sola. Puré ahumado, jugo reducido de cocción y hierbas frescas de temporada. El plato de la casa.",
@@ -42,6 +45,7 @@ export const menuItems: MenuItem[] = [
   },
   {
     id: "item-3",
+    restaurant_id: "rest-bistro",
     category_id: "cat-3",
     name: "Negroni de la casa",
     description: "Nuestra versión del clásico: gin artesanal, bitter seleccionado, vermut rojo y twist de naranja. Amargo, complejo y adictivo.",

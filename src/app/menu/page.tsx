@@ -8,10 +8,12 @@ import {
 } from "@/features/menu/actions";
 import { getMenuCatalog } from "@/features/menu/repository";
 import { getRoleConfig } from "@/features/auth/roles";
+import { getActiveRestaurantSession } from "@/features/restaurants/session";
 
 export default async function MenuPage() {
   const cookieStore = await cookies();
   const roleId = parseDemoRole(cookieStore.get(DEMO_ROLE_COOKIE)?.value);
+  const restaurantSession = getActiveRestaurantSession(cookieStore);
   const role = roleId ? getRoleConfig(roleId) : null;
   const menuCatalog = await getMenuCatalog();
   const initialCatalog =
@@ -39,6 +41,7 @@ export default async function MenuPage() {
             dataSource={menuCatalog.dataSource}
             persistAvailability={updateMenuItemAvailabilityAction}
             persistFeatured={updateMenuItemFeaturedAction}
+            restaurantId={restaurantSession?.restaurantId}
           />
         ) : (
           <div className="card-premium p-6 text-sm text-paper/60">

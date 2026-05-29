@@ -9,10 +9,12 @@ import {
   updateReservationTableAction
 } from "@/features/reservations/actions";
 import { getReservations } from "@/features/reservations/repository";
+import { getActiveRestaurantSession } from "@/features/restaurants/session";
 
 export default async function ReservationsPage() {
   const cookieStore = await cookies();
   const roleId = parseDemoRole(cookieStore.get(DEMO_ROLE_COOKIE)?.value);
+  const restaurantSession = getActiveRestaurantSession(cookieStore);
   const reservationsResult = await getReservations();
   const initialReservations =
     reservationsResult.dataSource === "supabase"
@@ -38,6 +40,7 @@ export default async function ReservationsPage() {
             persistStatus={updateReservationStatusAction}
             persistTable={updateReservationTableAction}
             persistCancel={cancelReservationAction}
+            restaurantId={restaurantSession?.restaurantId}
           />
         ) : (
           <div className="card-premium p-6 text-sm text-paper/60">

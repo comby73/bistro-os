@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, startTransition } from "react";
 import Image from "next/image";
 import { Star, ChevronDown } from "lucide-react";
 import type { MenuCategory, MenuItem } from "@/features/menu/types";
@@ -12,7 +12,7 @@ function DishImage({ item }: { item: MenuItem }) {
 
   useEffect(() => {
     const saved = localStorage.getItem(`bistro_menu_img_${item.id}`);
-    if (saved) setSrc(saved);
+    if (saved) startTransition(() => setSrc(saved));
   }, [item.id]);
 
   if (!src) {

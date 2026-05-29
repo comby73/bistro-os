@@ -19,15 +19,20 @@ export function MenuWorkspace({
   initialCatalog,
   dataSource,
   persistAvailability,
-  persistFeatured
+  persistFeatured,
+  restaurantId
 }: {
   roleId: RoleId;
   initialCatalog?: MenuCatalog;
   dataSource: MenuDataSource;
   persistAvailability?: (itemId: string, available: boolean) => Promise<unknown>;
   persistFeatured?: (itemId: string, featured: boolean) => Promise<unknown>;
+  restaurantId?: string;
 }) {
-  const { categories, items, toggleAvailability, toggleFeatured } = useDemoMenu(initialCatalog);
+  const { categories, items, toggleAvailability, toggleFeatured } = useDemoMenu(
+    initialCatalog,
+    restaurantId
+  );
   const [activeCategoryId, setActiveCategoryId] = useState("");
   const [search, setSearch] = useState("");
   const [isPending, startTransition] = useTransition();

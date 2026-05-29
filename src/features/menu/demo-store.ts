@@ -57,12 +57,16 @@ function subscribe(listener: () => void) {
   };
 }
 
-export function useDemoMenu(initialCatalog?: MenuCatalog) {
+export function useDemoMenu(initialCatalog?: MenuCatalog, restaurantId?: string) {
   const catalog = useSyncExternalStore(
     subscribe,
     readMenuCatalogSnapshot,
     () => cachedMenuCatalog
   );
+
+  const items = restaurantId
+    ? catalog.items.filter((item) => item.restaurant_id === restaurantId)
+    : catalog.items;
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -109,7 +113,7 @@ export function useDemoMenu(initialCatalog?: MenuCatalog) {
 
   return {
     categories: catalog.categories,
-    items: catalog.items,
+    items,
     toggleAvailability,
     toggleFeatured
   };

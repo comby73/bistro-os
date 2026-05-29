@@ -7,7 +7,9 @@ import {
   ClipboardList,
   CalendarDays,
   ChefHat,
-  BookOpen
+  BookOpen,
+  Users,
+  ChevronsUpDown
 } from "lucide-react";
 import { DemoSessionControls } from "@/components/auth/DemoSessionControls";
 import { SupabaseStatus } from "@/components/layout/SupabaseStatus";
@@ -19,6 +21,8 @@ import {
   isRouteAllowed,
   type AppRoute
 } from "@/features/auth/roles";
+import { getActiveRestaurantSession } from "@/features/restaurants/session";
+import { getBranchByIdFromDb, getRestaurantByIdFromDb } from "@/features/restaurants/db";
 
 const NAV_ICONS: Record<string, React.ElementType> = {
   "/dashboard":    LayoutDashboard,
@@ -26,11 +30,12 @@ const NAV_ICONS: Record<string, React.ElementType> = {
   "/orders":       ClipboardList,
   "/reservations": CalendarDays,
   "/kitchen":      ChefHat,
-  "/menu":         BookOpen
+  "/menu":         BookOpen,
+  "/users":        Users,
 };
 
 interface AppShellProps {
-  currentPath: AppRoute;
+  currentPath?: AppRoute;
   children: React.ReactNode;
 }
 
@@ -38,12 +43,23 @@ export async function AppShell({ currentPath, children }: AppShellProps) {
   const cookieStore = await cookies();
   const roleId = parseDemoRole(cookieStore.get(DEMO_ROLE_COOKIE)?.value);
 
-  if (!roleId) {
-    redirect("/login");
-  }
+  if (!roleId) redirect("/login");
 
   const role = getRoleConfig(roleId);
-  const isAllowed = isRouteAllowed(roleId, currentPath);
+  const isAllowed = currentPath ? isRouteAllowed(roleId, currentPath) : true;
+  const canSwitchBranch = roleId === "owner" || roleId === "admin";
+
+  const restaurantSession = getActiveRestaurantSession(cookieStore);
+
+  // Si owner/admin no eligió sucursal todavía, mandarlo al selector
+  if (canSwitchBranch && !restaurantSession?.branchId) {
+    redirect("/select-branch");
+  }
+
+  const [restaurant, branch] = await Promise.all([
+    getRestaurantByIdFromDb(restaurantSession?.restaurantId),
+    getBranchByIdFromDb(restaurantSession?.branchId),
+  ]);
 
   return (
     <div className="min-h-screen bg-ink text-paper">
@@ -54,17 +70,51 @@ export async function AppShell({ currentPath, children }: AppShellProps) {
               <BrandLogo size="sm" />
             </Link>
 
-            <div className="mt-8 rounded-3xl border border-gold/20 bg-gradient-to-br from-gold/8 via-ink/60 to-ink/90 p-5">
+            {/* Restaurante + sucursal */}
+            {restaurant && (
+              <div className="mt-6 rounded-2xl border border-line bg-layer1/50 p-4">
+                <p
+                  className="text-lg font-semibold leading-tight"
+                  style={{ color: restaurant.brand_color }}
+                >
+                  {restaurant.name}
+                </p>
+                {branch && (
+                  <p className="mt-1 text-xs text-paper/50">{branch.name} · {branch.address}</p>
+                )}
+
+                {/* Switcher para owner/admin */}
+                {canSwitchBranch ? (
+                  <Link
+                    href="/select-branch"
+                    className="mt-3 flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.16em] text-paper/50 transition hover:text-gold"
+                  >
+                    <ChevronsUpDown size={12} />
+                    Cambiar sucursal
+                  </Link>
+                ) : (
+                  <Link
+                    href="/login"
+                    className="mt-2 inline-flex text-[11px] uppercase tracking-[0.18em] text-paper/55 transition hover:text-gold"
+                  >
+                    Cambiar restaurante
+                  </Link>
+                )}
+              </div>
+            )}
+
+            {/* Rol activo */}
+            <div className="mt-6 rounded-3xl border border-gold/20 bg-gradient-to-br from-gold/8 via-ink/60 to-ink/90 p-5">
               <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-gold/90">Rol activo</p>
               <p className="mt-2.5 text-3xl font-bold tracking-[-0.03em] text-paper">{role.label}</p>
               <p className="mt-2 text-[14px] leading-6 text-paper/75">{role.description}</p>
             </div>
 
+            {/* Navegación */}
             <nav className="mt-8 space-y-1">
               {role.navigation.map((item) => {
                 const isActive = item.href === currentPath;
                 const Icon = NAV_ICONS[item.href] ?? LayoutDashboard;
-
                 return (
                   <Link
                     key={item.href}
@@ -93,7 +143,9 @@ export async function AppShell({ currentPath, children }: AppShellProps) {
           <header className="border-b border-line bg-ink/80 px-6 py-5 backdrop-blur-xl md:px-8">
             <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
               <div>
-                <p className="eyebrow mb-2">Sistema interno</p>
+                <p className="eyebrow mb-2">
+                  {branch ? `${branch.name}` : "Sistema interno"}
+                </p>
                 <h1 className="text-3xl font-bold tracking-[-0.04em] text-paper md:text-4xl">
                   {role.label} en operación
                 </h1>

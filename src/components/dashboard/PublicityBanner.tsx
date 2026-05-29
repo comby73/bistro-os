@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useCallback, useEffect } from "react";
+import { useState, useRef, useCallback, useEffect, startTransition } from "react";
 import { ImagePlus, Sparkles } from "lucide-react";
 import { HeroCarousel } from "@/components/carta/HeroCarousel";
 
@@ -13,7 +13,7 @@ export function PublicityBanner({ canEdit, defaultUrl }: { canEdit: boolean; def
 
   useEffect(() => {
     const saved = localStorage.getItem(STORAGE_KEY);
-    setImgSrc(saved ?? defaultUrl ?? null);
+    startTransition(() => setImgSrc(saved ?? defaultUrl ?? null));
   }, [defaultUrl]);
 
   const loadFile = useCallback((file: File) => {

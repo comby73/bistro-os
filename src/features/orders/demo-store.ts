@@ -62,8 +62,12 @@ function subscribe(listener: () => void) {
   };
 }
 
-export function useDemoOrders() {
-  const orders = useSyncExternalStore(subscribe, readOrdersSnapshot, () => cachedOrders);
+export function useDemoOrders(restaurantId?: string) {
+  const allOrders = useSyncExternalStore(subscribe, readOrdersSnapshot, () => cachedOrders);
+
+  const orders = restaurantId
+    ? allOrders.filter((order) => order.restaurant_id === restaurantId)
+    : allOrders;
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -73,12 +77,18 @@ export function useDemoOrders() {
     }
   }, []);
 
-  const createOrder = useCallback((input: CreateOrderInput) => {
-    const nextOrder = buildOrderFromInput(input, readMenuItemsSnapshot());
-    const currentOrders = readOrdersSnapshot();
+  const createOrder = useCallback(
+    (input: CreateOrderInput) => {
+      const builtOrder = buildOrderFromInput(input, readMenuItemsSnapshot());
+      const nextOrder = restaurantId
+        ? { ...builtOrder, restaurant_id: restaurantId }
+        : builtOrder;
+      const currentOrders = readOrdersSnapshot();
 
-    writeOrdersSnapshot(sortOrdersByNewest([nextOrder, ...currentOrders]));
-  }, []);
+      writeOrdersSnapshot(sortOrdersByNewest([nextOrder, ...currentOrders]));
+    },
+    [restaurantId]
+  );
 
   const advanceOrderStatus = useCallback((orderId: string) => {
     const currentOrders = readOrdersSnapshot();

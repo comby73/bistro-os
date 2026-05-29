@@ -9,13 +9,15 @@ import type { Order } from "@/features/orders/types";
 
 export function OrderComposer({
   defaultWaiterName,
-  initialMenuCatalog
+  initialMenuCatalog,
+  restaurantId
 }: {
   defaultWaiterName: string;
   initialMenuCatalog?: MenuCatalog;
+  restaurantId?: string;
 }) {
-  const { createOrder, orders } = useDemoOrders();
-  const { categories, items: menuItems } = useDemoMenu(initialMenuCatalog);
+  const { createOrder, orders } = useDemoOrders(restaurantId);
+  const { categories, items: menuItems } = useDemoMenu(initialMenuCatalog, restaurantId);
   const [table, setTable] = useState("");
   const [waiterName, setWaiterName] = useState(defaultWaiterName);
   const [notes, setNotes] = useState("");

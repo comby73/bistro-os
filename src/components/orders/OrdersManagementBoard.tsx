@@ -6,8 +6,8 @@ import { useDemoClock } from "@/features/orders/demo-clock";
 import { useDemoOrders } from "@/features/orders/demo-store";
 import { OrderCard } from "./OrderCard";
 
-export function OrdersManagementBoard() {
-  const { orders } = useDemoOrders();
+export function OrdersManagementBoard({ restaurantId }: { restaurantId?: string }) {
+  const { orders } = useDemoOrders(restaurantId);
   const currentTime = useDemoClock();
   const sortedOrders = useMemo(() => sortOrdersByNewest(orders), [orders]);
 

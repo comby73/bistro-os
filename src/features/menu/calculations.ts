@@ -1,5 +1,11 @@
-import { menuCategories as seedMenuCategories, menuItems as seedMenuItems } from "./mock-data";
+import { demoMenuItems } from "@/features/restaurants/mock-data";
+import { menuCategories as seedMenuCategories, menuItems as baseMenuItems } from "./mock-data";
 import type { MenuCatalog, MenuCategory, MenuItem, MenuSummary } from "./types";
+
+// Combine the legacy single-restaurant seed (no restaurant_id collisions: base items
+// belong to rest-bistro and use the item-N ids; the multi-restaurant demo set uses
+// rest-<slug>-item-N ids) so every demo restaurant has its own catalog available.
+const seedMenuItems: MenuItem[] = [...baseMenuItems, ...demoMenuItems];
 
 export function sortMenuCategories(categories: MenuCategory[]): MenuCategory[] {
   return [...categories].sort((left, right) => {

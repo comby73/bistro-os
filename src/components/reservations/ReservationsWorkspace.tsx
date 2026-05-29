@@ -29,7 +29,8 @@ export function ReservationsWorkspace({
   persistCreate,
   persistStatus,
   persistTable,
-  persistCancel
+  persistCancel,
+  restaurantId
 }: {
   roleId: RoleId;
   initialReservations?: Reservation[];
@@ -41,6 +42,7 @@ export function ReservationsWorkspace({
   ) => Promise<unknown>;
   persistTable?: (reservationId: string, tableAssigned: string) => Promise<unknown>;
   persistCancel?: (reservationId: string) => Promise<unknown>;
+  restaurantId?: string;
 }) {
   const {
     reservations,
@@ -54,7 +56,8 @@ export function ReservationsWorkspace({
       persistCreate,
       persistStatus,
       persistTable,
-      persistCancel
+      persistCancel,
+      restaurantId
     });
   const currentTime = useDemoClock();
   const [activeFilter, setActiveFilter] = useState<ReservationFilter>("all");

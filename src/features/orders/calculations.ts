@@ -1,5 +1,8 @@
-import { menuItems as seedMenuItems } from "@/features/menu/mock-data";
+import { menuItems as baseMenuItems } from "@/features/menu/mock-data";
+import { demoMenuItems } from "@/features/restaurants/mock-data";
 import type { MenuItem } from "@/features/menu/types";
+
+const seedMenuItems: MenuItem[] = [...baseMenuItems, ...demoMenuItems];
 import { orders as seedOrders } from "./mock-data";
 import type {
   CreateOrderInput,

@@ -14,6 +14,7 @@ type MenuCategoryRow = {
 
 type MenuItemRow = {
   id: string;
+  restaurant_id: string;
   category_id: string | null;
   name: string;
   description: string | null;
@@ -65,6 +66,7 @@ function mapItemRows(rows: MenuItemRow[]): MenuItem[] {
     .filter((row) => row.category_id)
     .map((row) => ({
       id: row.id,
+      restaurant_id: row.restaurant_id,
       category_id: row.category_id as string,
       name: row.name,
       description: row.description ?? "",
@@ -115,7 +117,7 @@ async function getSupabaseMenuCatalog(): Promise<MenuCatalogResult> {
           .order("name", { ascending: true }),
         supabase
           .from("menu_items")
-          .select("id, category_id, name, description, base_price, station, available, featured, status")
+          .select("id, restaurant_id, category_id, name, description, base_price, station, available, featured, status")
           .eq("status", "active")
           .order("name", { ascending: true })
       ]);

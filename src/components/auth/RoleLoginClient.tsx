@@ -1,67 +1,117 @@
 import {
-  getRoleConfig,
-  roleList,
-  type RoleId
-} from "@/features/auth/roles";
-import { selectDemoRoleAction } from "@/features/auth/actions";
+  clearRestaurantAction,
+  selectRestaurantRoleAction
+} from "@/features/restaurants/actions";
+import type { Branch, DemoUser, Restaurant } from "@/features/restaurants/types";
+import type { RoleId } from "@/features/auth/roles";
 
 interface RoleLoginClientProps {
   initialRoleId: RoleId | null;
+  restaurant: Restaurant;
+  branch: Branch | null;
+  users: DemoUser[];
 }
 
-export function RoleLoginClient({ initialRoleId }: RoleLoginClientProps) {
-  const activeRoleConfig = initialRoleId ? getRoleConfig(initialRoleId) : null;
+export function RoleLoginClient({ initialRoleId, restaurant, branch, users }: RoleLoginClientProps) {
 
   return (
     <section className="card-premium mx-6 w-full max-w-5xl p-8 md:p-10">
-      <div className="grid gap-8 md:grid-cols-[0.9fr_1.1fr]">
-        <div>
-          <p className="eyebrow mb-4">Acceso demo</p>
-          <h1 className="text-3xl font-semibold tracking-[-0.04em] md:text-5xl">
-            Entrar al sistema operativo interno.
-          </h1>
-          <p className="mt-4 max-w-md text-sm leading-7 text-paper/60">
-            Elegí un rol de trabajo para recorrer la aplicación con navegación y
-            pantallas adaptadas al contexto operativo de cada perfil.
-          </p>
-          <div className="mt-8 rounded-2xl border border-line bg-layer1/60 p-5">
-            <p className="text-xs uppercase tracking-[0.22em] text-gold/80">
-              Rol activo
-            </p>
-            <p className="mt-3 text-lg font-semibold text-paper">
-              {activeRoleConfig?.label ?? "Ninguno"}
-            </p>
-            <p className="mt-2 text-sm leading-6 text-paper/58">
-              {activeRoleConfig?.description ??
-                "La selección se guarda en una cookie demo simple, sin autenticación real."}
-            </p>
-          </div>
-        </div>
+      <div className="grid gap-10 md:grid-cols-[0.85fr_1.15fr]">
 
-        <div className="grid gap-4">
-          {roleList.map((role) => (
-            <form key={role.id} action={selectDemoRoleAction}>
-              <input type="hidden" name="roleId" value={role.id} />
+        {/* ── columna izquierda ── */}
+        <div>
+          <p className="eyebrow mb-4">Acceso demo · Paso 2 de 2</p>
+          <h1 className="text-3xl font-bold tracking-[-0.04em] text-paper md:text-4xl">
+            ¿Quién sos?
+          </h1>
+          <p className="mt-3 text-[15px] leading-7 text-paper/65">
+            Elegí tu usuario para entrar al sistema con las pantallas y permisos de tu rol.
+          </p>
+
+          {/* restaurante activo */}
+          <div className="mt-8 rounded-2xl border p-5" style={{ borderColor: `${restaurant.brand_color}40` }}>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-paper/45">
+              Restaurante
+            </p>
+            <p className="mt-2 text-[18px] font-bold" style={{ color: restaurant.brand_color }}>
+              {restaurant.name}
+            </p>
+            {branch && (
+              <p className="mt-1 text-[13px] text-paper/55">{branch.name} · {branch.address}</p>
+            )}
+            <form action={clearRestaurantAction} className="mt-4">
               <button
                 type="submit"
-                className="w-full rounded-3xl border border-line bg-layer1/70 p-5 text-left transition hover:border-gold/50 hover:bg-layer1"
+                className="text-[12px] font-medium uppercase tracking-[0.14em] text-paper/50 underline-offset-4 transition hover:text-gold hover:underline"
               >
-                <div className="flex items-start justify-between gap-4">
-                  <div>
-                    <p className="text-lg font-semibold text-paper">{role.label}</p>
-                    <p className="mt-2 text-sm leading-6 text-paper/60">{role.description}</p>
-                  </div>
-                  <span className="rounded-full border border-gold/30 px-3 py-1 text-[11px] uppercase tracking-[0.2em] text-gold">
-                    {role.id}
+                Cambiar restaurante
+              </button>
+            </form>
+          </div>
+
+          {/* rol activo (si ya eligió) */}
+          {initialRoleId && (
+            <div className="mt-4 rounded-2xl border border-gold/20 bg-gold/5 p-4">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-gold/70">
+                Sesión activa
+              </p>
+              <p className="mt-1.5 text-[15px] font-semibold text-paper">
+                {users.find((u) => u.role_id === initialRoleId)?.name ?? initialRoleId}
+              </p>
+            </div>
+          )}
+        </div>
+
+        {/* ── columna derecha: cards de usuarios ── */}
+        <div className="grid gap-3 sm:grid-cols-2">
+          {users.map((user) => (
+            <form key={user.id} action={selectRestaurantRoleAction}>
+              <input type="hidden" name="roleId"        value={user.role_id} />
+              <input type="hidden" name="restaurantId"  value={restaurant.id} />
+              {branch && <input type="hidden" name="branchId" value={branch.id} />}
+              <button
+                type="submit"
+                className={`group w-full rounded-3xl border p-5 text-left transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg ${
+                  initialRoleId === user.role_id
+                    ? "border-gold/40 bg-gold/8 shadow-gold/10"
+                    : "border-line bg-layer1/60 hover:border-gold/30 hover:bg-layer1"
+                }`}
+              >
+                {/* avatar */}
+                <div
+                  className="flex h-11 w-11 items-center justify-center rounded-2xl text-[14px] font-bold"
+                  style={{
+                    backgroundColor: `${user.avatar_color}28`,
+                    color: user.avatar_color
+                  }}
+                >
+                  {user.avatar_initials}
+                </div>
+
+                {/* nombre y título */}
+                <p className="mt-3 text-[16px] font-bold text-paper">{user.name}</p>
+                <p className="mt-0.5 text-[13px] text-paper/60">{user.title}</p>
+
+                {/* badge de rol */}
+                <div className="mt-4 flex items-center justify-between gap-2">
+                  <span
+                    className="rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.12em]"
+                    style={{
+                      backgroundColor: `${user.avatar_color}20`,
+                      color: user.avatar_color
+                    }}
+                  >
+                    {user.role_id}
+                  </span>
+                  <span className="text-[12px] font-medium text-paper/40 transition group-hover:text-gold">
+                    Entrar →
                   </span>
                 </div>
-                <p className="mt-4 text-xs uppercase tracking-[0.18em] text-paper/45">
-                  Entrar como {role.label}
-                </p>
               </button>
             </form>
           ))}
         </div>
+
       </div>
     </section>
   );

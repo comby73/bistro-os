@@ -1,10 +1,15 @@
-import { reservations as seedReservations } from "./mock-data";
+import { demoReservations } from "@/features/restaurants/mock-data";
+import { reservations as baseReservations } from "./mock-data";
 import type {
   CreateReservationInput,
   Reservation,
   ReservationFilter,
   ReservationStatus
 } from "./types";
+
+// Base reservations have no restaurant_id (legacy demo, shown only in the no-session
+// fallback). The multi-restaurant demo reservations carry restaurant_id/branch_id.
+const seedReservations: Reservation[] = [...baseReservations, ...demoReservations];
 
 export function getInitialReservations(): Reservation[] {
   return [...seedReservations];

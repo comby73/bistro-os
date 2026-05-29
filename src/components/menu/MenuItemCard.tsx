@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useCallback, useEffect } from "react";
+import { useState, useRef, useCallback, useEffect, startTransition } from "react";
 import { ImagePlus, Star, Eye, EyeOff } from "lucide-react";
 import type { MenuItem } from "@/features/menu/types";
 
@@ -33,7 +33,7 @@ function ItemImage({
 
   useEffect(() => {
     const saved = localStorage.getItem(storageKey);
-    setImgSrc(saved ?? defaultUrl ?? null);
+    startTransition(() => setImgSrc(saved ?? defaultUrl ?? null));
   }, [storageKey, defaultUrl]);
 
   const loadFile = useCallback((file: File) => {
