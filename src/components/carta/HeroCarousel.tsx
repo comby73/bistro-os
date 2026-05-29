@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 
 const INTERVAL_MS = 5000;
 const MAX_SLIDES  = 6;
@@ -23,8 +23,11 @@ export function HeroCarousel({
 
   // Si hay slug → solo imágenes de ese restaurante (sin fallback genérico)
   // Si no hay slug → imágenes genéricas
-  const STATIC_SLIDES = Array.from({ length: MAX_SLIDES }, (_, i) => i + 1).map((n) =>
-    slug ? `/${slug}-hero${n}.jpg` : `/restaurant-hero${n}.jpg`
+  const candidates = useMemo(
+    () => Array.from({ length: MAX_SLIDES }, (_, i) => i + 1).map((n) =>
+      slug ? `/${slug}-hero${n}.jpg` : `/restaurant-hero${n}.jpg`
+    ),
+    [slug]
   );
 
   /* detecta qué imágenes existen cargándolas en background */
@@ -32,7 +35,7 @@ export function HeroCarousel({
     let active = true;
     const found: string[] = [];
 
-    const checks = STATIC_SLIDES.map(
+    const checks = candidates.map(
       (src) =>
         new Promise<void>((resolve) => {
           const img = new window.Image();
@@ -47,7 +50,7 @@ export function HeroCarousel({
     });
 
     return () => { active = false; };
-  }, []);
+  }, [candidates]);
 
   /* avanza al siguiente slide */
   const next = useCallback(() => {

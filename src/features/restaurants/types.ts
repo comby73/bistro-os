@@ -17,7 +17,7 @@ export interface Branch {
 
 export interface RestaurantSession {
   restaurantId: string;
-  branchId: string;
+  branchId: string | null;
 }
 
 export interface DemoUser {
