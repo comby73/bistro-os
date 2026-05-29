@@ -47,12 +47,14 @@ export function DashboardWorkspace({
   roleId,
   roleLabel,
   restaurantId,
-  restaurantName
+  restaurantName,
+  restaurantSlug,
 }: {
   roleId: RoleId;
   roleLabel: string;
   restaurantId?: string;
   restaurantName?: string;
+  restaurantSlug?: string;
 }) {
   const { orders } = useDemoOrders(restaurantId);
   const { reservations } = useDemoReservations({ restaurantId });
@@ -100,7 +102,11 @@ export function DashboardWorkspace({
 
       {(roleId === "owner" || roleId === "admin") && (
         <>
-          <PublicityBanner canEdit={roleId === "owner" || roleId === "admin"} defaultUrl="/restaurant-hero.jpg" />
+          <PublicityBanner
+            canEdit={roleId === "owner" || roleId === "admin"}
+            restaurantSlug={restaurantSlug}
+            restaurantName={restaurantName}
+          />
 
           <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
             <MetricCard accent="gold" label="Ventas hoy" value={`USD ${ownerAdminMetrics.revenueToday}`} hint="Total estimado del turno activo." />

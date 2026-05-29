@@ -4,28 +4,40 @@ import { useState, useRef, useCallback, useEffect, startTransition } from "react
 import { ImagePlus, Sparkles } from "lucide-react";
 import { HeroCarousel } from "@/components/carta/HeroCarousel";
 
-const STORAGE_KEY = "bistro_publicity_banner";
+export function PublicityBanner({
+  canEdit,
+  defaultUrl,
+  restaurantSlug,
+  restaurantName,
+}: {
+  canEdit: boolean;
+  defaultUrl?: string;
+  restaurantSlug?: string;
+  restaurantName?: string;
+}) {
+  const storageKey = restaurantSlug
+    ? `bistro_banner_${restaurantSlug}`
+    : "bistro_publicity_banner";
 
-export function PublicityBanner({ canEdit, defaultUrl }: { canEdit: boolean; defaultUrl?: string }) {
   const [imgSrc, setImgSrc] = useState<string | null>(null);
   const [dragOver, setDragOver] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    const saved = localStorage.getItem(STORAGE_KEY);
+    const saved = localStorage.getItem(storageKey);
     startTransition(() => setImgSrc(saved ?? defaultUrl ?? null));
-  }, [defaultUrl]);
+  }, [storageKey, defaultUrl]);
 
   const loadFile = useCallback((file: File) => {
     if (!file.type.startsWith("image/")) return;
     const reader = new FileReader();
     reader.onload = (e) => {
       const b64 = e.target?.result as string;
-      localStorage.setItem(STORAGE_KEY, b64);
+      localStorage.setItem(storageKey, b64);
       setImgSrc(b64);
     };
     reader.readAsDataURL(file);
-  }, []);
+  }, [storageKey]);
 
   const onDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -58,7 +70,7 @@ export function PublicityBanner({ canEdit, defaultUrl }: { canEdit: boolean; def
           className="absolute inset-0 h-full w-full object-cover"
         />
       ) : (
-        <HeroCarousel overlay="bg-gradient-to-r from-ink/80 via-ink/40 to-transparent" />
+        <HeroCarousel overlay="bg-gradient-to-r from-ink/80 via-ink/40 to-transparent" slug={restaurantSlug} />
       )}
 
       {/* overlay adicional solo cuando hay imagen custom */}
@@ -76,7 +88,7 @@ export function PublicityBanner({ canEdit, defaultUrl }: { canEdit: boolean; def
             </span>
           </div>
           <h2 className="text-3xl font-bold tracking-[-0.04em] text-paper md:text-4xl">
-            Cuisine & Ambiance
+            {restaurantName ?? "Cuisine & Ambiance"}
           </h2>
           <p className="mt-2 text-[14px] leading-6 text-paper/70">
             Experiencias gastronómicas únicas · Reservas disponibles

@@ -2,27 +2,33 @@
 
 import { useState, useEffect, useCallback } from "react";
 
-/* Candidatos en orden — agrega restaurant-hero3.jpg, 4, etc. y aparecen solos */
-const STATIC_SLIDES = [
-  "/restaurant-hero1.jpg",
-  "/restaurant-hero2.jpg",
-  "/restaurant-hero3.jpg",
-  "/restaurant-hero4.jpg",
-  "/restaurant-hero5.jpg"
-];
-
 const INTERVAL_MS = 5000;
+const MAX_SLIDES  = 6;
 
 interface HeroCarouselProps {
-  /** Overlay que se pinta encima de cada imagen */
   overlay?: string;
   className?: string;
+  /** slug del restaurante, ej: "bistro-palermo". Si se omite usa las genéricas. */
+  slug?: string;
 }
 
-export function HeroCarousel({ overlay = "bg-gradient-to-t from-ink via-ink/50 to-ink/20", className = "" }: HeroCarouselProps) {
+export function HeroCarousel({
+  overlay = "bg-gradient-to-t from-ink via-ink/50 to-ink/20",
+  className = "",
+  slug,
+}: HeroCarouselProps) {
   const [slides, setSlides] = useState<string[]>([]);
   const [current, setCurrent] = useState(0);
   const [fade, setFade] = useState(true);
+
+  /* Genera candidatos: primero las del restaurante, luego genéricas como fallback */
+  const candidates = Array.from({ length: MAX_SLIDES }, (_, i) => i + 1).flatMap((n) => {
+    const specific = slug ? [`/${slug}-hero${n}.jpg`] : [];
+    const generic  = [`/restaurant-hero${n}.jpg`];
+    return [...specific, ...generic];
+  });
+  // deduplicar manteniendo orden
+  const STATIC_SLIDES = [...new Set(candidates)];
 
   /* detecta qué imágenes existen cargándolas en background */
   useEffect(() => {
