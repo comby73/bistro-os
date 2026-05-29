@@ -10,10 +10,11 @@ const DEMO_RESTAURANTS = [
     name: "Bistró Palermo",
     color: "#E8B863",
     users: [
-      { email: "demo@bistro-os.com",   label: "Dueño" },
-      { email: "salon@bistro-os.com",  label: "Jefe de sala" },
-      { email: "mozo@bistro-os.com",   label: "Mozo" },
-      { email: "cocina@bistro-os.com", label: "Cocina" },
+      { email: "owner@bistro-os.com",   label: "Dueño" },
+      { email: "admin@bistro-os.com",   label: "Administrador" },
+      { email: "manager@bistro-os.com", label: "Jefe de sala" },
+      { email: "waiter@bistro-os.com",  label: "Mozo" },
+      { email: "kitchen@bistro-os.com", label: "Cocina" },
     ],
   },
   {
@@ -21,8 +22,9 @@ const DEMO_RESTAURANTS = [
     color: "#4A9B7F",
     users: [
       { email: "owner@casanorte.com",   label: "Dueño" },
-      { email: "admin@casanorte.com",   label: "Admin" },
+      { email: "admin@casanorte.com",   label: "Administrador" },
       { email: "manager@casanorte.com", label: "Jefe de sala" },
+      { email: "waiter@casanorte.com",  label: "Mozo" },
     ],
   },
   {
@@ -30,8 +32,9 @@ const DEMO_RESTAURANTS = [
     color: "#C0732A",
     users: [
       { email: "owner@mesadorada.com",   label: "Dueño" },
-      { email: "admin@mesadorada.com",   label: "Admin" },
+      { email: "admin@mesadorada.com",   label: "Administrador" },
       { email: "manager@mesadorada.com", label: "Jefe de sala" },
+      { email: "waiter@mesadorada.com",  label: "Mozo" },
     ],
   },
 ];
