@@ -33,5 +33,6 @@ export async function logoutAction() {
   cookieStore.delete(DEMO_ROLE_COOKIE);
   cookieStore.delete("bistro_restaurant_id");
   cookieStore.delete("bistro_branch_id");
+  cookieStore.delete("bistro_profile_id");
   redirect("/login");
 }

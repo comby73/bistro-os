@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { DEMO_ROLE_COOKIE, } from "@/features/auth/demo-session";
 import { getDefaultRouteForRole, isValidRoleId } from "@/features/auth/roles";
-import { BRANCH_COOKIE, RESTAURANT_COOKIE } from "@/features/restaurants/session";
+import { BRANCH_COOKIE, PROFILE_COOKIE, RESTAURANT_COOKIE } from "@/features/restaurants/session";
 
 const COOKIE_OPTIONS = {
   path: "/",
@@ -69,13 +69,13 @@ export async function loginAction(
 
   // 3. Setear cookies
   const cookieStore = await cookies();
-  cookieStore.set(RESTAURANT_COOKIE, profile.restaurant_id, COOKIE_OPTIONS);
-  cookieStore.set(DEMO_ROLE_COOKIE, role, COOKIE_OPTIONS);
+  cookieStore.set(PROFILE_COOKIE,     profile.id,            COOKIE_OPTIONS);
+  cookieStore.set(RESTAURANT_COOKIE,  profile.restaurant_id, COOKIE_OPTIONS);
+  cookieStore.set(DEMO_ROLE_COOKIE,   role,                  COOKIE_OPTIONS);
 
-  // Dueño y admin eligen sucursal; el resto va directo a la suya
+  // Dueño y admin eligen restaurante+sucursal; el resto va directo a la suya
   const needsBranchSelect = role === "owner" || role === "admin";
   if (needsBranchSelect) {
-    // Limpiar branch anterior para forzar selección
     cookieStore.delete(BRANCH_COOKIE);
     redirect("/select-branch");
   }

@@ -2,6 +2,7 @@ import type { RestaurantSession } from "./types";
 
 export const RESTAURANT_COOKIE = "bistro_restaurant_id";
 export const BRANCH_COOKIE     = "bistro_branch_id";
+export const PROFILE_COOKIE    = "bistro_profile_id";
 
 interface CookieReader {
   get(name: string): { value: string } | undefined;

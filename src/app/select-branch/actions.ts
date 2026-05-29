@@ -2,7 +2,7 @@
 
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { BRANCH_COOKIE } from "@/features/restaurants/session";
+import { BRANCH_COOKIE, RESTAURANT_COOKIE } from "@/features/restaurants/session";
 import { DEMO_ROLE_COOKIE, parseDemoRole } from "@/features/auth/demo-session";
 import { getDefaultRouteForRole } from "@/features/auth/roles";
 
@@ -14,11 +14,18 @@ const COOKIE_OPTIONS = {
 };
 
 export async function selectBranchAction(formData: FormData) {
-  const branchId = formData.get("branchId")?.toString();
+  const branchId     = formData.get("branchId")?.toString();
+  const restaurantId = formData.get("restaurantId")?.toString();
+
   if (!branchId) redirect("/select-branch");
 
   const cookieStore = await cookies();
   cookieStore.set(BRANCH_COOKIE, branchId, COOKIE_OPTIONS);
+
+  // Actualizar restaurante activo si el dueño eligió una sucursal de otro restaurante
+  if (restaurantId) {
+    cookieStore.set(RESTAURANT_COOKIE, restaurantId, COOKIE_OPTIONS);
+  }
 
   const role = parseDemoRole(cookieStore.get(DEMO_ROLE_COOKIE)?.value);
   redirect(role ? getDefaultRouteForRole(role) : "/dashboard");
