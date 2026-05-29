@@ -1,61 +1,94 @@
 # 08 — Roadmap
 
-## Estado actual del MVP
+## Estado actual del MVP (mayo 2026)
 
 - App operativa con roles demo.
-- `AppShell` interno y navegación contextual.
+- `AppShell` interno y navegación contextual por rol.
 - `/orders` con modo servicio para mozo.
-- `/kitchen` con tablero KDS simple.
-- `/reservations` como módulo operativo con persistencia demo local.
-- `/menu` como carta operativa con disponibilidad persistida localmente.
+- `/kitchen` con tablero KDS con columnas color-coded por estado.
+- `/reservations` como módulo operativo con adaptador Supabase activo.
+- `/menu` como carta operativa con adaptador Supabase activo.
 - `/sales` como ventas y caja operativa simulada.
 - `/dashboard` alimentado por stores demo de pedidos y reservas.
-- `localStorage` como persistencia temporal de demo.
+- **Supabase conectado** para `menu` y `reservations` (Fases 4B y 4C completadas).
+- Indicador de conexión Supabase visible en sidebar.
+- `localStorage` como persistencia de pedidos y cocina (pendiente Fase 4D).
 - n8n opcional y no bloqueante.
-- Supabase todavía no conectado a la operación real.
 
-## Fase 3A — Flujo operativo
+## Fase 3A — Flujo operativo ✅
 
-- Consolidar Mozo → Pedido → Cocina.
-- Ajustar UX de servicio y KDS.
-- Mejorar visibilidad de tiempos y estados.
-- Mantener todo demostrable sin backend externo.
+- Consolidado Mozo → Pedido → Cocina.
+- KDS con estados color-coded (recibido/preparando/listo).
+- Visibilidad de tiempos y estados en tickets.
+- Sistema demostrable sin backend externo.
 
-## Fase 3B — Reservas operativas
+## Fase 3B — Reservas operativas ✅
 
-- Convertir reservas en flujo operativo local.
-- Relacionar reservas con mesas, turnos y estados.
-- Mejorar la lectura operativa para manager y owner.
-- Mantener localStorage hasta Fase 4.
+- Reservas como flujo operativo local.
+- Relación con mesas, turnos y estados.
+- Lectura operativa para manager y owner.
+- Adaptador con fallback a localStorage.
 
-## Fase 3D — Menú operativo
+## Fase 3D — Menú operativo ✅
 
-- Convertir `/menu` en carta operativa por rol.
-- Compartir disponibilidad entre menú y toma de pedidos.
-- Permitir edición demo de disponibilidad y destacados para owner/admin.
-- Mantener a manager en modo supervisión y a waiter en modo consulta rápida.
+- `/menu` como carta operativa por rol.
+- Disponibilidad compartida entre menú y toma de pedidos.
+- Edición demo de disponibilidad y destacados para owner/admin.
+- Manager en modo supervisión, waiter en modo consulta rápida.
 
-## Fase 4 — Supabase real
+## Fase 4A — Preparación backend ✅
 
-- Reemplazar `localStorage` por persistencia real.
-- Persistir perfiles, pedidos, items, reservas y kitchen flow.
-- Preparar modelo relacional para caja operativa.
-- Mantener `/sales` como caja y ventas, no como facturación fiscal homologada.
+- Esquema SQL alineado con el producto.
+- Seed coherente con la demo.
+- RLS inicial sin complejidad excesiva.
+- Documentación de migración.
+
+## Fase 4B — Menú en Supabase ✅
+
+- Categorías y productos leídos desde Supabase.
+- `available` y `featured` persistidos server-side.
+- `/orders` consume el mismo catálogo resuelto.
+- Fallback a localStorage si las variables no están.
+
+## Fase 4C — Reservas en Supabase ✅
+
+- Lectura del listado desde Supabase.
+- Escrituras vía server actions.
+- Store local como capa de resiliencia.
+- Fallback a localStorage si las variables no están.
+
+## Fase 4D — Conectar `orders` y `kitchen`
+
+- Persistir pedidos reales.
+- Persistir items de pedido.
+- Persistir transición de estados.
+- Registrar `kitchen_events`.
+
+Riesgo: es el corazón operativo. Migrar escritura primero, luego lectura compartida.
+
+## Fase 4E — Dashboard con datos reales
+
+Depende de tener conectados: menu, reservations, orders, kitchen y parte de sales.
+
+## Fase 4F — Auth real y RLS serio
+
+- Vincular `profiles.auth_user_id` con Supabase Auth.
+- Activar acceso por tenant y sucursal.
+- Definir permisos por rol en RLS.
 
 ## Fase 5 — Automatización n8n opcional
 
 - Reintroducir n8n como capa externa secundaria.
 - Consumir eventos ya persistidos.
-- Agregar webhooks opcionales para notificaciones y resúmenes.
+- Webhooks opcionales para notificaciones y resúmenes.
 - No convertir n8n en dependencia crítica.
 
-## Fase 6 — Evolución profesional y defensa
+## Fase 6 — Defensa final
 
 - Afinar documentación final.
 - Consolidar narrativa FOH / BOH.
-- Presentar modelo relacional futuro.
-- Explicar APIs y webhooks futuros.
-- Defender stock/costeo como roadmap, no como parte cerrada del MVP actual.
+- Presentar modelo relacional.
+- Defender stock/costeo como roadmap futuro.
 
 ## Roadmap posterior sugerido
 
@@ -68,7 +101,7 @@
 
 ## Límites explícitos del estado actual
 
-- Sin Supabase real en producción demo.
+- Pedidos y cocina aún en localStorage (Fase 4D pendiente).
 - Sin n8n conectado al núcleo operativo.
 - Sin facturación fiscal real.
 - Sin pagos reales.

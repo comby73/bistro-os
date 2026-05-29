@@ -12,6 +12,7 @@ import type { MenuCatalog, MenuDataSource } from "@/features/menu/types";
 import { MenuCategoryTabs } from "./MenuCategoryTabs";
 import { MenuItemCard } from "./MenuItemCard";
 import { MenuSummaryCards } from "./MenuSummaryCards";
+import { QRPanel } from "@/components/carta/QRPanel";
 
 export function MenuWorkspace({
   roleId,
@@ -130,6 +131,9 @@ export function MenuWorkspace({
               )}
               <div className="mt-5">
                 <MenuSummaryCards summary={summary} />
+              </div>
+              <div className="mt-6">
+                <QRPanel />
               </div>
             </>
           ) : (

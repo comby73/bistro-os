@@ -4,7 +4,7 @@
 
 Conectar Supabase de forma gradual sin romper la demo actual basada en `localStorage`.
 
-La meta no es “migrar todo” de una vez.  
+La meta no es "migrar todo" de una vez.  
 La meta es sustituir stores locales por persistencia real módulo por módulo.
 
 ## Criterios de la migración
@@ -14,7 +14,9 @@ La meta es sustituir stores locales por persistencia real módulo por módulo.
 - mantener el sistema demostrable aun si una fase queda a mitad de camino,
 - preservar compatibilidad con el modelo operativo ya validado.
 
-## Fase 4A — Preparación de backend
+---
+
+## Fase 4A — Preparación de backend ✅ COMPLETADA
 
 Incluye:
 
@@ -25,125 +27,54 @@ Incluye:
 
 No incluye:
 
-- conexión de componentes a Supabase,
-- reemplazo de `localStorage`,
 - auth real,
 - sincronización tiempo real.
 
-## Fase 4B — Conectar solo `menu`
+---
 
-### Alcance
+## Fase 4B — Conectar `menu` ✅ COMPLETADA
 
-- leer categorías desde Supabase,
-- leer productos desde Supabase,
-- persistir `available` y `featured`,
-- mantener `/orders` consumiendo la misma fuente.
+**Qué cubre:** leer categorías y productos desde Supabase, persistir `available` y `featured`, que `/orders` consuma el mismo catálogo resuelto.
 
-### Estado actual de implementación
+**Cómo está implementado:** `repository.ts` decide entre `local` y `supabase`. Si faltan variables de entorno el sistema sigue en modo local. Con variables completas, `/menu` lee desde Supabase y persiste cambios server-side. `/orders` reutiliza ese catálogo sin migrar todavía su propio dominio.
 
-Fase 4B quedó preparada con un adaptador reversible:
+**Verificación:** `menu_items` en Supabase responde con 4 registros (HTTP 200).
 
-- `repository.ts` decide entre `local` y `supabase`,
-- si faltan variables, el sistema sigue en modo local,
-- si la configuración está completa, `/menu` puede leer desde Supabase y persistir cambios de forma server-side,
-- `/orders` reutiliza ese catálogo resuelto sin migrar todavía su propio dominio.
+---
 
-### Motivo
+## Fase 4C — Conectar `reservations` ✅ COMPLETADA
 
-`menu` es el módulo menos riesgoso para abrir la migración:
+**Qué cubre:** persistir reservas, cambios de estado y asignación de mesa, manteniendo filtros y UX actual.
 
-- tiene pocas mutaciones,
-- no implica coordinación temporal compleja,
-- impacta de forma positiva a `/orders`.
+**Cómo está implementado:** mismo patrón que 4B. `repository.ts` decide entre `local` y `supabase`. Lectura remota desde tabla `reservations`. Escrituras vía server actions. Store local como capa de resiliencia. Mesa asignada persistida en `metadata.table_assigned_label` hasta tener gestión real de mesas.
 
-### Estrategia técnica
+**Verificación:** `reservations` en Supabase responde HTTP 200 (tabla vacía, esperando datos operativos reales).
 
-- crear adaptador `menu repository`,
-- mantener fallback temporal a mock/localStorage si fuera necesario,
-- no tocar el diseño de `/menu`.
-- copiar el catálogo remoto a la store local para no romper la demo ni la consulta en otras pantallas.
+---
 
-## Fase 4C — Conectar `reservations`
+## Fase 4D — Conectar `orders` y `kitchen` (PENDIENTE)
 
-### Alcance
+**Qué cubre:** persistir pedidos reales, items de pedido, transición de estados y registro de `kitchen_events`.
 
-- persistir reservas,
-- persistir cambios de estado,
-- persistir asignación de mesa,
-- mantener filtros y UX actual.
+**Riesgo:** es el corazón operativo. Si se implementa mal, la demo pierde coherencia entre salón y cocina. Migrar escritura primero, luego lectura compartida en cocina, luego eventos.
 
-### Estado actual de implementación
+**Bloqueante actual:** la tabla `placed_orders` no existe todavía en Supabase. Requiere migración SQL antes de conectar el adaptador.
 
-Fase 4C quedó preparada con un adaptador equivalente al de `menu`:
+---
 
-- `repository.ts` decide entre `local` y `supabase`,
-- si faltan variables, `/reservations` sigue operando con `localStorage`,
-- si la configuración está completa, la lectura del listado viene desde Supabase,
-- las escrituras remotas se hacen vía server actions,
-- la store local sigue existiendo como capa de resiliencia y demostración.
+## Fase 4E — Conectar `dashboard` (PENDIENTE)
 
-### Riesgos
+Depende de tener ya conectados: `menu` ✅, `reservations` ✅, `orders` ⏳, `kitchen` ⏳ y al menos parte de `sales` ⏳.
 
-- normalización de fecha/hora,
-- relación futura con mesas y turnos,
-- necesidad de ordenar bien por sucursal.
+---
 
-## Fase 4D — Conectar `orders` y `kitchen`
+## Fase 4F — Auth real y RLS serio (PENDIENTE)
 
-### Alcance
+**Qué cubre:** vincular `profiles.auth_user_id` con Supabase Auth, activar acceso por tenant, aislar por restaurante y sucursal, definir políticas RLS por rol (owner, admin, manager, waiter, kitchen).
 
-- persistir pedidos reales,
-- persistir items de pedido,
-- persistir transición de estados,
-- registrar `kitchen_events`.
+**Por qué va al final:** primero conviene estabilizar el modelo y las escrituras. Recién después tiene sentido cerrar el perímetro de seguridad real.
 
-### Riesgo principal
-
-Es el corazón operativo del sistema.  
-Si esta fase se implementa mal, la demo puede perder coherencia entre salón y cocina.
-
-### Recomendación
-
-- migrar primero escritura de pedidos,
-- luego lectura compartida en cocina,
-- luego eventos o timeline de cocina.
-
-## Fase 4E — Conectar `dashboard`
-
-### Alcance
-
-- reemplazar métricas derivadas de stores demo por consultas reales,
-- mantener cálculos reutilizables,
-- no duplicar reglas de negocio entre frontend y SQL.
-
-### Dependencias
-
-Depende de tener ya conectados:
-
-- `menu`,
-- `reservations`,
-- `orders`,
-- `kitchen`,
-- y al menos parte de `sales`.
-
-## Fase 4F — Auth real y RLS serio
-
-### Alcance
-
-- vincular `profiles.auth_user_id` con Supabase Auth,
-- activar acceso por tenant,
-- aislar por restaurante y sucursal,
-- definir permisos por rol:
-  - owner
-  - admin
-  - manager
-  - waiter
-  - kitchen
-
-### Por qué va al final
-
-Primero conviene estabilizar el modelo y las escrituras.  
-Recién después tiene sentido cerrar el perímetro de seguridad real.
+---
 
 ## Fuera de este plan inmediato
 

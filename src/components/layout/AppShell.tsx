@@ -1,7 +1,16 @@
 import Link from "next/link";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import {
+  LayoutDashboard,
+  TrendingUp,
+  ClipboardList,
+  CalendarDays,
+  ChefHat,
+  BookOpen
+} from "lucide-react";
 import { DemoSessionControls } from "@/components/auth/DemoSessionControls";
+import { SupabaseStatus } from "@/components/layout/SupabaseStatus";
 import { BrandLogo } from "@/components/brand/BrandLogo";
 import { DEMO_ROLE_COOKIE, parseDemoRole } from "@/features/auth/demo-session";
 import {
@@ -10,6 +19,15 @@ import {
   isRouteAllowed,
   type AppRoute
 } from "@/features/auth/roles";
+
+const NAV_ICONS: Record<string, React.ElementType> = {
+  "/dashboard":    LayoutDashboard,
+  "/sales":        TrendingUp,
+  "/orders":       ClipboardList,
+  "/reservations": CalendarDays,
+  "/kitchen":      ChefHat,
+  "/menu":         BookOpen
+};
 
 interface AppShellProps {
   currentPath: AppRoute;
@@ -36,15 +54,16 @@ export async function AppShell({ currentPath, children }: AppShellProps) {
               <BrandLogo size="sm" />
             </Link>
 
-            <div className="mt-8 rounded-3xl border border-line bg-ink/70 p-5">
-              <p className="text-xs uppercase tracking-[0.22em] text-gold/80">Rol activo</p>
-              <p className="mt-3 text-2xl font-semibold">{role.label}</p>
-              <p className="mt-2 text-sm leading-6 text-paper/58">{role.description}</p>
+            <div className="mt-8 rounded-3xl border border-gold/20 bg-gradient-to-br from-gold/8 via-ink/60 to-ink/90 p-5">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-gold/90">Rol activo</p>
+              <p className="mt-2.5 text-3xl font-bold tracking-[-0.03em] text-paper">{role.label}</p>
+              <p className="mt-2 text-[14px] leading-6 text-paper/75">{role.description}</p>
             </div>
 
-            <nav className="mt-8 space-y-2">
+            <nav className="mt-8 space-y-1">
               {role.navigation.map((item) => {
                 const isActive = item.href === currentPath;
+                const Icon = NAV_ICONS[item.href] ?? LayoutDashboard;
 
                 return (
                   <Link
@@ -52,17 +71,19 @@ export async function AppShell({ currentPath, children }: AppShellProps) {
                     href={item.href}
                     className={
                       isActive
-                        ? "block rounded-2xl border border-gold/35 bg-gold/10 px-4 py-3 text-sm font-medium text-gold"
-                        : "block rounded-2xl border border-transparent px-4 py-3 text-sm text-paper/70 transition hover:border-line hover:bg-layer1/70 hover:text-paper"
+                        ? "flex items-center gap-3 rounded-2xl border border-gold/35 bg-gold/10 px-4 py-3.5 text-[15px] font-semibold text-gold"
+                        : "flex items-center gap-3 rounded-2xl border border-transparent px-4 py-3.5 text-[15px] font-medium text-paper/75 transition-all duration-200 hover:border-line hover:bg-layer1/70 hover:text-paper"
                     }
                   >
+                    <Icon size={18} className={isActive ? "text-gold" : "opacity-60"} />
                     {item.label}
                   </Link>
                 );
               })}
             </nav>
 
-            <div className="mt-auto pt-8">
+            <div className="mt-auto space-y-3 pt-8">
+              <SupabaseStatus />
               <DemoSessionControls />
             </div>
           </div>
@@ -73,12 +94,22 @@ export async function AppShell({ currentPath, children }: AppShellProps) {
             <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
               <div>
                 <p className="eyebrow mb-2">Sistema interno</p>
-                <h1 className="text-2xl font-semibold tracking-[-0.04em] md:text-3xl">
+                <h1 className="text-3xl font-bold tracking-[-0.04em] text-paper md:text-4xl">
                   {role.label} en operación
                 </h1>
               </div>
-              <div className="text-sm text-paper/55">
-                Navegación visible según permisos del rol demo actual.
+              <div className="flex flex-col items-start gap-1 md:items-end">
+                <p className="text-[15px] font-medium capitalize text-paper/85">
+                  {new Intl.DateTimeFormat("es-AR", {
+                    weekday: "long",
+                    day: "numeric",
+                    month: "long",
+                    year: "numeric"
+                  }).format(new Date())}
+                </p>
+                <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-paper/45">
+                  Bistró OS · Demo
+                </p>
               </div>
             </div>
           </header>

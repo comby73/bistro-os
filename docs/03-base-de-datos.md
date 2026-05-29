@@ -1,18 +1,20 @@
 # 03 — Base de datos
 
-## Estado actual
+## Estado actual (mayo 2026)
 
-La app **todavía no usa Supabase como persistencia operativa**.
+La app usa Supabase como persistencia operativa para `menu` y `reservations`.  
+Los módulos `orders` y `kitchen` siguen en `localStorage` hasta Fase 4D.
 
-Hoy conviven dos mecanismos:
+Hoy conviven tres mecanismos:
 
-- `mock-data.ts` para catálogos y semillas de demo.
-- `localStorage` para los módulos interactivos:
-  - pedidos / cocina
-  - reservas
-  - menú operativo
+- `mock-data.ts` para semillas de demo y fallback cuando no hay backend.
+- `localStorage` para pedidos y cocina (módulos aún no migrados).
+- **Supabase real** para:
+  - `menu_items` — categorías y productos con disponibilidad y destacados persistidos.
+  - `reservations` — reservas operativas con estados y asignación de mesa.
+  - `profiles` — perfiles de usuario (tabla vacía hasta activar auth real).
 
-Esto permite demostrar el producto sin backend externo mientras se estabilizan UX, permisos y flujos operativos.
+El indicador de conexión en el sidebar confirma el estado en tiempo real.
 
 ## Objetivo de Fase 4A
 
@@ -51,15 +53,16 @@ Se mantiene por tres motivos:
 
 ### Hoy
 
-- `orders`, `reservations` y `menu` viven en stores demo locales.
+- `menu` y `reservations` leen y escriben en Supabase (con fallback local).
+- `orders` y `kitchen` viven en localStorage demo.
 - `/sales` sigue siendo cálculo mock.
 - `/dashboard` deriva información desde stores locales y cálculos reutilizables.
 
-### Futuro
+### Siguiente paso (Fase 4D)
 
-- Supabase almacenará el estado operativo real.
+- Conectar `orders` y `kitchen` a Supabase.
 - La UI seguirá casi igual.
-- La capa que cambiará primero será la de acceso a datos.
+- La capa que cambia es solo el acceso a datos.
 
 ## Tablas del modelo Supabase preparado
 

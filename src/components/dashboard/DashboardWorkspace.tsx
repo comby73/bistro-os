@@ -17,6 +17,7 @@ import {
 } from "@/features/dashboard/calculations";
 import { DashboardAlertList } from "./DashboardAlertList";
 import { DashboardOrdersTable } from "./DashboardOrdersTable";
+import { PublicityBanner } from "./PublicityBanner";
 
 const FALLBACK_NOW = Date.parse("2026-01-01T12:00:00Z");
 
@@ -33,9 +34,9 @@ function QuickAccessCard({
 }) {
   return (
     <article className="card-premium p-6">
-      <h2 className="text-xl font-semibold">{title}</h2>
-      <p className="mt-3 text-sm leading-7 text-paper/60">{description}</p>
-      <Link href={href} className="mt-6 inline-flex text-sm text-gold transition hover:text-paper">
+      <h2 className="text-[20px] font-bold tracking-[-0.02em] text-paper">{title}</h2>
+      <p className="mt-3 text-[15px] leading-7 text-paper/72">{description}</p>
+      <Link href={href} className="mt-6 inline-flex text-[15px] font-medium text-gold transition hover:text-paper">
         {cta}
       </Link>
     </article>
@@ -83,18 +84,20 @@ export function DashboardWorkspace({
     <section className="space-y-6">
       <div>
         <p className="eyebrow mb-3">Dashboard</p>
-        <h2 className="text-4xl font-semibold tracking-[-0.05em] md:text-5xl">
+        <h2 className="text-4xl font-bold tracking-[-0.05em] text-paper md:text-6xl">
           Vista interna para {roleLabel}.
         </h2>
       </div>
 
       {(roleId === "owner" || roleId === "admin") && (
         <>
+          <PublicityBanner canEdit={roleId === "owner" || roleId === "admin"} defaultUrl="/restaurant-hero.jpg" />
+
           <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
-            <MetricCard label="Ventas hoy" value={`USD ${ownerAdminMetrics.revenueToday}`} hint="Resumen reutilizado desde ventas simuladas." />
-            <MetricCard label="Pedidos activos" value={String(ownerAdminMetrics.activeOrders)} hint="Pedidos vivos desde el store demo de orders." />
-            <MetricCard label="Reservas pendientes" value={String(ownerAdminMetrics.pendingReservations)} hint="Reservas que todavía requieren confirmación." />
-            <MetricCard label="Ticket promedio" value={`USD ${ownerAdminMetrics.averageTicket}`} hint="Derivado de `/sales` mientras no haya backend real." />
+            <MetricCard accent="gold" label="Ventas hoy" value={`USD ${ownerAdminMetrics.revenueToday}`} hint="Total estimado del turno activo." />
+            <MetricCard accent="sky" label="Pedidos activos" value={String(ownerAdminMetrics.activeOrders)} hint="Comandas vivas en salón y cocina." />
+            <MetricCard accent="amber" label="Reservas pendientes" value={String(ownerAdminMetrics.pendingReservations)} hint="Requieren confirmación del salón." />
+            <MetricCard accent="muted" label="Ticket promedio" value={`USD ${ownerAdminMetrics.averageTicket}`} hint="Calculado sobre pedidos entregados." />
           </div>
 
           <div className="grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">
@@ -102,8 +105,8 @@ export function DashboardWorkspace({
             <div className="space-y-6">
               <section className="card-premium p-6">
                 <p className="eyebrow mb-4">Lectura ejecutiva</p>
-                <h3 className="mb-4 text-lg font-semibold">Resumen del servicio</h3>
-                <p className="text-sm leading-7 text-paper/62">{executiveSummary}</p>
+                <h3 className="mb-4 text-[18px] font-bold text-paper">Resumen del servicio</h3>
+                <p className="text-[15px] leading-7 text-paper/75">{executiveSummary}</p>
               </section>
               <DashboardAlertList alerts={alerts} />
             </div>
@@ -135,10 +138,10 @@ export function DashboardWorkspace({
       {roleId === "manager" && (
         <>
           <div className="grid gap-5 md:grid-cols-4">
-            <MetricCard label="Pedidos activos" value={String(managerSnapshot.activeOrders)} hint="Comandas vivas del turno." />
-            <MetricCard label="Reservas de hoy" value={String(managerSnapshot.todayReservations.length)} hint="Agenda del servicio actual." />
-            <MetricCard label="Tickets demorados" value={String(managerSnapshot.delayedOrders)} hint="Pedidos sobre el umbral operativo." />
-            <MetricCard label="Listos sin entregar" value={String(managerSnapshot.readyOrders)} hint="Pedidos listos para coordinar salida." />
+            <MetricCard accent="sky" label="Pedidos activos" value={String(managerSnapshot.activeOrders)} hint="Comandas vivas del turno." />
+            <MetricCard accent="gold" label="Reservas de hoy" value={String(managerSnapshot.todayReservations.length)} hint="Agenda del servicio actual." />
+            <MetricCard accent="amber" label="Tickets demorados" value={String(managerSnapshot.delayedOrders)} hint="Pedidos sobre el umbral operativo." />
+            <MetricCard accent="emerald" label="Listos sin entregar" value={String(managerSnapshot.readyOrders)} hint="Pedidos listos para coordinar salida." />
           </div>
 
           <div className="grid gap-6 xl:grid-cols-[0.9fr_1.1fr]">

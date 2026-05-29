@@ -15,6 +15,7 @@ export interface MenuItem {
   station: KitchenStation;
   available: boolean;
   featured: boolean;
+  image_url?: string;
 }
 
 export interface MenuSummary {

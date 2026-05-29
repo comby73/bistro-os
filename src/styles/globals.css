@@ -15,6 +15,8 @@ body {
   color: #F4EFE6;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+  font-size: 16px;
+  line-height: 1.7;
 }
 
 ::selection {
@@ -27,30 +29,41 @@ body {
     @apply mx-auto w-full max-w-7xl px-6 lg:px-10;
   }
 
+  /* — Etiqueta de sección, más legible que 11px — */
   .eyebrow {
-    @apply text-[11px] uppercase tracking-[0.18em] text-mute;
+    @apply text-[13px] font-semibold uppercase tracking-[0.13em] text-mute;
   }
 
+  /* — Card base con glass morphism y transición suave — */
   .card-premium {
-    @apply rounded-2xl border border-line bg-layer1/90 shadow-2xl shadow-black/20 transition duration-200;
+    @apply rounded-2xl border border-line bg-layer1/90 shadow-2xl shadow-black/30
+           transition-all duration-300 ease-out;
   }
 
   .card-premium:hover {
-    @apply border-gold/30;
+    @apply border-gold/35 shadow-gold/10 -translate-y-[1px];
   }
 
+  /* — Botón dorado con brillo en hover — */
   .btn-gold {
-    @apply inline-flex items-center justify-center rounded-full bg-gold px-5 py-3 text-sm font-semibold text-ink transition duration-200 hover:-translate-y-0.5 hover:bg-goldhi;
+    @apply inline-flex items-center justify-center rounded-full bg-gold px-5 py-3
+           text-sm font-semibold text-ink transition-all duration-200
+           hover:-translate-y-0.5 hover:bg-goldhi hover:shadow-lg hover:shadow-gold/30;
   }
 
+  /* — Botón fantasma con borde — */
   .btn-ghost {
-    @apply inline-flex items-center justify-center rounded-full border border-line bg-white/[0.02] px-5 py-3 text-sm font-medium text-paper transition duration-200 hover:border-gold/60 hover:bg-gold/5;
+    @apply inline-flex items-center justify-center rounded-full border border-line
+           bg-white/[0.02] px-5 py-3 text-sm font-medium text-paper
+           transition-all duration-200 hover:border-gold/60 hover:bg-gold/5;
   }
 
+  /* — Texto con gradiente dorado — */
   .gold-gradient-text {
     @apply bg-gradient-to-b from-goldhi via-gold to-golddim bg-clip-text text-transparent;
   }
 
+  /* — Logo con efecto shine — */
   .brand-logo-shell {
     @apply relative inline-block overflow-hidden;
   }
@@ -80,21 +93,58 @@ body {
   .brand-logo-image {
     filter: drop-shadow(0 0 20px rgba(232, 184, 99, 0.08));
   }
+
+  /* — Card con entrada animada — */
+  .card-animated {
+    animation: fade-up 0.4s ease both;
+  }
+
+  /* — Glow pulsante para alertas o highlights — */
+  .glow-gold {
+    box-shadow: 0 0 0 0 rgba(232, 184, 99, 0.4);
+    animation: glow-pulse 2.5s ease-in-out infinite;
+  }
+
+  /* — Drop zone para arrastrar imágenes — */
+  .drop-zone {
+    @apply relative border-2 border-dashed border-line bg-ink/40 transition-all duration-200;
+  }
+
+  .drop-zone.drag-over {
+    @apply border-gold/60 bg-gold/5;
+  }
 }
 
-@keyframes brand-logo-shine {
-  0% {
-    transform: translateX(-145%) skewX(-18deg);
-  }
+/* — Keyframes — */
 
-  100% {
-    transform: translateX(145%) skewX(-18deg);
+@keyframes brand-logo-shine {
+  0%   { transform: translateX(-145%) skewX(-18deg); }
+  100% { transform: translateX(145%)  skewX(-18deg); }
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
   }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes glow-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(232, 184, 99, 0.35); }
+  50%       { box-shadow: 0 0 18px 4px rgba(232, 184, 99, 0.18); }
+}
+
+@keyframes shimmer {
+  from { background-position: -200% center; }
+  to   { background-position:  200% center; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .brand-logo-shell:hover::after {
-    animation: none;
-    opacity: 0;
-  }
+  .brand-logo-shell:hover::after { animation: none; opacity: 0; }
+  .card-animated { animation: none; }
+  .glow-gold     { animation: none; }
 }

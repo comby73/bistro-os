@@ -8,3 +8,6 @@ dist
 .DS_Store
 coverage
 *.log
+tsconfig.tsbuildinfo
+*-response.html
+.claude/
