@@ -1,13 +1,15 @@
-import { clearDemoRoleAction } from "@/features/auth/actions";
+import { logoutAction } from "@/features/auth/actions";
+import { LogOut } from "lucide-react";
 
 export function DemoSessionControls() {
   return (
-    <form action={clearDemoRoleAction}>
+    <form action={logoutAction}>
       <button
         type="submit"
-        className="rounded-full border border-line px-4 py-2 text-xs uppercase tracking-[0.18em] text-paper/70 transition hover:border-gold/40 hover:text-paper"
+        className="flex w-full items-center gap-2 rounded-2xl border border-line/60 px-4 py-2.5 text-[13px] font-medium text-paper/60 transition hover:border-red-500/40 hover:text-red-400"
       >
-        Cambiar rol
+        <LogOut size={14} />
+        Cerrar sesión
       </button>
     </form>
   );

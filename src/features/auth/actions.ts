@@ -27,3 +27,11 @@ export async function clearDemoRoleAction() {
   cookieStore.delete(DEMO_ROLE_COOKIE);
   redirect("/login");
 }
+
+export async function logoutAction() {
+  const cookieStore = await cookies();
+  cookieStore.delete(DEMO_ROLE_COOKIE);
+  cookieStore.delete("bistro_restaurant_id");
+  cookieStore.delete("bistro_branch_id");
+  redirect("/login");
+}

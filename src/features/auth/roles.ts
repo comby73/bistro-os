@@ -1,4 +1,4 @@
-export type AppRoute = "/dashboard" | "/orders" | "/reservations" | "/kitchen" | "/menu" | "/sales" | "/users";
+export type AppRoute = "/dashboard" | "/orders" | "/reservations" | "/kitchen" | "/menu" | "/sales" | "/users" | "/branches";
 
 export type RoleId = "owner" | "admin" | "manager" | "waiter" | "kitchen";
 
@@ -16,7 +16,8 @@ export interface RoleConfig {
 }
 
 const DASHBOARD_NAV: NavigationItem = { href: "/dashboard", label: "Dashboard" };
-const USERS_NAV: NavigationItem = { href: "/users", label: "Usuarios" };
+const USERS_NAV:    NavigationItem = { href: "/users",    label: "Usuarios" };
+const BRANCHES_NAV: NavigationItem = { href: "/branches", label: "Sucursales" };
 const ORDERS_NAV: NavigationItem = { href: "/orders", label: "Pedidos" };
 const RESERVATIONS_NAV: NavigationItem = { href: "/reservations", label: "Reservas" };
 const KITCHEN_NAV: NavigationItem = { href: "/kitchen", label: "Cocina" };
@@ -28,8 +29,8 @@ export const roleConfigs: Record<RoleId, RoleConfig> = {
     id: "owner",
     label: "Dueño",
     description: "Visión global del negocio, ventas, operación y configuración del servicio.",
-    allowedRoutes: ["/dashboard", "/sales", "/orders", "/reservations", "/kitchen", "/menu", "/users"],
-    navigation: [DASHBOARD_NAV, SALES_NAV, ORDERS_NAV, RESERVATIONS_NAV, KITCHEN_NAV, MENU_NAV, USERS_NAV]
+    allowedRoutes: ["/dashboard", "/sales", "/orders", "/reservations", "/kitchen", "/menu", "/users", "/branches"],
+    navigation: [DASHBOARD_NAV, SALES_NAV, ORDERS_NAV, RESERVATIONS_NAV, KITCHEN_NAV, MENU_NAV, USERS_NAV, BRANCHES_NAV]
   },
   admin: {
     id: "admin",

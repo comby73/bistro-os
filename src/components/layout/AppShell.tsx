@@ -9,6 +9,7 @@ import {
   ChefHat,
   BookOpen,
   Users,
+  MapPin,
   ChevronsUpDown
 } from "lucide-react";
 import { DemoSessionControls } from "@/components/auth/DemoSessionControls";
@@ -32,6 +33,7 @@ const NAV_ICONS: Record<string, React.ElementType> = {
   "/kitchen":      ChefHat,
   "/menu":         BookOpen,
   "/users":        Users,
+  "/branches":     MapPin,
 };
 
 interface AppShellProps {
@@ -84,20 +86,13 @@ export async function AppShell({ currentPath, children }: AppShellProps) {
                 )}
 
                 {/* Switcher para owner/admin */}
-                {canSwitchBranch ? (
+                {canSwitchBranch && (
                   <Link
                     href="/select-branch"
                     className="mt-3 flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.16em] text-paper/50 transition hover:text-gold"
                   >
                     <ChevronsUpDown size={12} />
                     Cambiar sucursal
-                  </Link>
-                ) : (
-                  <Link
-                    href="/login"
-                    className="mt-2 inline-flex text-[11px] uppercase tracking-[0.18em] text-paper/55 transition hover:text-gold"
-                  >
-                    Cambiar restaurante
                   </Link>
                 )}
               </div>
