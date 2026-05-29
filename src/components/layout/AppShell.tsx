@@ -22,7 +22,10 @@ import {
   isRouteAllowed,
   type AppRoute
 } from "@/features/auth/roles";
-import { getActiveRestaurantSession } from "@/features/restaurants/session";
+import {
+  getActiveRestaurantSession,
+  PROFILE_NAME_COOKIE,
+} from "@/features/restaurants/session";
 import { getBranchByIdFromDb, getRestaurantByIdFromDb } from "@/features/restaurants/db";
 
 const NAV_ICONS: Record<string, React.ElementType> = {
@@ -50,6 +53,7 @@ export async function AppShell({ currentPath, children }: AppShellProps) {
   const role = getRoleConfig(roleId);
   const isAllowed = currentPath ? isRouteAllowed(roleId, currentPath) : true;
   const canSwitchBranch = roleId === "owner" || roleId === "admin";
+  const profileName = cookieStore.get(PROFILE_NAME_COOKIE)?.value ?? "";
 
   const restaurantSession = getActiveRestaurantSession(cookieStore);
 
@@ -98,11 +102,14 @@ export async function AppShell({ currentPath, children }: AppShellProps) {
               </div>
             )}
 
-            {/* Rol activo */}
+            {/* Usuario + Rol activo */}
             <div className="mt-6 rounded-3xl border border-gold/20 bg-gradient-to-br from-gold/8 via-ink/60 to-ink/90 p-5">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-gold/90">Rol activo</p>
-              <p className="mt-2.5 text-3xl font-bold tracking-[-0.03em] text-paper">{role.label}</p>
-              <p className="mt-2 text-[14px] leading-6 text-paper/75">{role.description}</p>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-gold/90">Sesión activa</p>
+              {profileName && (
+                <p className="mt-2 text-[17px] font-bold text-paper leading-tight">{profileName}</p>
+              )}
+              <p className={`${profileName ? "mt-0.5" : "mt-2.5"} text-[13px] font-semibold text-gold/80`}>{role.label}</p>
+              <p className="mt-2 text-[13px] leading-6 text-paper/65">{role.description}</p>
             </div>
 
             {/* Navegación */}
