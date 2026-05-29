@@ -20,6 +20,7 @@ export const menuItems: MenuItem[] = [
     station: "cold",
     available: true,
     featured: true,
+    image_url: "/bistro-ent-burrata.jpg",
   },
   {
     id: "item-ent-2",
@@ -31,6 +32,7 @@ export const menuItems: MenuItem[] = [
     station: "hot",
     available: true,
     featured: false,
+    image_url: "/bistro-ent-croquetas.jpg",
   },
   {
     id: "item-ent-3",
@@ -42,6 +44,7 @@ export const menuItems: MenuItem[] = [
     station: "grill",
     available: true,
     featured: false,
+    image_url: "/bistro-ent-provoleta.jpg",
   },
 
   // ── Principales ─────────────────────────────────────────────────────────────
@@ -55,7 +58,7 @@ export const menuItems: MenuItem[] = [
     station: "hot",
     available: true,
     featured: true,
-    image_url: "/risotto-hongos.jpg",
+    image_url: "/bistro-pri-risotto.jpg",
   },
   {
     id: "item-pri-2",
@@ -67,6 +70,7 @@ export const menuItems: MenuItem[] = [
     station: "hot",
     available: true,
     featured: false,
+    image_url: "/bistro-pri-ravioles.jpg",
   },
   {
     id: "item-pri-3",
@@ -78,7 +82,7 @@ export const menuItems: MenuItem[] = [
     station: "grill",
     available: true,
     featured: false,
-    image_url: "/tartar-atun.jpg",
+    image_url: "/bistro-pri-salmon.jpg",
   },
 
   // ── Parrilla ────────────────────────────────────────────────────────────────
@@ -92,7 +96,7 @@ export const menuItems: MenuItem[] = [
     station: "grill",
     available: true,
     featured: true,
-    image_url: "/cordero-patagonico.jpg",
+    image_url: "/bistro-par-ojo-de-bife.jpg",
   },
   {
     id: "item-par-2",
@@ -104,6 +108,7 @@ export const menuItems: MenuItem[] = [
     station: "grill",
     available: true,
     featured: false,
+    image_url: "/bistro-par-entrana.jpg",
   },
   {
     id: "item-par-3",
@@ -115,6 +120,7 @@ export const menuItems: MenuItem[] = [
     station: "grill",
     available: true,
     featured: false,
+    image_url: "/bistro-par-pollo.jpg",
   },
 
   // ── Bebidas ─────────────────────────────────────────────────────────────────
@@ -128,6 +134,7 @@ export const menuItems: MenuItem[] = [
     station: "bar",
     available: true,
     featured: false,
+    image_url: "/bistro-beb-limonada.jpg",
   },
   {
     id: "item-beb-2",
@@ -161,7 +168,7 @@ export const menuItems: MenuItem[] = [
     station: "bar",
     available: true,
     featured: false,
-    image_url: "/aperol.jpg",
+    image_url: "/bistro-beb-mocktail.jpg",
   },
 
   // ── Postres ─────────────────────────────────────────────────────────────────
@@ -175,6 +182,7 @@ export const menuItems: MenuItem[] = [
     station: "cold",
     available: true,
     featured: true,
+    image_url: "/bistro-pos-tiramisu.jpg",
   },
   {
     id: "item-pos-2",
@@ -186,6 +194,7 @@ export const menuItems: MenuItem[] = [
     station: "cold",
     available: true,
     featured: false,
+    image_url: "/bistro-pos-flan.jpg",
   },
   {
     id: "item-pos-3",
@@ -197,5 +206,6 @@ export const menuItems: MenuItem[] = [
     station: "cold",
     available: true,
     featured: false,
+    image_url: "/bistro-pos-pannacotta.jpg",
   },
 ];
