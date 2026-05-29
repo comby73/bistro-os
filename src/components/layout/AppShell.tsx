@@ -10,6 +10,8 @@ import {
   BookOpen,
   Users,
   MapPin,
+  Store,
+  BarChart3,
   ChevronsUpDown
 } from "lucide-react";
 import { DemoSessionControls } from "@/components/auth/DemoSessionControls";
@@ -37,6 +39,8 @@ const NAV_ICONS: Record<string, React.ElementType> = {
   "/menu":         BookOpen,
   "/users":        Users,
   "/branches":     MapPin,
+  "/restaurants":  Store,
+  "/finances":     BarChart3,
 };
 
 interface AppShellProps {

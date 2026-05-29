@@ -9,7 +9,9 @@ const PROTECTED_ROUTES = [
   "/kitchen",
   "/menu",
   "/users",
-  "/branches"
+  "/branches",
+  "/restaurants",
+  "/finances"
 ];
 
 /**
