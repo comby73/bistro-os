@@ -5,6 +5,7 @@ import { toggleBranchStatusAction } from "@/features/restaurants/branch-actions"
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { getActiveRestaurantSession } from "@/features/restaurants/session";
 import { MapPin, CheckCircle, XCircle, Building2 } from "lucide-react";
+import { ConfirmSubmit } from "@/components/ui/ConfirmSubmit";
 
 export default async function BranchesPage() {
   const cookieStore = await cookies();
@@ -64,11 +65,15 @@ export default async function BranchesPage() {
                     <form action={toggleBranchStatusAction}>
                       <input type="hidden" name="branchId" value={b.id} />
                       <input type="hidden" name="status"   value="inactive" />
-                      <button type="submit"
-                        className="flex items-center gap-1.5 rounded-xl border border-line px-3 py-1.5 text-[12px] font-medium text-paper/50 transition hover:border-red-500/40 hover:text-red-400">
+                      <ConfirmSubmit
+                        title="Desactivar sucursal"
+                        message={`¿Seguro que querés desactivar "${b.name}"? Dejará de aparecer en el selector de sucursales. Podés reactivarla después.`}
+                        confirmLabel="Sí, desactivar"
+                        className="flex items-center gap-1.5 rounded-xl border border-line px-3 py-1.5 text-[12px] font-medium text-paper/50 transition hover:border-red-500/40 hover:text-red-400"
+                      >
                         <XCircle size={13} />
                         Desactivar
-                      </button>
+                      </ConfirmSubmit>
                     </form>
                   </div>
                 ))}

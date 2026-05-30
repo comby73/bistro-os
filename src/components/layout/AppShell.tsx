@@ -15,6 +15,7 @@ import {
   ChevronsUpDown
 } from "lucide-react";
 import { DemoSessionControls } from "@/components/auth/DemoSessionControls";
+import { LogoutButton } from "@/components/auth/LogoutButton";
 import { SupabaseStatus } from "@/components/layout/SupabaseStatus";
 import { BrandLogo } from "@/components/brand/BrandLogo";
 import { DEMO_ROLE_COOKIE, parseDemoRole } from "@/features/auth/demo-session";
@@ -156,18 +157,21 @@ export async function AppShell({ currentPath, children }: AppShellProps) {
                   {role.label} en operación
                 </h1>
               </div>
-              <div className="flex flex-col items-start gap-1 md:items-end">
-                <p className="text-[15px] font-medium capitalize text-paper/85">
-                  {new Intl.DateTimeFormat("es-AR", {
-                    weekday: "long",
-                    day: "numeric",
-                    month: "long",
-                    year: "numeric"
-                  }).format(new Date())}
-                </p>
-                <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-paper/45">
-                  Bistró OS · Demo
-                </p>
+              <div className="flex items-center gap-4">
+                <div className="flex flex-col items-start gap-1 md:items-end">
+                  <p className="text-[15px] font-medium capitalize text-paper/85">
+                    {new Intl.DateTimeFormat("es-AR", {
+                      weekday: "long",
+                      day: "numeric",
+                      month: "long",
+                      year: "numeric"
+                    }).format(new Date())}
+                  </p>
+                  <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-paper/45">
+                    Bistró OS · Demo
+                  </p>
+                </div>
+                <LogoutButton variant="header" />
               </div>
             </div>
           </header>

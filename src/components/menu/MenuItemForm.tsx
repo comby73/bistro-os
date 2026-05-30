@@ -5,6 +5,7 @@ import { Loader2, Save, Archive } from "lucide-react";
 import type { KitchenStation } from "@/features/kitchen/types";
 import type { MenuCategory, MenuItem, MenuItemInput } from "@/features/menu/types";
 import { MenuImageUploader } from "./MenuImageUploader";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 
 const STATIONS: { value: KitchenStation; label: string }[] = [
   { value: "cold",  label: "Frío" },
@@ -44,6 +45,7 @@ export function MenuItemForm({
   const [featured, setFeatured] = useState(item?.featured ?? false);
   const [imageUrl, setImageUrl] = useState(item?.image_url ?? "");
   const [error, setError] = useState<string | null>(null);
+  const [confirmArchive, setConfirmArchive] = useState(false);
 
   function submit() {
     if (!name.trim()) return setError("El nombre es obligatorio.");
@@ -123,11 +125,22 @@ export function MenuItemForm({
       </div>
 
       {item && onArchive && (
-        <button type="button" onClick={onArchive}
+        <button type="button" onClick={() => setConfirmArchive(true)}
           className="flex items-center justify-center gap-2 rounded-2xl border border-line/60 py-2.5 text-[13px] text-paper/50 transition hover:border-red-500/40 hover:text-red-400">
           <Archive size={14} /> Dar de baja (baja lógica)
         </button>
       )}
+
+      <ConfirmDialog
+        open={confirmArchive}
+        title="Dar de baja el producto"
+        message={`¿Seguro que querés dar de baja "${item?.name ?? "este producto"}"? Dejará de verse en la carta y en los pedidos. No se borra: podés reactivarlo después.`}
+        confirmLabel="Sí, dar de baja"
+        tone="danger"
+        pending={pending}
+        onConfirm={() => { setConfirmArchive(false); onArchive?.(); }}
+        onClose={() => setConfirmArchive(false)}
+      />
     </div>
   );
 }

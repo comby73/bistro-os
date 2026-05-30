@@ -5,6 +5,7 @@ import { toggleRestaurantStatusAction } from "@/features/restaurants/restaurant-
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { PROFILE_COOKIE } from "@/features/restaurants/session";
 import { Store, CheckCircle, XCircle } from "lucide-react";
+import { ConfirmSubmit } from "@/components/ui/ConfirmSubmit";
 
 export default async function RestaurantsPage() {
   const cookieStore = await cookies();
@@ -89,11 +90,15 @@ export default async function RestaurantsPage() {
                       <form action={toggleRestaurantStatusAction}>
                         <input type="hidden" name="restaurantId" value={r.id} />
                         <input type="hidden" name="status"       value="inactive" />
-                        <button type="submit"
-                          className="flex items-center gap-1.5 rounded-xl border border-line px-3 py-1.5 text-[12px] font-medium text-paper/50 transition hover:border-red-500/40 hover:text-red-400">
+                        <ConfirmSubmit
+                          title="Desactivar restaurante"
+                          message={`¿Seguro que querés desactivar "${r.name}"? Dejará de aparecer en tu cuenta y en el selector. Podés reactivarlo después.`}
+                          confirmLabel="Sí, desactivar"
+                          className="flex items-center gap-1.5 rounded-xl border border-line px-3 py-1.5 text-[12px] font-medium text-paper/50 transition hover:border-red-500/40 hover:text-red-400"
+                        >
                           <XCircle size={13} />
                           Desactivar
-                        </button>
+                        </ConfirmSubmit>
                       </form>
                     </div>
                   );
