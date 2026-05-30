@@ -49,12 +49,14 @@ export function DashboardWorkspace({
   restaurantId,
   restaurantName,
   restaurantSlug,
+  heroImages,
 }: {
   roleId: RoleId;
   roleLabel: string;
   restaurantId?: string;
   restaurantName?: string;
   restaurantSlug?: string;
+  heroImages?: string[];
 }) {
   const { orders } = useDemoOrders(restaurantId);
   const { reservations } = useDemoReservations({ restaurantId });
@@ -106,6 +108,7 @@ export function DashboardWorkspace({
             canEdit={roleId === "owner" || roleId === "admin"}
             restaurantSlug={restaurantSlug}
             restaurantName={restaurantName}
+            heroImages={heroImages}
           />
 
           <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">

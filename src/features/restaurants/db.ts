@@ -17,7 +17,7 @@ import {
 type DbRestaurant = {
   id: string;
   name: string;
-  metadata: Record<string, string> | null;
+  metadata: (Record<string, string> & { hero_images?: string[] }) | null;
 };
 
 type DbBranch = {
@@ -43,6 +43,7 @@ function mapRestaurant(row: DbRestaurant): Restaurant {
     slug: meta.slug ?? row.id,
     description: meta.description ?? "",
     brand_color: meta.brand_color ?? "#E8B863",
+    hero_images: Array.isArray(meta.hero_images) ? meta.hero_images : undefined,
   };
 }
 

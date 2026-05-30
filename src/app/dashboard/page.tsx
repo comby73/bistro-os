@@ -22,6 +22,7 @@ export default async function DashboardPage() {
           restaurantId={restaurantSession?.restaurantId}
           restaurantName={restaurant?.name}
           restaurantSlug={restaurant?.slug}
+          heroImages={restaurant?.hero_images}
         />
       ) : (
         <section className="space-y-6">

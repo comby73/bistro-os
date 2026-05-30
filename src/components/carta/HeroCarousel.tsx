@@ -10,19 +10,22 @@ interface HeroCarouselProps {
   className?: string;
   /** slug del restaurante, ej: "bistro-palermo". Si se omite usa las genéricas. */
   slug?: string;
+  /** Imágenes administradas desde la app (Storage). Tienen prioridad sobre las de /public. */
+  images?: string[];
 }
 
 export function HeroCarousel({
   overlay = "bg-gradient-to-t from-ink via-ink/50 to-ink/20",
   className = "",
   slug,
+  images,
 }: HeroCarouselProps) {
   const [slides, setSlides] = useState<string[]>([]);
   const [current, setCurrent] = useState(0);
   const [fade, setFade] = useState(true);
 
-  // Imágenes propias del restaurante; si no tiene ninguna, genéricas como fallback.
-  // Así no se mezclan fotos entre restaurantes, pero nadie queda sin carrusel.
+  // Imágenes administradas (Storage) → prioridad. Si no hay, las propias de /public.
+  const managed = useMemo(() => images ?? [], [images]);
   const ownImages = useMemo(
     () => (slug ? Array.from({ length: MAX_SLIDES }, (_, i) => `/${slug}-hero${i + 1}.jpg`) : []),
     [slug]
@@ -51,7 +54,12 @@ export function HeroCarousel({
       ).then((res) => res.filter((s): s is string => s !== null));
 
     (async () => {
-      // 1) propias del restaurante
+      // 0) administradas desde la app (Storage) → prioridad absoluta
+      if (managed.length > 0) {
+        if (active) setSlides(managed);
+        return;
+      }
+      // 1) propias del restaurante en /public
       let found = ownImages.length ? await detect(ownImages) : [];
       // 2) si no tiene propias, caer a genéricas
       if (found.length === 0) found = await detect(genericImages);
@@ -59,7 +67,7 @@ export function HeroCarousel({
     })();
 
     return () => { active = false; };
-  }, [ownImages, genericImages]);
+  }, [managed, ownImages, genericImages]);
 
   /* avanza al siguiente slide */
   const next = useCallback(() => {

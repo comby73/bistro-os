@@ -46,6 +46,7 @@ export default async function CartaSlugPage({ params }: { params: Promise<{ slug
       restaurantName={restaurant?.name}
       restaurantSlug={slug}
       brandColor={restaurant?.brand_color}
+      heroImages={restaurant?.hero_images}
     />
   );
 }

@@ -6,6 +6,8 @@ export interface Restaurant {
   logo_url?: string;
   cover_image_url?: string;
   brand_color: string;
+  /** Imágenes de cabecera (carrusel) administradas por owner/admin, en Storage. */
+  hero_images?: string[];
 }
 
 export interface Branch {

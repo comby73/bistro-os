@@ -91,12 +91,14 @@ export function CartaView({
   restaurantName,
   restaurantSlug,
   brandColor,
+  heroImages,
 }: {
   categories: MenuCategory[];
   items: MenuItem[];
   restaurantName?: string;
   restaurantSlug?: string;
   brandColor?: string;
+  heroImages?: string[];
 }) {
   const [activeCategory, setActiveCategory] = useState<string>("all");
   const navRef = useRef<HTMLDivElement>(null);
@@ -114,7 +116,7 @@ export function CartaView({
       {/* ── HERO ── */}
       <header className="relative flex min-h-[42vh] flex-col items-center justify-end overflow-hidden pb-10 text-center">
         {/* carrusel de fotos del restaurante */}
-        <HeroCarousel overlay="bg-gradient-to-b from-ink/30 via-ink/50 to-ink" slug={restaurantSlug} />
+        <HeroCarousel overlay="bg-gradient-to-b from-ink/30 via-ink/50 to-ink" slug={restaurantSlug} images={heroImages} />
 
         {/* contenido hero */}
         <div className="relative z-10 px-6">
