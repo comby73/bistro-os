@@ -6,12 +6,12 @@ Bistró OS
 
 ## Definición actual
 
-Aplicación operativa demo para restaurantes que centraliza roles internos, pedidos, cocina, reservas, menú, ventas/caja simulada y automatizaciones futuras.
+SaaS operativo multi-restaurante para restaurantes que centraliza roles internos, pedidos, cocina, reservas, carta, ventas/caja simulada y automatizaciones futuras.
 
 ## Cambio de foco
 
 El proyecto ya no se posiciona principalmente como landing comercial.  
-La prioridad actual es demostrar un sistema interno defendible, modular y navegable por roles reales del restaurante.
+La prioridad actual es demostrar un sistema interno defendible, modular, navegable por roles reales y conectado a Supabase en los dominios ya migrados.
 
 ## Problema
 
@@ -25,14 +25,14 @@ Muchos restaurantes de gama media-alta operan con información dispersa:
 
 ## Solución
 
-Una app interna con demo funcional por rol que conecta:
+Una app interna con funcionamiento por rol que conecta:
 
-- acceso por perfil,
+- acceso real por perfil,
 - dashboard contextual,
 - pedidos,
 - cocina,
 - reservas,
-- menú,
+- carta administrable,
 - ventas y caja simulada.
 
 ## Roles objetivo
@@ -45,12 +45,14 @@ Una app interna con demo funcional por rol que conecta:
 
 ## Valor principal
 
-Demostrar que Bistró OS puede funcionar como sistema operativo de restaurante antes de conectar infraestructura real.
+Demostrar que Bistró OS puede funcionar como sistema operativo de restaurante con autenticación y datos reales donde importa, manteniendo demo local para los módulos aún no migrados.
 
 ## Alcance actual
 
-- Roles demo y control de acceso.
+- Supabase Auth real y control de acceso por rol.
 - AppShell interno.
 - Flujo operativo inicial Mozo → Pedido → Cocina.
+- Menú/carta con CRUD real, baja lógica y Storage de imágenes.
+- Reservas persistidas por restaurante/sucursal.
 - Ventas y caja simulada sin facturación fiscal real.
-- Supabase y n8n preparados para fases posteriores.
+- n8n preparado como capa opcional posterior.

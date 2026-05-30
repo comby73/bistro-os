@@ -1,5 +1,29 @@
 # 03 — Base de datos
 
+## menu_items — gestión de carta (mayo 2026)
+
+`scripts/seed-menu.mjs` carga la **carta inicial demo** desde `src/features/menu/catalog.json`. Después,
+owner/admin la administran desde `/menu` (alta/edición/baja). Supabase es la fuente
+principal; `catalog.json` es el fallback de dev.
+
+Columnas relevantes de `menu_items`:
+
+| Columna | Uso |
+|---|---|
+| `base_price` | precio (el front lo expone como `price`) |
+| `available` | `false` = **indisponibilidad temporal** (visible como "No disponible") |
+| `status` | `'archived'` = **baja lógica** (oculto en /menu y /carta). Nunca DELETE físico |
+| `image_url`, `storage_path` | imagen del producto (Supabase Storage, bucket `menu-images`) |
+| `category_id` | categoría por restaurante (UUID determinista del seed) |
+| `restaurant_id`, `branch_id` | tenant; toda edición valida pertenencia |
+
+> Nota de implementación: `supabase/schema.sql` ya documenta `image_url`/`storage_path`.
+> La DB viva puede seguir usando `metadata.image_url` / `metadata.storage_path` hasta ejecutar
+> el `ALTER` de promoción incluido en el schema.
+
+**Storage:** bucket público `menu-images`, ruta
+`restaurants/{restaurant_id}/menu/{item_id}/{filename}`. No se guardan imágenes en base64.
+
 ## Estado actual (mayo 2026)
 
 La app usa Supabase como persistencia operativa para `menu` y `reservations`.  
@@ -12,14 +36,14 @@ Hoy conviven tres mecanismos:
 - **Supabase real** para:
   - `menu_items` — categorías y productos con disponibilidad y destacados persistidos.
   - `reservations` — reservas operativas con estados y asignación de mesa.
-  - `profiles` — perfiles de usuario (tabla vacía hasta activar auth real).
+  - `profiles` y `role_assignments` — usuarios internos, roles y pertenencia a restaurante/sucursal.
 
 El indicador de conexión en el sidebar confirma el estado en tiempo real.
 
 ## Objetivo de Fase 4A
 
-Fase 4A no migra la app.  
-Prepara el contrato de datos real en Supabase para que la migración futura sea incremental y segura.
+Fase 4A preparó el contrato de datos real en Supabase para que la migración fuera incremental
+y segura. Las fases posteriores ya migraron auth/tenant, menú y reservas.
 
 La estrategia es:
 
@@ -28,15 +52,15 @@ La estrategia es:
 3. preparar seed coherente con la demo actual,
 4. migrar módulo por módulo en fases posteriores.
 
-## Persistencia futura
+## Persistencia principal
 
-La base prevista sigue siendo **Supabase PostgreSQL**.
+La base principal es **Supabase PostgreSQL**.
 
 Se mantiene por tres motivos:
 
 - encaja con el stack Next.js + TypeScript,
 - resuelve bien datos relacionales operativos,
-- permite evolucionar luego hacia auth real, RLS, eventos y APIs.
+- permite evolucionar luego hacia RLS por tenant, eventos y APIs.
 
 ## Convenciones del esquema
 
@@ -100,7 +124,7 @@ Representa personas del sistema.
 
 Campos clave:
 
-- `auth_user_id` opcional hasta que exista auth real,
+- `auth_user_id` para vincular con Supabase Auth,
 - `restaurant_id`,
 - `branch_id`,
 - nombre completo,
@@ -343,30 +367,21 @@ El archivo `supabase/policies.sql` deja un punto de partida prudente:
 
 Todavía **no** se definen políticas complejas por tenant, branch y rol porque:
 
-- la app aún no usa auth real,
-- no conviene congelar una política incorrecta demasiado pronto.
+- aunque Supabase Auth ya está activo, las escrituras actuales pasan por server actions con service role,
+- primero conviene estabilizar dominios y ownership antes de congelar políticas DB incorrectas.
 
 Eso queda para Fase 4F.
 
-## Seed de referencia
+## Seeds de referencia
 
-El seed actual prepara:
+Los seeds actuales preparan:
 
-- 1 restaurante,
-- 1 sucursal,
-- perfiles demo,
-- asignaciones de rol,
-- mesas,
-- categorías,
-- productos,
-- reservas,
-- pedidos,
-- items,
-- eventos de cocina,
-- pagos,
-- cierre de caja,
-- eventos genéricos,
-- una interacción de IA.
+- `scripts/seed-supabase.mjs`: 3 restaurantes, 3 sucursales, perfiles demo y `role_assignments`.
+- `scripts/create-auth-users.mjs`: usuarios de Supabase Auth para el login real.
+- `scripts/seed-menu.mjs`: 15 categorías (5 por restaurante) y 42 productos; archiva items obsoletos.
+- `scripts/seed-reservations.mjs`: 3 reservas por restaurante, idempotentes.
+
+Pedidos, cocina, pagos y cierre de caja siguen como datos demo/locales hasta Fase 4D+.
 
 ## Estrategia de migración por módulo
 
@@ -376,7 +391,7 @@ La migración se hará de menor riesgo a mayor riesgo:
 2. reservas,
 3. pedidos y cocina,
 4. dashboard,
-5. auth real y RLS serio.
+5. RLS serio por tenant y rol.
 
 ## Estado concreto de Fase 4B
 

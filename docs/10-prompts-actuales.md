@@ -4,6 +4,10 @@
 
 Este documento reúne los prompts y templates definidos en Bistró OS hasta esta etapa, para que se puedan revisar, reutilizar y extender sin tener que recorrer toda la carpeta `/prompts`.
 
+> **Bitácora de desarrollo:** el historial cronológico de los prompts que fueron
+> construyendo el sistema (multi-restaurante, Supabase, carta administrable) está en
+> [`11-historial-prompts.md`](./11-historial-prompts.md).
+
 ## Estado actual
 
 - Los prompts ya están documentados.
@@ -321,7 +325,7 @@ Encaje por fase:
 - Fase actual: documentación y preparación.
 - Fase 3A: posible soporte a cocina y flujo mozo -> pedido -> cocina.
 - Fase 3B: soporte a reservas operativas.
-- Fase 4: enriquecimiento sobre eventos y datos persistidos en Supabase.
+- Fase 4: enriquecimiento sobre eventos y datos persistidos en Supabase (menú/reservas ya migrados; pedidos/cocina pendientes).
 - Fase 5: integración opcional con n8n.
 
 Referencias directas ya visibles en el repo:

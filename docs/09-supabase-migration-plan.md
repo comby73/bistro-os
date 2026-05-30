@@ -1,8 +1,25 @@
 # 09 — Supabase migration plan
 
+## Menú — migrado a Supabase (mayo 2026)
+
+Estado: **completo**. El menú es el primer módulo con escritura real end-to-end.
+
+- **Lectura:** `getMenuCatalogForRestaurant(restaurantId)` (repository) → `menu_categories` +
+  `menu_items` filtrados por restaurante y `status='active'`. Fallback a `catalog.json`.
+- **Escritura:** server actions (`features/menu/actions.ts`) → `createMenuItem` /
+  `updateMenuItem` / `archiveMenuItem` / `setMenuItemImage`. Validan rol (owner/admin) y
+  ownership por `restaurant_id` (no se confía en el cliente).
+- **Seeds:** `scripts/seed-menu.mjs` (idempotente, UUID deterministas, archiva lo obsoleto).
+- **Storage:** bucket `menu-images` (público). Upload vía `uploadMenuImageAction`.
+- **Pendiente:** promover `image_url`/`storage_path` de `metadata` a columnas (ALTER listo
+  en `schema.sql`); RLS por tenant para escritura (hoy vía service role server-side).
+
+Próximos módulos a migrar con el mismo patrón: pedidos (`placed_orders`) y cocina
+(`kitchen_events`).
+
 ## Objetivo
 
-Conectar Supabase de forma gradual sin romper la demo actual basada en `localStorage`.
+Conectar Supabase de forma gradual sin romper la demo actual ni los fallbacks locales.
 
 La meta no es "migrar todo" de una vez.  
 La meta es sustituir stores locales por persistencia real módulo por módulo.
@@ -34,11 +51,11 @@ No incluye:
 
 ## Fase 4B — Conectar `menu` ✅ COMPLETADA
 
-**Qué cubre:** leer categorías y productos desde Supabase, persistir `available` y `featured`, que `/orders` consuma el mismo catálogo resuelto.
+**Qué cubre:** leer categorías y productos desde Supabase, crear/editar/archivar productos, persistir `available` y `featured`, subir imágenes a Storage y hacer que `/orders` y `/carta/[slug]` consuman el mismo catálogo resuelto.
 
 **Cómo está implementado:** `repository.ts` decide entre `local` y `supabase`. Si faltan variables de entorno el sistema sigue en modo local. Con variables completas, `/menu` lee desde Supabase y persiste cambios server-side. `/orders` reutiliza ese catálogo sin migrar todavía su propio dominio.
 
-**Verificación:** `menu_items` en Supabase responde con 4 registros (HTTP 200).
+**Verificación:** `scripts/seed-menu.mjs` deja 42 items activos repartidos 18/13/11 y 15 categorías activas (5 por restaurante). CRUD y upload verificados contra Supabase real.
 
 ---
 
@@ -48,7 +65,7 @@ No incluye:
 
 **Cómo está implementado:** mismo patrón que 4B. `repository.ts` decide entre `local` y `supabase`. Lectura remota desde tabla `reservations`. Escrituras vía server actions. Store local como capa de resiliencia. Mesa asignada persistida en `metadata.table_assigned_label` hasta tener gestión real de mesas.
 
-**Verificación:** `reservations` en Supabase responde HTTP 200 (tabla vacía, esperando datos operativos reales).
+**Verificación:** `scripts/seed-reservations.mjs` deja reservas por los 3 restaurantes; `/reservations` filtra por restaurante/sucursal activos.
 
 ---
 
@@ -58,7 +75,7 @@ No incluye:
 
 **Riesgo:** es el corazón operativo. Si se implementa mal, la demo pierde coherencia entre salón y cocina. Migrar escritura primero, luego lectura compartida en cocina, luego eventos.
 
-**Bloqueante actual:** la tabla `placed_orders` no existe todavía en Supabase. Requiere migración SQL antes de conectar el adaptador.
+**Estado actual:** las tablas `placed_orders`, `order_items` y `kitchen_events` ya están modeladas en `supabase/schema.sql`, pero el código todavía usa demo-store/localStorage. El trabajo pendiente es el adaptador de lectura/escritura y la migración gradual de UX.
 
 ---
 
@@ -68,11 +85,11 @@ Depende de tener ya conectados: `menu` ✅, `reservations` ✅, `orders` ⏳, `k
 
 ---
 
-## Fase 4F — Auth real y RLS serio (PENDIENTE)
+## Fase 4F — RLS serio por tenant/rol (PENDIENTE)
 
-**Qué cubre:** vincular `profiles.auth_user_id` con Supabase Auth, activar acceso por tenant, aislar por restaurante y sucursal, definir políticas RLS por rol (owner, admin, manager, waiter, kitchen).
+**Qué cubre:** fortalecer acceso por tenant, aislar por restaurante y sucursal desde RLS, y definir políticas por rol (owner, admin, manager, waiter, kitchen) además de los guards server-side actuales.
 
-**Por qué va al final:** primero conviene estabilizar el modelo y las escrituras. Recién después tiene sentido cerrar el perímetro de seguridad real.
+**Estado actual:** Supabase Auth ya funciona y la app resuelve perfil/rol/restaurante. Las escrituras críticas de menú usan service role server-side con validación de cookies y ownership; falta llevar ese aislamiento a políticas DB completas.
 
 ---
 

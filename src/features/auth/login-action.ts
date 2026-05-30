@@ -14,7 +14,8 @@ import {
 
 const COOKIE_OPTIONS = {
   path: "/",
-  maxAge: 60 * 60 * 24 * 30,
+  // Sin maxAge → cookie de sesión: muere al cerrar el navegador.
+  // Cada inicio fresco de la app vuelve a pedir login (no queda "guardada").
   sameSite: "lax" as const,
   httpOnly: true,
 };

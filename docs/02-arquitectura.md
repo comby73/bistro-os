@@ -1,11 +1,34 @@
 # 02 — Arquitectura
 
+## Gestión de carta desde la app (mayo 2026)
+
+`/menu` es un gestor real de carta digital, no solo lectura. owner/admin pueden
+crear, editar, cambiar precio/categoría/estación/imagen, marcar disponible/destacado
+y dar de baja (baja lógica) — todo desde un drawer lateral (`MenuItemEditor`).
+
+Flujo de escritura (patrón repository + server actions):
+
+```
+UI (MenuItemForm / drawer)
+   → server action (features/menu/actions.ts)  ── valida rol + ownership (cookies)
+      → repository (features/menu/repository.ts) ── Supabase si está configurado
+         → menu_items (insert/update/archive)
+   → fallback demo-store (localStorage) si no hay Supabase
+```
+
+- Permisos server-side: solo `owner`/`admin` (rol `chef` → roadmap). El cliente nunca
+  define `restaurant_id`; lo inyecta el server desde la cookie de sesión.
+- Aislamiento por tenant: toda edición valida que el item pertenezca al `restaurant_id` activo.
+- `/menu`, `/orders` y `/carta/[slug]` leen del **mismo repository** (sin doble fuente).
+- Imágenes: upload real a Supabase Storage (bucket `menu-images`) vía server action; en
+  fallback local se edita la URL directamente.
+
 ## Stack
 
 - Next.js + TypeScript para app y UI.
 - Tailwind CSS para la interfaz.
-- `localStorage` + stores demo para persistencia local temporal.
-- Supabase PostgreSQL preparado para persistencia real futura.
+- Supabase PostgreSQL para auth, tenant, menú/carta y reservas.
+- `localStorage` + stores demo para pedidos/cocina y fallback local.
 - n8n como integración opcional para automatizaciones externas.
 - LLM como capa asistiva documentada, no crítica.
 
@@ -15,7 +38,7 @@
 2. Separación UI / negocio / estado demo / datos futuros.
 3. Roles explícitos y navegación contextual.
 4. Integraciones externas no bloqueantes.
-5. Mocks primero, persistencia real después.
+5. Persistencia real por dominio, con fallback local para demo resiliente.
 6. Testing básico sobre validaciones y cálculos.
 
 ## Capas
@@ -25,9 +48,8 @@ Rutas App Router
 → AppShell y navegación por rol
 → Componentes de UI
 → Features (tipos, cálculos, stores demo, acciones)
-→ Persistencia local temporal
 → Adaptadores de datos por módulo
-→ Supabase futuro
+→ Supabase real / fallback local según dominio
 → Automatizaciones opcionales (n8n)
 ```
 
@@ -65,12 +87,12 @@ La misma lógica de negocio puede renderizar experiencias distintas por rol sin 
 
 ## Módulos implementados
 
-- `auth`: roles demo, selector y control de acceso.
+- `auth`: Supabase Auth, perfiles, roles y control de acceso.
 - `dashboard`: centro de control vivo derivado de stores demo y cálculos reutilizables.
 - `orders`: carga y seguimiento de pedidos.
 - `kitchen`: KDS demo y avance de estados.
-- `reservations`: módulo operativo con store demo, filtros y acciones de estado.
-- `menu`: carta operativa con disponibilidad y destacados persistidos en modo demo.
+- `reservations`: módulo operativo con Supabase, fallback local, filtros y acciones de estado.
+- `menu`: gestor de carta con CRUD, disponibilidad, destacados, baja lógica e imágenes en Storage.
 - `sales`: ventas y caja simulada.
 - `leads`: formulario comercial con automatización opcional.
 
@@ -95,6 +117,34 @@ Este modelo ayuda a ordenar el producto en módulos transaccionales claros:
 - **Pedidos** como núcleo de operación entre salón y cocina.
 - **KDS / cocina** como reflejo del avance del pedido en tiempo real.
 - **Ventas y caja** como cierre operativo del turno.
+
+## Contexto multi-restaurante
+
+La app modela varios restaurantes conviviendo en el mismo SaaS. Supabase resuelve perfiles,
+roles, restaurantes y sucursales; los mocks quedan como fallback de desarrollo. Vive en
+`src/features/restaurants/`:
+
+- `types.ts` — interfaces `Restaurant`, `Branch`, `RestaurantSession`.
+- `mock-data.ts` — fallback de 3 restaurantes (Bistró Palermo, Casa Norte, La Mesa Dorada).
+- `session.ts` — helper server-side `getActiveRestaurantSession(cookieStore)` y las
+  constantes de cookie (`RESTAURANT_COOKIE`, `BRANCH_COOKIE`). Sigue el mismo patrón
+  que `features/auth/demo-session.ts`.
+- `demo-store.ts` — hook cliente `useActiveRestaurant()` (localStorage + cookies,
+  SSR-safe) y acciones de sesión.
+- `actions.ts` — server actions para fijar/limpiar las cookies de restaurante y rol.
+
+**Flujo de selección.** `/login` autentica con Supabase Auth. Según `role_assignments`,
+roles operativos entran directo a su sucursal y owner/admin con más de una opción pasan por
+`/select-branch`.
+
+**Propagación.** Las páginas server leen `getActiveRestaurantSession(await cookies())`
+y pasan `restaurantId` a cada workspace. Los stores demo (`menu`, `reservations`,
+`orders`) filtran por `restaurant_id` cuando se les pasa el id; si no hay sesión,
+muestran todo (fallback compatible con el comportamiento previo). El `AppShell`
+muestra nombre del restaurante (con su `brand_color`), sucursal y un link "Cambiar".
+
+> Branding: hoy `slug`, descripción y color viven en `metadata`; si se promueven a columnas,
+> seguir las propuestas comentadas en `supabase/schema.sql`.
 - **Menú** como catálogo jerárquico de productos, categorías y disponibilidad.
 
 ## Integraciones futuras de referencia
@@ -109,22 +159,22 @@ Sin implementarlas todavía, la arquitectura deja espacio para:
 ## Integraciones
 
 - La app debe operar aunque n8n no exista o falle.
-- Supabase todavía no persiste el estado operativo.
-- El patrón actual favorece reemplazar stores demo por Supabase en Fase 4 sin rehacer la UI completa.
+- Supabase ya persiste tenant, auth, menú y reservas.
+- Pedidos/cocina siguen en demo-store hasta Fase 4D.
 
 ## Estrategia de migración a Supabase
 
-La migración prevista es incremental:
+La migración es incremental:
 
-1. mantener `src` operando con `localStorage` mientras se valida el modelo SQL,
-2. conectar primero módulos de bajo riesgo,
-3. dejar pedidos/cocina para cuando ya exista un patrón estable de lectura/escritura,
-4. formalizar auth real y RLS al final de la secuencia.
+1. conectar primero dominios de bajo riesgo (`menu`, `reservations`),
+2. dejar pedidos/cocina para cuando ya exista un patrón estable de lectura/escritura,
+3. mover dashboard a datos reales cuando los dominios fuente estén conectados,
+4. endurecer RLS por tenant/rol sobre la base ya estabilizada.
 
 Orden esperado:
 
-- Fase 4B: `menu`
-- Fase 4C: `reservations`
+- Fase 4B: `menu` ✅
+- Fase 4C: `reservations` ✅
 - Fase 4D: `orders` + `kitchen`
 - Fase 4E: `dashboard`
-- Fase 4F: auth real + RLS multi-tenant serio
+- Fase 4F: RLS multi-tenant serio por rol

@@ -28,6 +28,10 @@ Los prompts están documentados, pero la app operativa actual todavía no depend
 - consultar ventas/caja,
 - operar reservas.
 
+La bitácora de prompts de **desarrollo del sistema** está separada en
+[`11-historial-prompts.md`](./11-historial-prompts.md). Este archivo mantiene solo los
+prompts/agentes que podrían usarse como capa asistiva del producto.
+
 ## Uso futuro más probable
 
 - clasificación de leads,

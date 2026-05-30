@@ -8,7 +8,7 @@ import { getDefaultRouteForRole } from "@/features/auth/roles";
 
 const COOKIE_OPTIONS = {
   path: "/",
-  maxAge: 60 * 60 * 24 * 30,
+  // Cookie de sesión (sin maxAge): se borra al cerrar el navegador.
   sameSite: "lax" as const,
   httpOnly: true,
 };

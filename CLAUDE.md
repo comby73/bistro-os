@@ -6,16 +6,17 @@ Actuá como Senior Product Designer + Front-end Architect + Full-stack Developer
 
 ## Proyecto
 
-Bistró OS es una aplicación operativa demo para restaurantes con foco en flujo interno, no en la landing.
+Bistró OS es un SaaS operativo multi-restaurante para restaurantes, con foco en flujo interno, no en la landing.
 
 ## Estado real
 
-- Roles demo implementados: `owner`, `admin`, `manager`, `waiter`, `kitchen`.
-- `AppShell` interno con navegación por rol.
-- `/login` como selector de rol demo.
-- Módulos activos: dashboard, pedidos, cocina, reservas, menú y ventas/caja simulada.
+- Roles implementados: `owner`, `admin`, `manager`, `waiter`, `kitchen`.
+- `AppShell` interno con navegación por rol y contexto de restaurante/sucursal.
+- `/login` con Supabase Auth real (email + password).
+- Módulos activos: dashboard, pedidos, cocina, reservas, menú/carta, ventas/caja, usuarios, sucursales y restaurantes.
 - `/sales` no es facturación fiscal real.
-- Supabase todavía no es la persistencia activa.
+- Supabase es persistencia activa para auth, restaurantes, sucursales, perfiles/roles, menú y reservas.
+- Pedidos y cocina siguen en demo-store/localStorage hasta Fase 4D.
 - n8n es opcional y no debe bloquear flujos.
 
 ## Stack
@@ -23,7 +24,7 @@ Bistró OS es una aplicación operativa demo para restaurantes con foco en flujo
 - Next.js App Router
 - TypeScript estricto
 - Tailwind CSS
-- Supabase preparado para una fase futura
+- Supabase real conectado para auth, tenant, menú y reservas
 - n8n como integración opcional
 - Prompts/agentes documentados en `/prompts`
 
@@ -33,7 +34,7 @@ Bistró OS es una aplicación operativa demo para restaurantes con foco en flujo
 2. No mezclar UI, lógica de negocio y acceso a datos.
 3. Usar `src/features` para reglas de negocio, tipos, stores y validaciones.
 4. Usar `src/components` para UI reutilizable.
-5. Usar datos mock y `localStorage` hasta conectar Supabase.
+5. Usar Supabase para dominios ya migrados; mantener fallback local/demo donde corresponda.
 6. No inventar credenciales.
 7. No exponer service role keys en cliente.
 8. Mantener estética dark/champagne.
@@ -41,7 +42,7 @@ Bistró OS es una aplicación operativa demo para restaurantes con foco en flujo
 10. Tratar n8n como integración externa opcional.
 11. No presentar `/sales` como módulo fiscal real.
 
-## Sistema de imágenes (localStorage, sin servidor)
+## Sistema de imágenes
 
 ### Banner de publicidad del restaurante
 - Componente: `src/components/dashboard/PublicityBanner.tsx`
@@ -53,10 +54,11 @@ Bistró OS es una aplicación operativa demo para restaurantes con foco en flujo
 
 ### Fotos de platos en el menú
 - Tipo: `MenuItem.image_url?: string` en `src/features/menu/types.ts`.
-- Componente: `src/components/menu/MenuItemCard.tsx` — zona de imagen en la parte superior de cada card.
-- Con `canEdit=true` (owner/admin): arrastrás o hacés clic sobre la zona de imagen para cambiarla.
-- Se guarda en `localStorage` con clave `bistro_menu_img_{item.id}` (base64).
-- Para imagen fija desde código: definir `image_url: "/menu/nombre.jpg"` en `mock-data.ts` y copiar la foto a `public/menu/`.
+- Componentes: `MenuItemCard`, `MenuItemEditor`, `MenuImageUploader`.
+- Owner/admin pueden cargar imagen desde el drawer de edición.
+- En Supabase: upload real al bucket público `menu-images`, ruta `restaurants/{restaurant_id}/menu/{item_id}/{file}`.
+- La URL pública queda persistida en `metadata.image_url` junto con `metadata.storage_path` hasta aplicar la migración de columnas reales.
+- En fallback local: puede usarse URL directa; no se guardan imágenes base64 para carta.
 
 ## Diseño y estética
 
@@ -85,8 +87,8 @@ Bistró OS es una aplicación operativa demo para restaurantes con foco en flujo
 
 ## Próximas tareas sugeridas
 
-1. Consolidar flujo operativo Mozo → Pedido → Cocina.
-2. Conectar persistencia real con Supabase (imágenes migrar de localStorage a Supabase Storage).
-3. Reintroducir automatizaciones opcionales con n8n.
+1. Persistir pedidos y cocina en Supabase (`placed_orders`, `order_items`, `kitchen_events`).
+2. Completar RLS por tenant/rol para escrituras.
+3. Reintroducir automatizaciones opcionales con n8n sobre eventos persistidos.
 4. Preparar demo y defensa final.
 5. Vista de reservas en formato timeline/calendario.

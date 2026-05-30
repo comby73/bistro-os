@@ -15,7 +15,7 @@ export async function selectDemoRoleAction(formData: FormData) {
   const cookieStore = await cookies();
   cookieStore.set(DEMO_ROLE_COOKIE, roleId, {
     path: "/",
-    maxAge: 60 * 60 * 24 * 30,
+    // Cookie de sesión (sin maxAge): se borra al cerrar el navegador.
     sameSite: "lax"
   });
 

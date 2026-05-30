@@ -12,7 +12,7 @@
 1. La app valida y resuelve la acción principal por su cuenta.
 2. Si existe webhook configurado, intenta notificar a n8n.
 3. Si el webhook falta o falla, la app sigue respondiendo éxito funcional.
-4. En una fase futura con Supabase, la persistencia ocurrirá antes de automatizar.
+4. Para dominios migrados a Supabase, la persistencia debe ocurrir antes de automatizar.
 
 ## Caso implementado hoy: lead comercial
 
@@ -61,7 +61,7 @@ Hoy n8n **no** participa en:
 | Fase | Estado | Descripción |
 |---|---|---|
 | Fase 2B | ✅ Actual | Lead demo con automatización opcional |
-| Fase 4 | Pendiente | Persistir primero en Supabase |
+| Fase 4 | Parcial ✅ | Supabase activo para auth, menú y reservas; pedidos/cocina pendientes |
 | Fase 5 | Pendiente | Reintroducir automatizaciones n8n como capa secundaria |
 
 ## Regla arquitectónica

@@ -1,87 +1,134 @@
 # Bistró OS
 
-**Bistró OS** es una demo funcional de aplicación operativa para restaurantes.  
-El foco actual ya no es la landing comercial, sino el sistema interno: roles demo, pedidos, cocina, reservas, menú, dashboard y ventas/caja simulada.
+**Bistró OS** es un SaaS multi-restaurante de administración gastronómica (Next.js 16 + Supabase).
+No es una landing: es el sistema operativo interno del restaurante — login real, roles, menú,
+reservas, pedidos, cocina, dashboard, finanzas y gestión multi-sucursal.
 
 ## Qué es ahora
 
-- App interna para operación de restaurante.
-- Navegación y acceso por rol demo.
-- Módulos funcionales conectados entre sí con datos mock.
-- Modos visuales diferenciados para gestión, servicio y cocina.
-- Integraciones reales todavía desacopladas:
-  - Supabase queda preparado como persistencia futura.
-  - n8n queda como automatización opcional y no bloqueante.
+- App operativa multi-restaurante con **autenticación real (Supabase Auth)**.
+- **Supabase es la fuente de verdad** de restaurantes, sucursales, perfiles, roles, menú y reservas.
+- `mock-data` queda solo como **fallback de desarrollo** cuando no hay variables de Supabase.
+- Aislamiento por `restaurant_id` y `branch_id` en datos y navegación.
+- Carta pública por restaurante con QR único.
 
-## Roles demo
+## Autenticación
 
-| Rol | Qué puede hacer hoy |
+El login (`/login`) usa **email + contraseña contra Supabase Auth**. No es un selector de rol.
+Tras autenticar, el sistema lee el perfil del usuario y resuelve restaurante, sucursal y rol:
+
+- **Mozo / Cocina / Jefe de sala** → entran directo a su sucursal.
+- **Dueño / Admin** con 1 sucursal → directo; con varias → selector de sucursal.
+
+### Usuarios demo (contraseña: `demo1234`)
+
+| Email | Rol | Restaurante |
+|---|---|---|
+| `owner@bistro-os.com` | Dueño | Bistró Palermo |
+| `admin@bistro-os.com` | Admin | Bistró Palermo |
+| `manager@bistro-os.com` | Jefe de sala | Bistró Palermo |
+| `waiter@bistro-os.com` | Mozo | Bistró Palermo |
+| `kitchen@bistro-os.com` | Cocina | Bistró Palermo |
+| `owner@casanorte.com` | Dueño | Casa Norte |
+| `owner@mesadorada.com` | Dueño | La Mesa Dorada |
+| `demo@bistro-os.com` | Dueño (multi) | Los 3 restaurantes |
+
+El panel de login incluye accesos rápidos que autocompletan estas credenciales.
+
+## Roles y permisos
+
+| Rol | Rutas |
 |---|---|
-| `owner` | Ver dashboard, ventas/caja, pedidos, reservas, cocina y menú |
-| `admin` | Ver dashboard, ventas/caja, pedidos, reservas, cocina y menú |
-| `manager` | Ver dashboard, ventas/caja en solo lectura, pedidos, reservas y menú en supervisión |
-| `waiter` | Usar `/orders` en modo servicio y consultar `/menu` en formato rápido |
-| `kitchen` | Usar `/kitchen` como KDS con tickets grandes y acciones de avance |
+| `owner` | dashboard, finanzas, ventas, pedidos, reservas, cocina, menú, usuarios, sucursales, restaurantes |
+| `admin` | dashboard, ventas, pedidos, reservas, cocina, menú |
+| `manager` | dashboard, ventas, reservas, pedidos, menú |
+| `waiter` | pedidos, menú |
+| `kitchen` | cocina |
 
 ## Rutas principales
 
 | Ruta | Estado |
 |---|---|
-| `/` | Landing existente, no prioritaria |
-| `/login` | Selector de rol demo |
+| `/` | Landing comercial pública |
+| `/login` | Login real (email + contraseña, Supabase Auth) |
+| `/select-branch` | Selector de restaurante/sucursal (owner/admin multi) |
 | `/dashboard` | Vista interna adaptada por rol |
-| `/orders` | Pedidos activos + creación de pedido demo |
-| `/kitchen` | KDS demo con avance de estados |
-| `/reservations` | Gestión operativa de reservas con store demo |
-| `/menu` | Carta operativa con disponibilidad persistida en demo |
-| `/sales` | Ventas y caja simulada |
-| `/demo` | Formulario comercial / lead demo |
+| `/menu` | Menú operativo — **lee de Supabase** por restaurante |
+| `/carta/[slug]` | Carta pública por restaurante — **misma fuente que /menu** |
+| `/orders` | Pedidos activos + creación (demo en memoria por restaurante) |
+| `/kitchen` | KDS por restaurante (demo en memoria) |
+| `/reservations` | Reservas — **lee de Supabase** por restaurante/sucursal |
+| `/finances` | Recaudación consolidada (solo owner) |
+| `/users` `/branches` `/restaurants` | Altas/bajas (solo owner) |
+| `/demo` | Formulario comercial / lead (n8n lead-capture) |
 
-## Módulos implementados
+Slugs de carta pública: `bistro-palermo`, `casa-norte`, `la-mesa-dorada`.
 
-- Sistema de roles demo.
-- `AppShell` interno con navegación por rol.
-- Dashboard contextual por rol.
-- Dashboard vivo derivado de pedidos, reservas y ventas simuladas.
-- Pedidos.
-- Cocina.
-- Reservas.
-- Reservas operativas con filtros y estados.
-- Menú operativo con disponibilidad y destacados persistidos en `localStorage`.
-- Ventas y caja simulada.
-- Captura de leads demo con automatización opcional.
+## Fuente de datos
 
-## Estado de integraciones
+| Dato | Fuente real | Fallback |
+|---|---|---|
+| Restaurantes, sucursales, perfiles, roles | Supabase | `features/restaurants/mock-data` |
+| Menú (categorías + items) | Supabase | `features/menu/catalog.json` |
+| Reservas | Supabase | `features/reservations/mock-data` |
+| Pedidos / cocina | Demo en memoria (aún no en Supabase) | — |
 
-- **Supabase**: todavía no conectado como persistencia real.
-- **n8n**: integración opcional/no bloqueante.
-- **Facturación fiscal**: no implementada. `/sales` representa solo facturación operativa simulada.
+El menú comparte una sola fuente: `src/features/menu/catalog.json`, consumido por la app
+(fallback) y por `scripts/seed-menu.mjs` (carga a Supabase). `/menu` y `/carta` leen del
+**mismo repository**, eliminando la doble fuente de verdad anterior.
 
-## Estado de backend
+## Gestión de carta desde la app
 
-- La app sigue usando `mock-data` + `localStorage`.
-- `supabase/schema.sql` ya modela el backend futuro de forma más completa.
-- La migración real a Supabase será incremental por módulo, no un reemplazo total de una vez.
-- Fase 4B deja `menu` preparado para leer/escribir en Supabase solo si las variables están completas; si no, el fallback local sigue siendo el comportamiento por defecto.
-- Fase 4C hace lo mismo para `reservations`: lectura y escritura remota opcional con fallback local garantizado.
+`scripts/seed-menu.mjs` carga la carta inicial demo; después **owner/admin administran la carta desde
+`/menu`** sin tocar código:
 
-## Cómo correr el proyecto
+- Crear producto, editar nombre/descripción/precio/categoría/estación.
+- Disponibilidad (`available=false` = "No disponible" temporal) y destacado.
+- **Baja lógica** (`status='archived'`): el producto se oculta en `/menu` y `/carta`, nunca
+  se borra físicamente.
+- **Imagen**: upload real a Supabase Storage (bucket `menu-images`,
+  `restaurants/{restaurant_id}/menu/{item_id}/{filename}`) o URL directa como fallback.
+
+Todo se guarda en Supabase si está configurado; si no, cae a `localStorage`. `/orders` y
+`/carta/[slug]` reflejan los cambios porque leen el mismo repository.
+Permisos: owner/admin (rol `chef` → roadmap). manager/waiter solo lectura; kitchen no administra menú.
+
+## Cómo probar
 
 ```bash
 npm install
 npm run dev
 ```
 
-Abrir:
+1. **Login** → http://localhost:3000/login → entrar con cualquier usuario demo (`demo1234`).
+2. **Menú interno** → `/menu` → muestra los productos del restaurante activo (Casa Norte y
+   La Mesa Dorada ya no aparecen vacíos).
+3. **Carta pública** → `/carta/casa-norte`, `/carta/la-mesa-dorada`, `/carta/bistro-palermo`.
+4. **Reservas** → `/reservations` → reservas del restaurante/sucursal activos.
+5. **Pedidos** → `/orders` → comandas demo del restaurante activo.
+6. **Cocina** → `/kitchen` → tickets demo del restaurante activo.
 
-```txt
-http://localhost:3000
+## Seeds de Supabase
+
+Con `.env.local` configurado:
+
+```bash
+npm run seed:menu          # carga categorías + items del catálogo a Supabase
+npm run seed:reservations  # carga reservas demo por restaurante
+npm run seed:demo          # ambos
 ```
 
-Para entrar al sistema interno:
+Son **idempotentes** (UUID deterministas + upsert). El seed de menú archiva
+(`status='archived'`) los items que ya no estén en el catálogo.
 
-```txt
-http://localhost:3000/login
+### Consultas de validación
+
+```sql
+select restaurant_id, count(*) from menu_items
+where coalesce(status,'active')='active' group by restaurant_id order by restaurant_id;
+-- esperado: 001→18, 002→13, 003→11
+
+select restaurant_id, count(*) from reservations group by restaurant_id order by restaurant_id;
 ```
 
 ## Variables de entorno
@@ -92,12 +139,11 @@ Copiar `.env.example` a `.env.local`:
 cp .env.example .env.local
 ```
 
-Valores importantes hoy:
+- `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY` → cliente / lectura pública.
+- `SUPABASE_SERVICE_ROLE_KEY` → **solo server-side** (seeds, escritura segura). Nunca exponer en cliente.
+- `N8N_LEAD_WEBHOOK_URL` → opcional (captura de leads).
 
-- `DEMO_AUTH_BYPASS=true` para navegar la demo sin auth real.
-- `N8N_LEAD_WEBHOOK_URL` es opcional.
-- `NEXT_PUBLIC_SUPABASE_URL` y `NEXT_PUBLIC_SUPABASE_ANON_KEY` habilitan lectura pública potencial.
-- `SUPABASE_SERVICE_ROLE_KEY` se usa solo server-side para activar la escritura segura del módulo `menu`.
+> `.env.local` está en `.gitignore` y no debe commitearse.
 
 ## Validación de calidad
 
@@ -107,10 +153,16 @@ npm test
 npm run build
 ```
 
-## Roadmap inmediato
+## Deploy (Vercel)
 
-1. Fase 3A: flujo Mozo → Pedido → Cocina.
-2. Fase 3B: reservas operativas.
-3. Fase 4: Supabase real.
-4. Fase 5: automatización n8n opcional.
-5. Fase 6: preparación de defensa/presentación.
+- Build de producción: `npm run build` (verificado, sin errores).
+- Variables a configurar en Vercel: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`,
+  `SUPABASE_SERVICE_ROLE_KEY`.
+- **URL pública: _pendiente de completar con URL de Vercel_.**
+
+## Roadmap
+
+1. Persistir pedidos/cocina en Supabase (`placed_orders` / `kitchen_events`).
+2. RLS por tenant (hoy `supabase/policies.sql` solo abre lectura pública de menú).
+3. Automatizaciones n8n: reserva confirmada → Telegram, pedido demorado → notificación.
+4. Promover `image_url`/`storage_path` desde `metadata` a columnas reales en la DB viva cuando se aplique la migración SQL.

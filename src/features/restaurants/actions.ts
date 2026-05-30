@@ -10,7 +10,7 @@ import { BRANCH_COOKIE, RESTAURANT_COOKIE } from "./session";
 
 const COOKIE_OPTIONS = {
   path: "/",
-  maxAge: 60 * 60 * 24 * 30,
+  // Cookie de sesión (sin maxAge): se borra al cerrar el navegador.
   sameSite: "lax" as const
 };
 

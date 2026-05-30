@@ -21,6 +21,13 @@ La demo valida calidad con:
 - repositorio de reservas con fallback local validado,
 - cálculos de dashboard derivados de stores demo,
 - cálculos de menú para disponibilidad, filtros y agrupación,
+- **gestión de carta (CRUD) en fallback local** (`tests/menu-store-crud.test.ts`):
+  - crear producto nuevo en el catálogo,
+  - editar nombre/precio/categoría,
+  - baja lógica (`status='archived'` + `available=false`, sin borrado físico),
+  - producto archivado oculto en carta pública (`visibleItems`),
+  - `available=false` sigue visible como "No disponible",
+  - `/orders` usa el catálogo actualizado (producto recién creado es ordenable),
 - permisos por rol,
 - cálculos de ventas,
 - cálculos de pedidos.
@@ -33,6 +40,9 @@ npm test
 npm run build
 ```
 
+Última validación reportada para este bloque: `npm run lint` sin errores,
+`npm test` con 58 tests verdes y `npm run build` OK.
+
 ## Qué garantizan hoy
 
 - que los contratos básicos de datos no se rompan,
@@ -44,6 +54,8 @@ npm run build
 
 ## Qué falta en fases futuras
 
+- tests de las server actions de menú con Supabase (hoy verificadas manualmente:
+  create → update → archive → upload contra la DB viva),
 - tests del store demo de pedidos/cocina,
 - tests de integración de rutas por rol,
 - tests E2E de flujo operativo,
