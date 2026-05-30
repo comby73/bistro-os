@@ -64,7 +64,7 @@ export function LoginForm() {
             Ingresá con tu email y contraseña.
           </p>
 
-          <form action={action} className="mt-8 flex flex-col gap-4">
+          <form action={action} suppressHydrationWarning className="mt-8 flex flex-col gap-4">
             <div className="flex flex-col gap-1.5">
               <label htmlFor="bistro-email" className="text-[12px] font-semibold uppercase tracking-[0.14em] text-paper/55">
                 Email
@@ -106,6 +106,7 @@ export function LoginForm() {
             <button
               type="submit"
               disabled={pending}
+              suppressHydrationWarning
               className="btn-gold mt-2 py-3 text-[15px] disabled:opacity-50"
             >
               {pending ? "Ingresando…" : "Ingresar"}
