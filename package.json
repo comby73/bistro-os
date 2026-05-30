@@ -8,7 +8,10 @@
     "start": "next start",
     "lint": "eslint src tests",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "seed:menu": "node scripts/seed-menu.mjs",
+    "seed:reservations": "node scripts/seed-reservations.mjs",
+    "seed:demo": "node scripts/seed-menu.mjs && node scripts/seed-reservations.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "latest",

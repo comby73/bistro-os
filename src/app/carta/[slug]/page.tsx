@@ -1,7 +1,9 @@
 import { notFound } from "next/navigation";
-import { menuCategories, menuItems, RESTAURANT_IDS } from "@/features/menu/mock-data";
+import { RESTAURANT_IDS } from "@/features/menu/mock-data";
+import { getMenuCatalogForRestaurant } from "@/features/menu/repository";
 import { CartaView } from "@/components/carta/CartaView";
 import { demoRestaurants } from "@/features/restaurants/mock-data";
+import { getRestaurantByIdFromDb } from "@/features/restaurants/db";
 
 // Mapeo slug → restaurantId (Supabase UUID)
 const SLUG_TO_ID: Record<string, string> = {
@@ -28,12 +30,18 @@ export default async function CartaSlugPage({ params }: { params: Promise<{ slug
 
   if (!restaurantId) notFound();
 
-  const restaurant = demoRestaurants.find((r) => r.slug === slug);
-  const items = menuItems.filter((i) => i.available && i.restaurant_id === restaurantId);
+  // Fuente única: el mismo repository que usa /menu interno.
+  // Lee Supabase si está configurado; cae a mock filtrado en dev.
+  const [catalog, restaurant] = await Promise.all([
+    getMenuCatalogForRestaurant(restaurantId),
+    getRestaurantByIdFromDb(restaurantId),
+  ]);
+
+  const items = catalog.items.filter((item) => item.available);
 
   return (
     <CartaView
-      categories={menuCategories}
+      categories={catalog.categories}
       items={items}
       restaurantName={restaurant?.name}
       restaurantSlug={slug}

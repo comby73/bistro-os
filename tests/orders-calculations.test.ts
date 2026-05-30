@@ -58,11 +58,12 @@ describe("orders calculations", () => {
     expect(getNextOrderStatus("ready")).toBe("delivered");
     expect(getNextOrderStatus("delivered")).toBeNull();
 
-    // groupOrdersByStatus solo agrupa received | preparing | ready (sin delivered)
+    // groupOrdersByStatus solo agrupa received | preparing | ready (sin delivered).
+    // Derivamos los conteos esperados del mock (cubre los 3 restaurantes).
     const grouped = groupOrdersByStatus(orders);
-    expect(grouped.received).toHaveLength(1);
-    expect(grouped.preparing).toHaveLength(1);
-    expect(grouped.ready).toHaveLength(0);
+    expect(grouped.received).toHaveLength(orders.filter((o) => o.status === "received").length);
+    expect(grouped.preparing).toHaveLength(orders.filter((o) => o.status === "preparing").length);
+    expect(grouped.ready).toHaveLength(orders.filter((o) => o.status === "ready").length);
   });
 
   it("totaliza el pedido según cantidad y precio unitario", () => {

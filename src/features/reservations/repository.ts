@@ -103,20 +103,28 @@ function buildReservationInsertPayload(input: CreateReservationInput) {
   };
 }
 
-export async function getReservations(): Promise<ReservationsResult> {
+export async function getReservations(
+  restaurantId: string = DEMO_RESTAURANT_ID,
+  branchId: string | null = DEMO_BRANCH_ID
+): Promise<ReservationsResult> {
   if (resolveReservationsDataSource() === "local") {
     return getLocalReservationsResult();
   }
 
   try {
     const supabase = createServerSupabaseClient();
-    const { data, error } = await supabase
+    let query = supabase
       .from("reservations")
       .select(
         "id, customer_name, customer_contact, reservation_date, reservation_time, party_size, status, notes, metadata"
       )
-      .eq("restaurant_id", DEMO_RESTAURANT_ID)
-      .eq("branch_id", DEMO_BRANCH_ID)
+      .eq("restaurant_id", restaurantId);
+
+    if (branchId) {
+      query = query.eq("branch_id", branchId);
+    }
+
+    const { data, error } = await query
       .order("reservation_date", { ascending: true })
       .order("reservation_time", { ascending: true });
 

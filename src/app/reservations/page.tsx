@@ -15,7 +15,10 @@ export default async function ReservationsPage() {
   const cookieStore = await cookies();
   const roleId = parseDemoRole(cookieStore.get(DEMO_ROLE_COOKIE)?.value);
   const restaurantSession = getActiveRestaurantSession(cookieStore);
-  const reservationsResult = await getReservations();
+  const reservationsResult = await getReservations(
+    restaurantSession?.restaurantId,
+    restaurantSession?.branchId ?? null
+  );
   const initialReservations =
     reservationsResult.dataSource === "supabase"
       ? reservationsResult.reservations

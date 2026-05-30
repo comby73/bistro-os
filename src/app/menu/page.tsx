@@ -6,7 +6,7 @@ import {
   updateMenuItemAvailabilityAction,
   updateMenuItemFeaturedAction
 } from "@/features/menu/actions";
-import { getMenuCatalog } from "@/features/menu/repository";
+import { getMenuCatalog, getMenuCatalogForRestaurant } from "@/features/menu/repository";
 import { getRoleConfig } from "@/features/auth/roles";
 import { getActiveRestaurantSession } from "@/features/restaurants/session";
 import { getRestaurantByIdFromDb } from "@/features/restaurants/db";
@@ -17,9 +17,12 @@ export default async function MenuPage() {
   const restaurantSession = getActiveRestaurantSession(cookieStore);
   const role = roleId ? getRoleConfig(roleId) : null;
 
+  // Catálogo filtrado por restaurante activo (mismo origen que /carta).
+  // Sin restaurante en sesión cae al catálogo completo.
+  const restaurantId = restaurantSession?.restaurantId;
   const [menuCatalog, restaurant] = await Promise.all([
-    getMenuCatalog(),
-    getRestaurantByIdFromDb(restaurantSession?.restaurantId),
+    restaurantId ? getMenuCatalogForRestaurant(restaurantId) : getMenuCatalog(),
+    getRestaurantByIdFromDb(restaurantId),
   ]);
 
   const initialCatalog =
