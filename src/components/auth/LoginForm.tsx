@@ -7,11 +7,18 @@ const initialState: LoginState = {};
 
 const DEMO_RESTAURANTS = [
   {
+    name: "Multi-restaurante",
+    subtitle: "Mismo usuario, varios locales → muestra el selector",
+    color: "#C9A86A",
+    users: [
+      { email: "owner@bistro-os.com", label: "Dueño · Palermo + Casa Norte" },
+      { email: "admin@bistro-os.com", label: "Admin · Palermo + Casa Norte" },
+    ],
+  },
+  {
     name: "Bistró Palermo",
     color: "#E8B863",
     users: [
-      { email: "owner@bistro-os.com",   label: "Dueño" },
-      { email: "admin@bistro-os.com",   label: "Administrador" },
       { email: "manager@bistro-os.com", label: "Jefe de sala" },
       { email: "waiter@bistro-os.com",  label: "Mozo" },
       { email: "kitchen@bistro-os.com", label: "Cocina" },
@@ -138,9 +145,14 @@ export function LoginForm() {
                 >
                   {rest.name.charAt(0)}
                 </span>
-                <p className="text-[14px] font-bold" style={{ color: rest.color }}>
-                  {rest.name}
-                </p>
+                <div>
+                  <p className="text-[14px] font-bold leading-tight" style={{ color: rest.color }}>
+                    {rest.name}
+                  </p>
+                  {"subtitle" in rest && rest.subtitle && (
+                    <p className="text-[11px] text-paper/45">{rest.subtitle}</p>
+                  )}
+                </div>
               </div>
 
               {/* Usuarios */}
