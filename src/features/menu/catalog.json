@@ -12,9 +12,10 @@
   "categories": [
     { "id": "cat-entradas", "name": "Entradas", "position": 1 },
     { "id": "cat-principales", "name": "Principales", "position": 2 },
-    { "id": "cat-parrilla", "name": "Parrilla", "position": 3 },
-    { "id": "cat-bebidas", "name": "Bebidas", "position": 4 },
-    { "id": "cat-postres", "name": "Postres", "position": 5 }
+    { "id": "cat-minutas", "name": "Minutas", "position": 3 },
+    { "id": "cat-parrilla", "name": "Parrilla", "position": 4 },
+    { "id": "cat-bebidas", "name": "Bebidas", "position": 5 },
+    { "id": "cat-postres", "name": "Postres", "position": 6 }
   ],
   "items": [
     { "id": "item-ent-1", "restaurant_id": "00000000-0000-0000-0000-000000000001", "category_id": "cat-entradas", "name": "Burrata con tomates confitados", "description": "Burrata cremosa sobre cama de tomates confitados al horno lento, aceite de albahaca y flor de sal.", "price": 22, "station": "cold", "available": true, "featured": true, "image_url": "/bistro-ent-burrata.jpg" },
@@ -35,6 +36,11 @@
     { "id": "item-pos-1", "restaurant_id": "00000000-0000-0000-0000-000000000001", "category_id": "cat-postres", "name": "Tiramisú de la casa", "description": "Tiramisú clásico: café fuerte, mascarpone esponjoso y cacao amargo.", "price": 14, "station": "cold", "available": true, "featured": true, "image_url": "/bistro-pos-tiramisu.jpg" },
     { "id": "item-pos-2", "restaurant_id": "00000000-0000-0000-0000-000000000001", "category_id": "cat-postres", "name": "Flan cremoso con dulce de leche", "description": "Flan casero de vainilla con caramelo oscuro y dulce de leche artesanal.", "price": 12, "station": "cold", "available": true, "featured": false, "image_url": "/bistro-pos-flan.jpg" },
     { "id": "item-pos-3", "restaurant_id": "00000000-0000-0000-0000-000000000001", "category_id": "cat-postres", "name": "Panna cotta de vainilla", "description": "Panna cotta de vainilla de Madagascar con coulis de frutos rojos.", "price": 13, "station": "cold", "available": true, "featured": false, "image_url": "/bistro-pos-pannacotta.jpg" },
+
+    { "id": "item-min-1", "restaurant_id": "00000000-0000-0000-0000-000000000001", "category_id": "cat-minutas", "name": "Milanesa napolitana con papas", "description": "Milanesa de ternera con jamón, salsa de tomate y mozzarella gratinada, con papas fritas.", "price": 20, "station": "hot", "available": true, "featured": true },
+    { "id": "item-min-2", "restaurant_id": "00000000-0000-0000-0000-000000000001", "category_id": "cat-minutas", "name": "Suprema Maryland", "description": "Suprema de pollo crocante con panceta, banana, crema de choclo y papas españolas.", "price": 19, "station": "hot", "available": true, "featured": false },
+    { "id": "item-min-3", "restaurant_id": "00000000-0000-0000-0000-000000000001", "category_id": "cat-minutas", "name": "Bife a caballo", "description": "Bife de chorizo con dos huevos fritos y papas a la española.", "price": 24, "station": "grill", "available": true, "featured": false },
+    { "id": "item-min-4", "restaurant_id": "00000000-0000-0000-0000-000000000001", "category_id": "cat-minutas", "name": "Tortilla de papas", "description": "Tortilla española jugosa con cebolla, acompañada de ensalada mixta.", "price": 15, "station": "hot", "available": true, "featured": false },
 
     { "id": "cn-ent-1", "restaurant_id": "00000000-0000-0000-0000-000000000002", "category_id": "cat-entradas", "name": "Empanadas salteñas", "description": "Carne cortada a cuchillo, papa, huevo y comino. Horneadas al punto. Docena.", "price": 18, "station": "hot", "available": true, "featured": true },
     { "id": "cn-ent-2", "restaurant_id": "00000000-0000-0000-0000-000000000002", "category_id": "cat-entradas", "name": "Humita en chala", "description": "Humita dulce y salada, envuelta en chala y cocida a vapor. Acompañada de salsa criolla.", "price": 14, "station": "hot", "available": true, "featured": false },
