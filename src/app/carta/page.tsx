@@ -1,12 +1,6 @@
-import { menuCategories, menuItems } from "@/features/menu/mock-data";
-import { CartaView } from "@/components/carta/CartaView";
+import { redirect } from "next/navigation";
 
-export const metadata = {
-  title: "Carta · Bistró",
-  description: "Menú del día — Bistró Cuisine & Ambiance"
-};
-
+// /carta sin slug → redirige a Bistró Palermo por defecto
 export default function CartaPage() {
-  const availableItems = menuItems.filter((i) => i.available);
-  return <CartaView categories={menuCategories} items={availableItems} />;
+  redirect("/carta/bistro-palermo");
 }

@@ -20,7 +20,8 @@ export function MenuWorkspace({
   dataSource,
   persistAvailability,
   persistFeatured,
-  restaurantId
+  restaurantId,
+  restaurantSlug,
 }: {
   roleId: RoleId;
   initialCatalog?: MenuCatalog;
@@ -28,6 +29,7 @@ export function MenuWorkspace({
   persistAvailability?: (itemId: string, available: boolean) => Promise<unknown>;
   persistFeatured?: (itemId: string, featured: boolean) => Promise<unknown>;
   restaurantId?: string;
+  restaurantSlug?: string;
 }) {
   const { categories, items, toggleAvailability, toggleFeatured } = useDemoMenu(
     initialCatalog,
@@ -138,7 +140,7 @@ export function MenuWorkspace({
                 <MenuSummaryCards summary={summary} />
               </div>
               <div className="mt-6">
-                <QRPanel />
+                <QRPanel restaurantSlug={restaurantSlug} />
               </div>
             </>
           ) : (

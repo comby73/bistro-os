@@ -9,19 +9,22 @@ import {
 import { getMenuCatalog } from "@/features/menu/repository";
 import { getRoleConfig } from "@/features/auth/roles";
 import { getActiveRestaurantSession } from "@/features/restaurants/session";
+import { getRestaurantByIdFromDb } from "@/features/restaurants/db";
 
 export default async function MenuPage() {
   const cookieStore = await cookies();
   const roleId = parseDemoRole(cookieStore.get(DEMO_ROLE_COOKIE)?.value);
   const restaurantSession = getActiveRestaurantSession(cookieStore);
   const role = roleId ? getRoleConfig(roleId) : null;
-  const menuCatalog = await getMenuCatalog();
+
+  const [menuCatalog, restaurant] = await Promise.all([
+    getMenuCatalog(),
+    getRestaurantByIdFromDb(restaurantSession?.restaurantId),
+  ]);
+
   const initialCatalog =
     menuCatalog.dataSource === "supabase"
-      ? {
-          categories: menuCatalog.categories,
-          items: menuCatalog.items
-        }
+      ? { categories: menuCatalog.categories, items: menuCatalog.items }
       : undefined;
 
   return (
@@ -42,6 +45,7 @@ export default async function MenuPage() {
             persistAvailability={updateMenuItemAvailabilityAction}
             persistFeatured={updateMenuItemFeaturedAction}
             restaurantId={restaurantSession?.restaurantId}
+            restaurantSlug={restaurant?.slug}
           />
         ) : (
           <div className="card-premium p-6 text-sm text-paper/60">

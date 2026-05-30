@@ -87,10 +87,16 @@ function DishCard({ item, index }: { item: MenuItem; index: number }) {
 /* ─── Vista principal ─── */
 export function CartaView({
   categories,
-  items
+  items,
+  restaurantName,
+  restaurantSlug,
+  brandColor,
 }: {
   categories: MenuCategory[];
   items: MenuItem[];
+  restaurantName?: string;
+  restaurantSlug?: string;
+  brandColor?: string;
 }) {
   const [activeCategory, setActiveCategory] = useState<string>("all");
   const navRef = useRef<HTMLDivElement>(null);
@@ -108,12 +114,15 @@ export function CartaView({
       {/* ── HERO ── */}
       <header className="relative flex min-h-[42vh] flex-col items-center justify-end overflow-hidden pb-10 text-center">
         {/* carrusel de fotos del restaurante */}
-        <HeroCarousel overlay="bg-gradient-to-b from-ink/30 via-ink/50 to-ink" />
+        <HeroCarousel overlay="bg-gradient-to-b from-ink/30 via-ink/50 to-ink" slug={restaurantSlug} />
 
         {/* contenido hero */}
         <div className="relative z-10 px-6">
-          <p className="mb-3 text-[12px] font-semibold uppercase tracking-[0.22em] text-gold/80">
-            Bistró · Cuisine & Ambiance
+          <p
+            className="mb-3 text-[12px] font-semibold uppercase tracking-[0.22em]"
+            style={{ color: brandColor ?? "#E8B863" }}
+          >
+            {restaurantName ?? "Bistró · Cuisine & Ambiance"}
           </p>
           <h1 className="text-5xl font-bold tracking-[-0.05em] text-paper sm:text-6xl md:text-7xl">
             Nuestra Carta
@@ -177,7 +186,7 @@ export function CartaView({
       {/* ── PIE ── */}
       <footer className="border-t border-line/50 py-10 text-center">
         <p className="text-[13px] text-paper/40">
-          Bistró · Cuisine & Ambiance · Carta del día
+          {restaurantName ?? "Bistró · Cuisine & Ambiance"} · Carta del día
         </p>
         <p className="mt-1 text-[12px] text-paper/28">
           Precios expresados en USD · IVA incluido

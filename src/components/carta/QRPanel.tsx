@@ -4,7 +4,7 @@ import { useState, useEffect, startTransition } from "react";
 import { QRCodeSVG } from "qrcode.react";
 import { QrCode, Copy, Check, ExternalLink, Printer } from "lucide-react";
 
-export function QRPanel() {
+export function QRPanel({ restaurantSlug }: { restaurantSlug?: string }) {
   const [origin, setOrigin] = useState("http://localhost:3000");
   const [copied, setCopied] = useState(false);
 
@@ -12,7 +12,8 @@ export function QRPanel() {
     startTransition(() => setOrigin(window.location.origin));
   }, []);
 
-  const cartaUrl = `${origin}/carta`;
+  const slug      = restaurantSlug ?? "bistro-palermo";
+  const cartaUrl  = `${origin}/carta/${slug}`;
 
   const copy = async () => {
     await navigator.clipboard.writeText(cartaUrl);
@@ -33,7 +34,7 @@ export function QRPanel() {
         p  { font-size: 13px; color: #666; margin-bottom: 24px; }
         .url { font-size: 11px; color: #999; margin-top: 16px; }
       </style></head><body>
-        <h2>Bistró · Cuisine & Ambiance</h2>
+        <h2>${slug.replace(/-/g, " ").replace(/\b\w/g, c => c.toUpperCase())}</h2>
         <p>Escaneá para ver la carta del día</p>
         ${svg}
         <p class="url">${cartaUrl}</p>
@@ -104,7 +105,7 @@ export function QRPanel() {
         </button>
 
         <a
-          href="/carta"
+          href={`/carta/${slug}`}
           target="_blank"
           rel="noreferrer"
           className="flex items-center justify-center gap-2 rounded-2xl border border-line bg-layer1/60 px-4 py-3 text-[14px] font-medium text-paper/75 transition-all duration-200 hover:border-gold/30 hover:text-paper"
