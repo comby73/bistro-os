@@ -17,6 +17,32 @@ export interface MenuItem {
   available: boolean;
   featured: boolean;
   image_url?: string;
+  /** "archived" = baja lógica (oculto). Ausente/"active" = visible. */
+  status?: "active" | "archived";
+}
+
+/** Datos para crear un producto nuevo (restaurant_id/branch_id los inyecta el server). */
+export interface MenuItemInput {
+  name: string;
+  description: string;
+  price: number;
+  category_id: string;
+  station: KitchenStation;
+  available: boolean;
+  featured: boolean;
+  image_url?: string;
+}
+
+/** Edición parcial de un producto existente. */
+export type MenuItemPatch = Partial<MenuItemInput> & {
+  status?: "active" | "archived";
+};
+
+/** Resultado de una mutación de menú (para distinguir fuente y éxito). */
+export interface MenuMutationResult {
+  dataSource: MenuDataSource;
+  updated: boolean;
+  itemId?: string;
 }
 
 export interface MenuSummary {

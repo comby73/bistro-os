@@ -1,17 +1,24 @@
 "use client";
 
 import { useMemo, useState, useTransition } from "react";
+import { Plus } from "lucide-react";
 import type { RoleId } from "@/features/auth/roles";
 import {
   filterMenuItems,
   getMenuSummary,
   groupMenuItemsByCategory
 } from "@/features/menu/calculations";
-import { useDemoMenu } from "@/features/menu/demo-store";
-import type { MenuCatalog, MenuDataSource } from "@/features/menu/types";
+import { useDemoMenu, newLocalItemId } from "@/features/menu/demo-store";
+import {
+  createMenuItemAction,
+  updateMenuItemAction,
+  archiveMenuItemAction
+} from "@/features/menu/actions";
+import type { MenuCatalog, MenuDataSource, MenuItem, MenuItemInput } from "@/features/menu/types";
 import { MenuCategoryTabs } from "./MenuCategoryTabs";
 import { MenuItemCard } from "./MenuItemCard";
 import { MenuSummaryCards } from "./MenuSummaryCards";
+import { MenuItemEditor } from "./MenuItemEditor";
 import { QRPanel } from "@/components/carta/QRPanel";
 
 export function MenuWorkspace({
@@ -31,13 +38,20 @@ export function MenuWorkspace({
   restaurantId?: string;
   restaurantSlug?: string;
 }) {
-  const { categories, items, toggleAvailability, toggleFeatured } = useDemoMenu(
-    initialCatalog,
-    restaurantId
-  );
+  const {
+    categories,
+    items,
+    toggleAvailability,
+    toggleFeatured,
+    createItem,
+    updateItem,
+    archiveItem
+  } = useDemoMenu(initialCatalog, restaurantId);
   const [activeCategoryId, setActiveCategoryId] = useState("");
   const [search, setSearch] = useState("");
   const [isPending, startTransition] = useTransition();
+  const [editorOpen, setEditorOpen] = useState(false);
+  const [editingItem, setEditingItem] = useState<MenuItem | undefined>(undefined);
   const canEdit = roleId === "owner" || roleId === "admin";
   const isWaiter = roleId === "waiter";
   const summary = useMemo(() => getMenuSummary(items), [items]);
@@ -80,13 +94,67 @@ export function MenuWorkspace({
     }
   }
 
+  function openCreate() {
+    setEditingItem(undefined);
+    setEditorOpen(true);
+  }
+
+  function openEdit(item: MenuItem) {
+    setEditingItem(item);
+    setEditorOpen(true);
+  }
+
+  function handleSubmit(input: MenuItemInput) {
+    startTransition(async () => {
+      if (editingItem) {
+        if (dataSource === "supabase") {
+          await updateMenuItemAction(editingItem.id, input);
+        }
+        updateItem(editingItem.id, input);
+      } else {
+        let id = newLocalItemId();
+        if (dataSource === "supabase") {
+          const res = await createMenuItemAction(input);
+          if (res.itemId) id = res.itemId;
+        }
+        createItem(input, id);
+      }
+      setEditorOpen(false);
+      setEditingItem(undefined);
+    });
+  }
+
+  function handleArchive() {
+    if (!editingItem) return;
+    const id = editingItem.id;
+    startTransition(async () => {
+      if (dataSource === "supabase") {
+        await archiveMenuItemAction(id);
+      }
+      archiveItem(id);
+      setEditorOpen(false);
+      setEditingItem(undefined);
+    });
+  }
+
   return (
     <section className="mx-auto max-w-[1320px] space-y-6">
       <div className={canEdit ? "grid gap-6 xl:grid-cols-[1.1fr_0.9fr]" : "grid gap-6 xl:grid-cols-[0.95fr_1.05fr]"}>
         <section className="card-premium p-6">
           <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
             <div>
-              <p className="eyebrow mb-3">{isWaiter ? "Consulta rápida" : "Carta operativa"}</p>
+              <div className="flex items-center gap-3">
+                <p className="eyebrow mb-3">{isWaiter ? "Consulta rápida" : "Carta operativa"}</p>
+                {canEdit && (
+                  <button
+                    type="button"
+                    onClick={openCreate}
+                    className="btn-gold mb-3 flex items-center gap-1.5 px-3 py-1.5 text-[12px]"
+                  >
+                    <Plus size={14} /> Nuevo producto
+                  </button>
+                )}
+              </div>
               <h3 className="text-3xl font-semibold tracking-[-0.04em]">
                 {isWaiter ? "Menú del turno" : "Gestión de productos y disponibilidad"}
               </h3>
@@ -213,6 +281,7 @@ export function MenuWorkspace({
                   compact={isWaiter}
                   onToggleAvailability={handleAvailabilityToggle}
                   onToggleFeatured={handleFeaturedToggle}
+                  onEdit={canEdit ? openEdit : undefined}
                 />
               ))}
             </div>
@@ -225,6 +294,19 @@ export function MenuWorkspace({
           </div>
         )}
       </div>
+
+      {canEdit && (
+        <MenuItemEditor
+          open={editorOpen}
+          item={editingItem}
+          categories={categories}
+          dataSource={dataSource}
+          pending={isPending}
+          onSubmit={handleSubmit}
+          onArchive={editingItem ? handleArchive : undefined}
+          onClose={() => { setEditorOpen(false); setEditingItem(undefined); }}
+        />
+      )}
     </section>
   );
 }

@@ -2,7 +2,67 @@
 
 import { useCallback, useEffect, useSyncExternalStore } from "react";
 import { getInitialMenuCatalog, normalizeMenuCatalog } from "./calculations";
-import type { MenuCatalog, MenuItem } from "./types";
+import type { MenuCatalog, MenuItem, MenuItemInput, MenuItemPatch } from "./types";
+
+export function newLocalItemId(): string {
+  if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
+    return crypto.randomUUID();
+  }
+  return `local-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+}
+
+// ── Operaciones puras sobre el catálogo (testeables sin React) ───────────────
+
+export function applyCreateItem(
+  catalog: MenuCatalog,
+  input: MenuItemInput,
+  restaurantId: string,
+  id: string = newLocalItemId()
+): MenuCatalog {
+  const item: MenuItem = {
+    id,
+    restaurant_id: restaurantId,
+    category_id: input.category_id,
+    name: input.name,
+    description: input.description,
+    price: input.price,
+    station: input.station,
+    available: input.available,
+    featured: input.featured,
+    image_url: input.image_url,
+    status: "active"
+  };
+  return { ...catalog, items: [...catalog.items, item] };
+}
+
+export function applyUpdateItem(
+  catalog: MenuCatalog,
+  itemId: string,
+  patch: MenuItemPatch
+): MenuCatalog {
+  return {
+    ...catalog,
+    items: catalog.items.map((item) =>
+      item.id === itemId ? { ...item, ...patch } : item
+    )
+  };
+}
+
+export function applyArchiveItem(catalog: MenuCatalog, itemId: string): MenuCatalog {
+  return {
+    ...catalog,
+    items: catalog.items.map((item) =>
+      item.id === itemId
+        ? { ...item, status: "archived" as const, available: false }
+        : item
+    )
+  };
+}
+
+/** Filtra los productos archivados (baja lógica) para vistas públicas/operativas. */
+export function visibleItems(items: MenuItem[]): MenuItem[] {
+  return items.filter((item) => item.status !== "archived");
+}
 
 const STORAGE_KEY = "bistro-demo-menu-v1";
 const STORAGE_EVENT = "bistro-demo-menu-change";
@@ -64,9 +124,11 @@ export function useDemoMenu(initialCatalog?: MenuCatalog, restaurantId?: string)
     () => cachedMenuCatalog
   );
 
-  const items = restaurantId
-    ? catalog.items.filter((item) => item.restaurant_id === restaurantId)
-    : catalog.items;
+  const items = visibleItems(
+    restaurantId
+      ? catalog.items.filter((item) => item.restaurant_id === restaurantId)
+      : catalog.items
+  );
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -111,10 +173,30 @@ export function useDemoMenu(initialCatalog?: MenuCatalog, restaurantId?: string)
     writeMenuSnapshot(nextCatalog);
   }, []);
 
+  const createItem = useCallback(
+    (input: MenuItemInput, id?: string) => {
+      if (!restaurantId) return;
+      const next = applyCreateItem(readMenuCatalogSnapshot(), input, restaurantId, id);
+      writeMenuSnapshot(next);
+    },
+    [restaurantId]
+  );
+
+  const updateItem = useCallback((itemId: string, patch: MenuItemPatch) => {
+    writeMenuSnapshot(applyUpdateItem(readMenuCatalogSnapshot(), itemId, patch));
+  }, []);
+
+  const archiveItem = useCallback((itemId: string) => {
+    writeMenuSnapshot(applyArchiveItem(readMenuCatalogSnapshot(), itemId));
+  }, []);
+
   return {
     categories: catalog.categories,
     items,
     toggleAvailability,
-    toggleFeatured
+    toggleFeatured,
+    createItem,
+    updateItem,
+    archiveItem
   };
 }

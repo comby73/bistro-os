@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useCallback, useEffect, startTransition } from "react";
-import { ImagePlus, Star, Eye, EyeOff } from "lucide-react";
+import { ImagePlus, Star, Eye, EyeOff, Pencil } from "lucide-react";
 import type { MenuItem } from "@/features/menu/types";
 
 function StatusBadge({ label, tone }: { label: string; tone: "gold" | "muted" | "paper" }) {
@@ -115,13 +115,15 @@ export function MenuItemCard({
   canEdit,
   compact,
   onToggleAvailability,
-  onToggleFeatured
+  onToggleFeatured,
+  onEdit
 }: {
   item: MenuItem;
   canEdit: boolean;
   compact?: boolean;
   onToggleAvailability?: (itemId: string) => void;
   onToggleFeatured?: (itemId: string) => void;
+  onEdit?: (item: MenuItem) => void;
 }) {
   return (
     <article className={`card-animated rounded-3xl border border-line bg-layer1/60 transition-all duration-300 hover:border-gold/20 ${compact ? "p-4" : "p-0 overflow-hidden"}`}>
@@ -176,6 +178,16 @@ export function MenuItemCard({
               <Star size={13} />
               {item.featured ? "Quitar destacado" : "Destacar"}
             </button>
+            {onEdit && (
+              <button
+                type="button"
+                onClick={() => onEdit(item)}
+                className="flex items-center gap-2 rounded-2xl border border-line bg-ink/80 px-4 py-3 text-[14px] font-medium text-paper/70 transition-all duration-200 hover:border-gold/30 hover:text-paper"
+              >
+                <Pencil size={13} />
+                Editar
+              </button>
+            )}
           </div>
         ) : (
           <div className="mt-4 text-[12px] uppercase tracking-[0.15em] text-paper/45">

@@ -126,10 +126,30 @@ create table if not exists menu_items (
   available boolean not null default true,
   featured boolean not null default false,
   status text not null default 'active' check (status in ('active', 'archived')),
+  image_url text,
+  storage_path text,
   metadata jsonb not null default '{}'::jsonb,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
+
+-- Gestión de carta desde la app (owner/admin):
+--   available=false → indisponibilidad temporal (visible como "No disponible").
+--   status='archived' → baja lógica (oculto en /menu y /carta). Nunca DELETE físico.
+--   image_url / storage_path → imagen del producto (Supabase Storage, bucket menu-images).
+--
+-- Migración para bases ya creadas (la DB demo guarda image_url/storage_path en
+-- metadata mientras estas columnas no existan; ejecutar para promover a columnas):
+-- alter table menu_items add column if not exists image_url text;
+-- alter table menu_items add column if not exists storage_path text;
+-- update menu_items
+--   set image_url = metadata->>'image_url',
+--       storage_path = metadata->>'storage_path'
+--   where metadata ? 'image_url';
+--
+-- Storage (crear una vez): bucket público `menu-images`.
+--   Ruta: restaurants/{restaurant_id}/menu/{item_id}/{filename}
+-- select storage.create_bucket('menu-images', public => true);
 
 create table if not exists reservations (
   id uuid primary key default gen_random_uuid(),
@@ -281,3 +301,22 @@ drop trigger if exists set_updated_at_cash_closings on cash_closings;
 create trigger set_updated_at_cash_closings before update on cash_closings for each row execute function public.set_updated_at();
 drop trigger if exists set_updated_at_ai_interactions on ai_interactions;
 create trigger set_updated_at_ai_interactions before update on ai_interactions for each row execute function public.set_updated_at();
+
+-- ---------------------------------------------------------------------------
+-- PROPUESTAS multi-restaurante (Fase demo de Restaurant Context)
+-- NO ejecutar automáticamente. Revisar y aplicar manualmente cuando se migre
+-- la capa de branding/marca-blanca de restaurantes a Supabase.
+--
+-- La tabla `restaurants` hoy no tiene columnas de presentación visual que el
+-- frontend demo ya usa (logo, portada, color de marca). El demo las modela en
+-- features/restaurants/types.ts (Restaurant.logo_url, cover_image_url,
+-- brand_color, slug). Para persistirlas en real:
+--
+-- alter table restaurants add column if not exists slug text unique;
+-- alter table restaurants add column if not exists description text;
+-- alter table restaurants add column if not exists logo_url text;
+-- alter table restaurants add column if not exists cover_image_url text;
+-- alter table restaurants add column if not exists brand_color text not null default '#E8B863';
+-- -- `metadata jsonb` ya existe en restaurants y branches; sirve como alternativa
+-- -- flexible para guardar branding sin migrar columnas dedicadas.
+-- ---------------------------------------------------------------------------
