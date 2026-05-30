@@ -21,36 +21,45 @@ export function HeroCarousel({
   const [current, setCurrent] = useState(0);
   const [fade, setFade] = useState(true);
 
-  // Si hay slug → solo imágenes de ese restaurante (sin fallback genérico)
-  // Si no hay slug → imágenes genéricas
-  const candidates = useMemo(
-    () => Array.from({ length: MAX_SLIDES }, (_, i) => i + 1).map((n) =>
-      slug ? `/${slug}-hero${n}.jpg` : `/restaurant-hero${n}.jpg`
-    ),
+  // Imágenes propias del restaurante; si no tiene ninguna, genéricas como fallback.
+  // Así no se mezclan fotos entre restaurantes, pero nadie queda sin carrusel.
+  const ownImages = useMemo(
+    () => (slug ? Array.from({ length: MAX_SLIDES }, (_, i) => `/${slug}-hero${i + 1}.jpg`) : []),
     [slug]
+  );
+  const genericImages = useMemo(
+    () => Array.from({ length: MAX_SLIDES }, (_, i) => `/restaurant-hero${i + 1}.jpg`),
+    []
   );
 
   /* detecta qué imágenes existen cargándolas en background */
   useEffect(() => {
     let active = true;
-    const found: string[] = [];
 
-    const checks = candidates.map(
-      (src) =>
-        new Promise<void>((resolve) => {
-          const img = new window.Image();
-          img.onload  = () => { found.push(src); resolve(); };
-          img.onerror = () => resolve();
-          img.src = src;
-        })
-    );
+    // Resuelve qué subconjunto de rutas existe, en orden.
+    const detect = (paths: string[]) =>
+      Promise.all(
+        paths.map(
+          (src) =>
+            new Promise<string | null>((resolve) => {
+              const img = new window.Image();
+              img.onload = () => resolve(src);
+              img.onerror = () => resolve(null);
+              img.src = src;
+            })
+        )
+      ).then((res) => res.filter((s): s is string => s !== null));
 
-    Promise.all(checks).then(() => {
+    (async () => {
+      // 1) propias del restaurante
+      let found = ownImages.length ? await detect(ownImages) : [];
+      // 2) si no tiene propias, caer a genéricas
+      if (found.length === 0) found = await detect(genericImages);
       if (active && found.length > 0) setSlides(found);
-    });
+    })();
 
     return () => { active = false; };
-  }, [candidates]);
+  }, [ownImages, genericImages]);
 
   /* avanza al siguiente slide */
   const next = useCallback(() => {
