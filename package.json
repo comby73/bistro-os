@@ -26,7 +26,6 @@
     "zod": "latest"
   },
   "devDependencies": {
-    "@rolldown/binding-win32-x64-msvc": "^1.0.2",
     "@testing-library/jest-dom": "latest",
     "@testing-library/react": "latest",
     "@types/node": "latest",
