@@ -16,6 +16,7 @@ Bistró OS es un SaaS operativo multi-restaurante para restaurantes, con foco en
 - Módulos activos: dashboard, pedidos, cocina, reservas, menú/carta, ventas/caja, finanzas, usuarios, sucursales y restaurantes.
 - `/sales` no es facturación fiscal real.
 - `/finances` es Análisis financiero demo: ventas, pagos, costos, inventario, mesas, gastos, nómina y exportación Excel.
+- Los importes visibles se muestran en pesos argentinos con tasa demo fija `1 USD = $1430 ARS`.
 - Supabase es persistencia activa para auth, restaurantes, sucursales, perfiles/roles, menú y reservas.
 - Pedidos y cocina siguen en demo-store/localStorage hasta Fase 4D.
 - n8n es opcional y no debe bloquear flujos.

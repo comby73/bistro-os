@@ -2,39 +2,61 @@ import Link from "next/link";
 
 export function Hero() {
   return (
-    <section className="relative overflow-hidden pt-28 md:pt-36">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(232,184,99,0.18),transparent_42%)]" />
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(rgba(232,184,99,0.07)_1px,transparent_1px)] [background-size:28px_28px] opacity-60" />
+    <section className="relative min-h-[88svh] overflow-hidden pt-24 md:pt-28">
+      <video
+        className="absolute inset-0 h-full w-full scale-105 object-cover opacity-90 blur-[1px]"
+        autoPlay
+        muted
+        loop
+        playsInline
+        poster="/bistro-palermo-hero1.jpg"
+        aria-hidden="true"
+      >
+        <source src="/Bistro.mp4" type="video/mp4" />
+      </video>
+      <div className="pointer-events-none absolute inset-0 bg-ink/38" />
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-ink/48 via-ink/18 to-ink/88" />
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-36 bg-gradient-to-t from-ink to-transparent" />
 
-      <div className="bistro-container relative pb-20 text-center md:pb-28">
-        <div className="mx-auto mb-8 flex items-center justify-center gap-3">
-          <span className="h-px w-10 bg-gradient-to-r from-transparent to-gold/60" />
-          <span className="eyebrow">SaaS gastronómico · LATAM</span>
-          <span className="h-px w-10 bg-gradient-to-l from-transparent to-gold/60" />
+      <div className="bistro-container relative flex min-h-[calc(88svh-6rem)] items-center pb-16">
+        <div className="max-w-4xl">
+          <div className="mb-7 inline-flex items-center rounded-full border border-gold/25 bg-ink/35 px-4 py-2 text-xs font-semibold uppercase tracking-[0.16em] text-gold backdrop-blur-md">
+            SaaS gastronómico · LATAM
+          </div>
+
+          <h1 className="max-w-3xl text-[clamp(4.5rem,13vw,10rem)] font-semibold leading-[0.82] tracking-[-0.07em] text-paper">
+            Bistró OS
+          </h1>
+
+          <p className="mt-8 max-w-2xl text-lg leading-8 text-paper/78 md:text-xl">
+            Una plataforma interna para operar restaurantes modernos: carta, reservas,
+            pedidos, cocina, caja y análisis en un solo lugar.
+          </p>
+
+          <div className="mt-10 flex flex-col gap-3 sm:flex-row">
+            <Link href="/login" className="btn-gold">
+              Entrar al sistema
+            </Link>
+            <Link href="/demo" className="btn-ghost border-paper/25 bg-ink/30 backdrop-blur-md">
+              Solicitar demo
+            </Link>
+          </div>
+
+          <div className="mt-10 grid max-w-2xl gap-3 text-sm text-paper/68 sm:grid-cols-3">
+            <div className="border-l border-gold/45 pl-4">
+              <p className="font-semibold text-paper">Multi-restaurante</p>
+              <p className="mt-1 text-paper/52">Roles, sucursales y operación.</p>
+            </div>
+            <div className="border-l border-gold/45 pl-4">
+              <p className="font-semibold text-paper">Carta viva</p>
+              <p className="mt-1 text-paper/52">QR, disponibilidad e imágenes.</p>
+            </div>
+            <div className="border-l border-gold/45 pl-4">
+              <p className="font-semibold text-paper">Cocina ágil</p>
+              <p className="mt-1 text-paper/52">Pedidos y tickets por estación.</p>
+            </div>
+          </div>
         </div>
-
-        <h1 className="mx-auto max-w-5xl text-[clamp(3rem,9vw,7rem)] font-semibold leading-[0.92] tracking-[-0.06em]">
-          El sistema operativo del{" "}
-          <span className="gold-gradient-text italic">restaurante moderno</span>.
-        </h1>
-
-        <p className="mx-auto mt-8 max-w-2xl text-base leading-8 text-paper/68 md:text-lg">
-          Bistró OS unifica pedidos, reservas por WhatsApp, cocina y ventas
-          en una sola plataforma para restaurantes de gama media-alta.
-        </p>
-
-        <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
-          <Link href="/demo" className="btn-gold">
-            Probar 14 días gratis
-          </Link>
-          <Link href="/login" className="btn-ghost">
-            Entrar al sistema demo
-          </Link>
-        </div>
-
-        <p className="mt-5 text-xs text-mute">
-          Prototipo funcional · Sin credenciales reales · Preparado para Supabase y n8n
-        </p>
       </div>
     </section>
   );

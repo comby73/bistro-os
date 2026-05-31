@@ -9,24 +9,28 @@ export function OrdersWorkspace({
   roleId,
   roleLabel,
   initialMenuCatalog,
-  restaurantId
+  restaurantId,
+  branchId
 }: {
   roleId: RoleId;
   roleLabel: string;
   initialMenuCatalog?: MenuCatalog;
   restaurantId?: string;
+  branchId?: string | null;
 }) {
-  const canCreate = roleId === "waiter";
+  const canCreate = roleId === "owner" || roleId === "admin" || roleId === "manager" || roleId === "waiter";
 
-  if (canCreate) {
-    return (
-      <OrderComposer
-        defaultWaiterName={roleLabel}
-        initialMenuCatalog={initialMenuCatalog}
-        restaurantId={restaurantId}
-      />
-    );
-  }
-
-  return <OrdersManagementBoard restaurantId={restaurantId} />;
+  return (
+    <div className="grid gap-8 2xl:grid-cols-[minmax(0,1.05fr)_minmax(420px,0.95fr)]">
+      {canCreate && (
+        <OrderComposer
+          defaultWaiterName={roleLabel}
+          initialMenuCatalog={initialMenuCatalog}
+          restaurantId={restaurantId}
+          branchId={branchId}
+        />
+      )}
+      <OrdersManagementBoard restaurantId={restaurantId} />
+    </div>
+  );
 }

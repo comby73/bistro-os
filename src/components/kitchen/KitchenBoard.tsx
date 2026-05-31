@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import { groupOrdersByStatus, KITCHEN_ACTIVE_STATUSES } from "@/features/orders/calculations";
+import { groupOrdersByStatus } from "@/features/orders/calculations";
 import { useDemoClock } from "@/features/orders/demo-clock";
 import { useDemoOrders } from "@/features/orders/demo-store";
 import type { RoleId } from "@/features/auth/roles";
@@ -34,6 +34,15 @@ const statusConfig = [
     border: "border-emerald-400/20",
     headerBorder: "border-emerald-400/25",
     bg: "bg-emerald-400/[0.04]"
+  },
+  {
+    status: "delivered",
+    label: "Entregados",
+    labelColor: "text-paper",
+    countColor: "text-paper/60",
+    border: "border-line",
+    headerBorder: "border-line",
+    bg: "bg-layer1/40"
   }
 ] as const;
 
@@ -41,10 +50,9 @@ export function KitchenBoard({ roleId, restaurantId }: { roleId: RoleId; restaur
   const { orders, advanceOrderStatus } = useDemoOrders(restaurantId);
   const currentTime = useDemoClock();
   const groupedOrders = useMemo(
-    () => groupOrdersByStatus(orders.filter((order) => KITCHEN_ACTIVE_STATUSES.includes(order.status))),
+    () => groupOrdersByStatus(orders),
     [orders]
   );
-  const deliveredCount = orders.filter((order) => order.status === "delivered").length;
   const canAdvance = roleId === "kitchen" || roleId === "owner" || roleId === "admin";
 
   return (
@@ -63,15 +71,9 @@ export function KitchenBoard({ roleId, restaurantId }: { roleId: RoleId; restaur
             </p>
           </div>
         ))}
-        <div className="rounded-3xl border border-line bg-layer1/40 p-5">
-          <p className="text-xs uppercase tracking-[0.18em] text-paper/45">Entregados</p>
-          <p className="mt-3 text-4xl font-semibold tracking-[-0.05em] text-paper/60">
-            {deliveredCount}
-          </p>
-        </div>
       </div>
 
-      <div className="grid gap-5 xl:grid-cols-3">
+      <div className="grid gap-5 xl:grid-cols-4">
         {statusConfig.map((column) => (
           <section
             key={column.status}

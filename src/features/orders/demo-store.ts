@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useSyncExternalStore } from "react";
+import { useCallback, useEffect, useMemo, useSyncExternalStore } from "react";
 import { readMenuItemsSnapshot } from "@/features/menu/demo-store";
 import {
   buildOrderFromInput,
@@ -10,42 +10,111 @@ import {
 } from "./calculations";
 import type { CreateOrderInput, Order } from "./types";
 
-const STORAGE_KEY = "bistro-demo-orders-v1";
+const LEGACY_STORAGE_KEY = "bistro-demo-orders-v1";
+const STORAGE_PREFIX = "bistro-demo-orders-v2";
 const STORAGE_EVENT = "bistro-demo-orders-change";
-const initialOrdersSnapshot = sortOrdersByNewest(getInitialOrders());
+const seedOrders = sortOrdersByNewest(getInitialOrders());
 
-let cachedOrders: Order[] = initialOrdersSnapshot;
-let cachedSerializedOrders = JSON.stringify(initialOrdersSnapshot);
+let cachedOrdersByRestaurant = new Map<string, Order[]>();
+let cachedAllOrders = seedOrders;
+let cachedSerializedByRestaurant = new Map<string, string>();
 
-function updateOrdersCache(nextOrders: Order[]) {
-  cachedOrders = nextOrders;
-  cachedSerializedOrders = JSON.stringify(nextOrders);
+function storageKeyForRestaurant(restaurantId: string) {
+  return `${STORAGE_PREFIX}-${restaurantId}`;
+}
+
+function getSeedOrdersForRestaurant(restaurantId: string) {
+  return sortOrdersByNewest(seedOrders.filter((order) => order.restaurant_id === restaurantId));
+}
+
+function parseOrders(value: string | null): Order[] | null {
+  if (!value) return null;
+
+  try {
+    return sortOrdersByNewest(JSON.parse(value) as Order[]);
+  } catch {
+    return null;
+  }
+}
+
+function updateRestaurantCache(restaurantId: string, nextOrders: Order[]) {
+  const sorted = sortOrdersByNewest(nextOrders);
+  cachedOrdersByRestaurant.set(restaurantId, sorted);
+  cachedSerializedByRestaurant.set(restaurantId, JSON.stringify(sorted));
+  cachedAllOrders = sortOrdersByNewest([
+    ...Array.from(cachedOrdersByRestaurant.values()).flat(),
+    ...seedOrders.filter((order) => {
+      const rid = order.restaurant_id;
+      return rid && !cachedOrdersByRestaurant.has(rid);
+    })
+  ]);
+}
+
+function readLegacyOrdersForRestaurant(restaurantId: string): Order[] | null {
+  if (typeof window === "undefined") return null;
+
+  const legacyOrders = parseOrders(window.localStorage.getItem(LEGACY_STORAGE_KEY));
+  if (!legacyOrders) return null;
+
+  const restaurantOrders = legacyOrders.filter((order) => order.restaurant_id === restaurantId);
+  return restaurantOrders.length > 0 ? restaurantOrders : null;
+}
+
+function readOrdersForRestaurant(restaurantId: string): Order[] {
+  if (typeof window === "undefined") {
+    return cachedOrdersByRestaurant.get(restaurantId) ?? getSeedOrdersForRestaurant(restaurantId);
+  }
+
+  const key = storageKeyForRestaurant(restaurantId);
+  const stored = window.localStorage.getItem(key);
+  const cachedSerialized = cachedSerializedByRestaurant.get(restaurantId);
+
+  if (stored && stored === cachedSerialized) {
+    return cachedOrdersByRestaurant.get(restaurantId) ?? [];
+  }
+
+  const parsed = parseOrders(stored);
+  if (parsed) {
+    updateRestaurantCache(restaurantId, parsed);
+    return parsed;
+  }
+
+  const legacyOrders = readLegacyOrdersForRestaurant(restaurantId);
+  if (legacyOrders) {
+    updateRestaurantCache(restaurantId, legacyOrders);
+    return legacyOrders;
+  }
+
+  const seeded = getSeedOrdersForRestaurant(restaurantId);
+  updateRestaurantCache(restaurantId, seeded);
+  return seeded;
 }
 
 function readOrdersSnapshot(): Order[] {
-  if (typeof window === "undefined") return cachedOrders;
-
-  const storedOrders = window.localStorage.getItem(STORAGE_KEY);
-
-  if (!storedOrders) return cachedOrders;
-
-  if (storedOrders === cachedSerializedOrders) {
-    return cachedOrders;
-  }
-
-  try {
-    const parsedOrders = sortOrdersByNewest(JSON.parse(storedOrders) as Order[]);
-    updateOrdersCache(parsedOrders);
-    return cachedOrders;
-  } catch {
-    return cachedOrders;
-  }
+  return cachedAllOrders;
 }
 
-function writeOrdersSnapshot(nextOrders: Order[]) {
-  updateOrdersCache(nextOrders);
-  window.localStorage.setItem(STORAGE_KEY, cachedSerializedOrders);
+function writeOrdersForRestaurant(restaurantId: string, nextOrders: Order[]) {
+  const scopedOrders = nextOrders.map((order) => ({ ...order, restaurant_id: restaurantId }));
+  updateRestaurantCache(restaurantId, scopedOrders);
+  window.localStorage.setItem(
+    storageKeyForRestaurant(restaurantId),
+    cachedSerializedByRestaurant.get(restaurantId) ?? "[]"
+  );
   window.dispatchEvent(new Event(STORAGE_EVENT));
+}
+
+function ensureRestaurantStorage(restaurantId: string) {
+  if (typeof window === "undefined") return;
+
+  const key = storageKeyForRestaurant(restaurantId);
+  if (window.localStorage.getItem(key)) {
+    readOrdersForRestaurant(restaurantId);
+    return;
+  }
+
+  const initialOrders = readLegacyOrdersForRestaurant(restaurantId) ?? getSeedOrdersForRestaurant(restaurantId);
+  writeOrdersForRestaurant(restaurantId, initialOrders);
 }
 
 function subscribe(listener: () => void) {
@@ -62,45 +131,52 @@ function subscribe(listener: () => void) {
   };
 }
 
-export function useDemoOrders(restaurantId?: string) {
-  const allOrders = useSyncExternalStore(subscribe, readOrdersSnapshot, () => cachedOrders);
-
-  const orders = restaurantId
-    ? allOrders.filter((order) => order.restaurant_id === restaurantId)
-    : allOrders;
+export function useDemoOrders(restaurantId?: string, branchId?: string | null) {
+  const allOrders = useSyncExternalStore(subscribe, readOrdersSnapshot, () => cachedAllOrders);
 
   useEffect(() => {
-    if (typeof window === "undefined") return;
+    if (restaurantId) ensureRestaurantStorage(restaurantId);
+  }, [restaurantId]);
 
-    if (!window.localStorage.getItem(STORAGE_KEY)) {
-      writeOrdersSnapshot(cachedOrders);
-    }
-  }, []);
+  const orders = useMemo(
+    () =>
+      restaurantId
+        ? sortOrdersByNewest(readOrdersForRestaurant(restaurantId))
+        : allOrders,
+    [allOrders, restaurantId]
+  );
 
   const createOrder = useCallback(
     (input: CreateOrderInput) => {
-      const builtOrder = buildOrderFromInput(input, readMenuItemsSnapshot());
-      const nextOrder = restaurantId
-        ? { ...builtOrder, restaurant_id: restaurantId }
-        : builtOrder;
-      const currentOrders = readOrdersSnapshot();
+      if (!restaurantId) return;
 
-      writeOrdersSnapshot(sortOrdersByNewest([nextOrder, ...currentOrders]));
+      const menuItems = readMenuItemsSnapshot().filter(
+        (item) => item.restaurant_id === restaurantId && item.status !== "archived"
+      );
+      const builtOrder = buildOrderFromInput(input, menuItems, { restaurantId, branchId });
+      const currentOrders = readOrdersForRestaurant(restaurantId);
+
+      writeOrdersForRestaurant(restaurantId, [builtOrder, ...currentOrders]);
+    },
+    [branchId, restaurantId]
+  );
+
+  const advanceOrderStatus = useCallback(
+    (orderId: string) => {
+      if (!restaurantId) return;
+
+      const currentOrders = readOrdersForRestaurant(restaurantId);
+      const nextOrders = currentOrders.map((order) => {
+        if (order.id !== orderId) return order;
+
+        const nextStatus = getNextOrderStatus(order.status);
+        return nextStatus ? { ...order, status: nextStatus } : order;
+      });
+
+      writeOrdersForRestaurant(restaurantId, nextOrders);
     },
     [restaurantId]
   );
-
-  const advanceOrderStatus = useCallback((orderId: string) => {
-    const currentOrders = readOrdersSnapshot();
-    const nextOrders = currentOrders.map((order) => {
-      if (order.id !== orderId) return order;
-
-      const nextStatus = getNextOrderStatus(order.status);
-      return nextStatus ? { ...order, status: nextStatus } : order;
-    });
-
-    writeOrdersSnapshot(sortOrdersByNewest(nextOrders));
-  }, []);
 
   return {
     orders,

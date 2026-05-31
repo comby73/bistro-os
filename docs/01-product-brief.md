@@ -56,4 +56,5 @@ Demostrar que Bistró OS puede funcionar como sistema operativo de restaurante c
 - Reservas persistidas por restaurante/sucursal.
 - Ventas y caja simulada sin facturación fiscal real.
 - Análisis financiero demo: ventas, pagos, costos, inventario, mesas, gastos, nómina y Excel.
+- Importes visibles en pesos argentinos, con conversión demo fija `1 USD = $1430 ARS`.
 - n8n preparado como capa opcional posterior.

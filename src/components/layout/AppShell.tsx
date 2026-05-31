@@ -44,6 +44,13 @@ const NAV_ICONS: Record<string, React.ElementType> = {
   "/finances":     BarChart3,
 };
 
+const NAV_GROUPS: { label: string; routes: AppRoute[] }[] = [
+  { label: "General", routes: ["/dashboard"] },
+  { label: "Operación", routes: ["/orders", "/reservations", "/kitchen", "/menu"] },
+  { label: "Caja y análisis", routes: ["/sales", "/finances"] },
+  { label: "Administración", routes: ["/users", "/branches", "/restaurants"] },
+];
+
 interface AppShellProps {
   currentPath?: AppRoute;
   children: React.ReactNode;
@@ -118,23 +125,37 @@ export async function AppShell({ currentPath, children }: AppShellProps) {
             </div>
 
             {/* Navegación */}
-            <nav className="mt-8 space-y-1">
-              {role.navigation.map((item) => {
-                const isActive = item.href === currentPath;
-                const Icon = NAV_ICONS[item.href] ?? LayoutDashboard;
+            <nav className="mt-8 space-y-6">
+              {NAV_GROUPS.map((group) => {
+                const items = role.navigation.filter((item) => group.routes.includes(item.href));
+                if (items.length === 0) return null;
+
                 return (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    className={
-                      isActive
-                        ? "flex items-center gap-3 rounded-2xl border border-gold/35 bg-gold/10 px-4 py-3.5 text-[15px] font-semibold text-gold"
-                        : "flex items-center gap-3 rounded-2xl border border-transparent px-4 py-3.5 text-[15px] font-medium text-paper/75 transition-all duration-200 hover:border-line hover:bg-layer1/70 hover:text-paper"
-                    }
-                  >
-                    <Icon size={18} className={isActive ? "text-gold" : "opacity-60"} />
-                    {item.label}
-                  </Link>
+                  <div key={group.label}>
+                    <p className="mb-2 px-4 text-[10px] font-semibold uppercase tracking-[0.18em] text-paper/35">
+                      {group.label}
+                    </p>
+                    <div className="space-y-1">
+                      {items.map((item) => {
+                        const isActive = item.href === currentPath;
+                        const Icon = NAV_ICONS[item.href] ?? LayoutDashboard;
+                        return (
+                          <Link
+                            key={item.href}
+                            href={item.href}
+                            className={
+                              isActive
+                                ? "flex items-center gap-3 rounded-2xl border border-gold/35 bg-gold/10 px-4 py-3.5 text-[15px] font-semibold text-gold"
+                                : "flex items-center gap-3 rounded-2xl border border-transparent px-4 py-3.5 text-[15px] font-medium text-paper/75 transition-all duration-200 hover:border-line hover:bg-layer1/70 hover:text-paper"
+                            }
+                          >
+                            <Icon size={18} className={isActive ? "text-gold" : "opacity-60"} />
+                            {item.label}
+                          </Link>
+                        );
+                      })}
+                    </div>
+                  </div>
                 );
               })}
             </nav>

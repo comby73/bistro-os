@@ -3,7 +3,7 @@ import { AppShell } from "@/components/layout/AppShell";
 import { OrdersWorkspace } from "@/components/orders/OrdersWorkspace";
 import { DEMO_ROLE_COOKIE, parseDemoRole } from "@/features/auth/demo-session";
 import { getRoleConfig } from "@/features/auth/roles";
-import { getMenuCatalog } from "@/features/menu/repository";
+import { getMenuCatalog, getMenuCatalogForRestaurant } from "@/features/menu/repository";
 import { getActiveRestaurantSession } from "@/features/restaurants/session";
 
 export default async function OrdersPage() {
@@ -11,7 +11,10 @@ export default async function OrdersPage() {
   const roleId = parseDemoRole(cookieStore.get(DEMO_ROLE_COOKIE)?.value);
   const restaurantSession = getActiveRestaurantSession(cookieStore);
   const role = roleId ? getRoleConfig(roleId) : null;
-  const menuCatalog = await getMenuCatalog();
+  const restaurantId = restaurantSession?.restaurantId;
+  const menuCatalog = restaurantId
+    ? await getMenuCatalogForRestaurant(restaurantId)
+    : await getMenuCatalog();
   const initialMenuCatalog =
     menuCatalog.dataSource === "supabase"
       ? {
@@ -36,6 +39,7 @@ export default async function OrdersPage() {
             roleLabel={role.label}
             initialMenuCatalog={initialMenuCatalog}
             restaurantId={restaurantSession?.restaurantId}
+            branchId={restaurantSession?.branchId}
           />
         ) : (
           <div className="card-premium p-6 text-sm text-paper/60">

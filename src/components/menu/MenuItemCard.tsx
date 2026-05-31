@@ -3,6 +3,7 @@
 import { useState, useRef, useCallback, useEffect, startTransition } from "react";
 import { ImagePlus, Star, Eye, EyeOff, Pencil } from "lucide-react";
 import type { MenuItem } from "@/features/menu/types";
+import { formatArsFromUsd } from "@/lib/utils";
 
 function StatusBadge({ label, tone }: { label: string; tone: "gold" | "muted" | "paper" }) {
   const cls =
@@ -148,7 +149,7 @@ export function MenuItemCard({
 
           <div className="shrink-0 text-right">
             <p className="text-[12px] uppercase tracking-[0.13em] text-paper/55">Precio</p>
-            <p className="mt-1 text-3xl font-bold tracking-[-0.04em] text-gold">USD {item.price}</p>
+            <p className="mt-1 text-3xl font-bold tracking-[-0.04em] text-gold">{formatArsFromUsd(item.price)}</p>
           </div>
         </div>
 

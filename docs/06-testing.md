@@ -30,7 +30,12 @@ La demo valida calidad con:
   - `/orders` usa el catálogo actualizado (producto recién creado es ordenable),
 - permisos por rol,
 - cálculos de ventas,
-- cálculos de pedidos.
+- cálculos de pedidos:
+  - creación en estado `received`,
+  - estaciones tomadas del catálogo recibido,
+  - transición `received → preparing → ready → delivered`,
+  - agrupación por `received`, `preparing`, `ready` y `delivered`,
+  - totales por cantidad y precio unitario.
 - **cálculos financieros demo** (`tests/finance-calculations.test.ts`):
   - resumen de ventas/gastos/sueldos,
   - ventas por día,
@@ -57,13 +62,14 @@ npm run build
 - que `/menu` conserve su lectura operativa por rol y sus cálculos base,
 - que `/reservations` mantenga fallback local aunque Supabase no esté configurado,
 - que `/sales` conserve sus cálculos mock,
+- que pedidos/cocina mantengan contratos de cálculo independientes de la UI,
 - que el flujo operativo siga compilando y pasando tipado.
 
 ## Qué falta en fases futuras
 
 - tests de las server actions de menú con Supabase (hoy verificadas manualmente:
   create → update → archive → upload contra la DB viva),
-- tests del store demo de pedidos/cocina,
+- tests automatizados del store demo de pedidos/cocina con `localStorage` por restaurante,
 - tests de integración de rutas por rol,
 - tests E2E de flujo operativo,
 - tests sobre persistencia real con Supabase.

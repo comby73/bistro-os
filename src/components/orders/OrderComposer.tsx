@@ -6,17 +6,20 @@ import type { MenuCatalog } from "@/features/menu/types";
 import { getOrderTotal } from "@/features/orders/calculations";
 import { useDemoOrders } from "@/features/orders/demo-store";
 import type { Order } from "@/features/orders/types";
+import { formatArsFromUsd } from "@/lib/utils";
 
 export function OrderComposer({
   defaultWaiterName,
   initialMenuCatalog,
-  restaurantId
+  restaurantId,
+  branchId
 }: {
   defaultWaiterName: string;
   initialMenuCatalog?: MenuCatalog;
   restaurantId?: string;
+  branchId?: string | null;
 }) {
-  const { createOrder, orders } = useDemoOrders(restaurantId);
+  const { createOrder, orders } = useDemoOrders(restaurantId, branchId);
   const { categories, items: menuItems } = useDemoMenu(initialMenuCatalog, restaurantId);
   const [table, setTable] = useState("");
   const [waiterName, setWaiterName] = useState(defaultWaiterName);
@@ -181,7 +184,7 @@ export function OrderComposer({
                   <div className="flex items-end justify-between gap-3">
                     <div>
                       <p className="text-xs uppercase tracking-[0.18em] text-paper/42">Precio</p>
-                      <p className="mt-1 text-xl font-semibold text-gold">USD {item.price}</p>
+                      <p className="mt-1 text-xl font-semibold text-gold">{formatArsFromUsd(item.price)}</p>
                     </div>
 
                     <div className="flex items-center gap-2 rounded-full border border-line bg-ink px-2 py-2">
@@ -239,11 +242,11 @@ export function OrderComposer({
                       <div>
                         <p className="font-semibold">{item.name}</p>
                         <p className="mt-1 text-sm text-paper/55">
-                          {item.quantity} x USD {item.price}
+                          {item.quantity} x {formatArsFromUsd(item.price)}
                         </p>
                       </div>
                       <p className="text-lg font-semibold text-gold">
-                        USD {item.quantity * item.price}
+                        {formatArsFromUsd(item.quantity * item.price)}
                       </p>
                     </div>
                   </div>
@@ -271,7 +274,7 @@ export function OrderComposer({
                 <span>{totalItems} items</span>
               </div>
               <p className="mt-2 text-3xl font-semibold tracking-[-0.05em] text-gold">
-                USD {currentOrderTotal}
+                {formatArsFromUsd(currentOrderTotal)}
               </p>
             </div>
 

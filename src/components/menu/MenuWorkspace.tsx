@@ -20,6 +20,7 @@ import { MenuItemCard } from "./MenuItemCard";
 import { MenuSummaryCards } from "./MenuSummaryCards";
 import { MenuItemEditor } from "./MenuItemEditor";
 import { QRPanel } from "@/components/carta/QRPanel";
+import { formatArsFromUsd } from "@/lib/utils";
 
 export function MenuWorkspace({
   roleId,
@@ -229,7 +230,7 @@ export function MenuWorkspace({
                           <p className="font-semibold">{item.name}</p>
                           <p className="mt-1 text-sm text-paper/55">{item.description}</p>
                         </div>
-                        <p className="text-lg font-semibold text-gold">USD {item.price}</p>
+                        <p className="text-lg font-semibold text-gold">{formatArsFromUsd(item.price)}</p>
                       </div>
                     </div>
                   ))

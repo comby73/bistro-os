@@ -4,9 +4,7 @@ import { BrandLogo } from "@/components/brand/BrandLogo";
 const links = [
   { href: "/#how", label: "Cómo funciona" },
   { href: "/#features", label: "Plataforma" },
-  { href: "/#testimonials", label: "Clientes" },
-  { href: "/#pricing", label: "Precios" },
-  { href: "/#faq", label: "FAQ" }
+  { href: "/#contact", label: "Contacto" }
 ];
 
 export function Navbar() {
@@ -30,7 +28,7 @@ export function Navbar() {
             Ingresar
           </Link>
           <Link href="/demo" className="btn-gold px-4 py-2 text-xs">
-            Probar demo
+            Solicitar demo
           </Link>
         </div>
       </div>

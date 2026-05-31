@@ -4,6 +4,7 @@ import {
   getOrderTotal
 } from "@/features/orders/calculations";
 import type { Order } from "@/features/orders/types";
+import { formatArsFromUsd } from "@/lib/utils";
 
 export function OrderCard({
   order,
@@ -27,7 +28,7 @@ export function OrderCard({
       </div>
 
       <div className="mb-5 flex flex-wrap gap-3 text-xs uppercase tracking-[0.14em] text-paper/42">
-        <span>USD {getOrderTotal(order)}</span>
+        <span>{formatArsFromUsd(getOrderTotal(order))}</span>
         {typeof elapsedMinutes === "number" && <span>{elapsedMinutes} min</span>}
       </div>
 

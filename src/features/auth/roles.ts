@@ -19,11 +19,11 @@ const DASHBOARD_NAV: NavigationItem = { href: "/dashboard", label: "Dashboard" }
 const USERS_NAV:       NavigationItem = { href: "/users",       label: "Usuarios" };
 const BRANCHES_NAV:    NavigationItem = { href: "/branches",    label: "Sucursales" };
 const RESTAURANTS_NAV: NavigationItem = { href: "/restaurants", label: "Mis restaurantes" };
-const FINANCES_NAV:    NavigationItem = { href: "/finances",    label: "Finanzas" };
+const FINANCES_NAV:    NavigationItem = { href: "/finances",    label: "Análisis financiero" };
 const ORDERS_NAV: NavigationItem = { href: "/orders", label: "Pedidos" };
 const RESERVATIONS_NAV: NavigationItem = { href: "/reservations", label: "Reservas" };
 const KITCHEN_NAV: NavigationItem = { href: "/kitchen", label: "Cocina" };
-const MENU_NAV: NavigationItem = { href: "/menu", label: "Menú" };
+const MENU_NAV: NavigationItem = { href: "/menu", label: "Carta" };
 const SALES_NAV: NavigationItem = { href: "/sales", label: "Ventas y caja" };
 
 export const roleConfigs: Record<RoleId, RoleConfig> = {

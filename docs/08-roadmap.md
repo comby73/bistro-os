@@ -21,6 +21,7 @@
 - App operativa con roles internos y Supabase Auth real.
 - `AppShell` interno y navegación contextual por rol.
 - `/orders` con modo servicio para mozo.
+- `/orders` y `/kitchen` como demo operativo por restaurante, persistido en `localStorage`.
 - `/kitchen` con tablero KDS con columnas color-coded por estado.
 - `/reservations` como módulo operativo con adaptador Supabase activo.
 - `/menu` como carta operativa con adaptador Supabase activo.
@@ -30,14 +31,15 @@
 - `/dashboard` alimentado por stores demo de pedidos y reservas.
 - **Supabase conectado** para `menu` y `reservations` (Fases 4B y 4C completadas).
 - Indicador de conexión Supabase visible en sidebar.
-- `localStorage` como persistencia de pedidos y cocina (pendiente Fase 4D).
+- `localStorage` por `restaurant_id` como persistencia de pedidos y cocina (pendiente Fase 4D).
 - n8n opcional y no bloqueante.
 
 ## Fase 3A — Flujo operativo ✅
 
 - Consolidado Mozo → Pedido → Cocina.
-- KDS con estados color-coded (recibido/preparando/listo).
+- KDS con estados color-coded (recibido/preparando/listo/entregado).
 - Visibilidad de tiempos y estados en tickets.
+- Seeds iniciales de pedidos para Bistró Palermo, Casa Norte y La Mesa Dorada sin mezclar tenants.
 - Sistema demostrable con Supabase configurado y fallback local para módulos no migrados.
 
 ## Fase 3B — Reservas operativas ✅
@@ -77,6 +79,9 @@
 - Fallback a localStorage si las variables no están.
 
 ## Fase 4D — Conectar `orders` y `kitchen`
+
+Estado previo listo: `/orders`, `/kitchen` y `/dashboard` ya consumen el demo-store por
+`restaurant_id`, con seeds iniciales y persistencia local sin pisar datos existentes.
 
 - Persistir pedidos reales.
 - Persistir items de pedido.

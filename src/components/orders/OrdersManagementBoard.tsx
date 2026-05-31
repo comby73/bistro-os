@@ -13,7 +13,7 @@ export function OrdersManagementBoard({ restaurantId }: { restaurantId?: string 
 
   return (
     <section className="space-y-6">
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="grid gap-4 md:grid-cols-4">
         <div className="rounded-3xl border border-line bg-layer1/60 p-5">
           <p className="text-xs uppercase tracking-[0.18em] text-paper/45">Recibidos</p>
           <p className="mt-3 text-4xl font-semibold tracking-[-0.05em] text-gold">
@@ -27,9 +27,15 @@ export function OrdersManagementBoard({ restaurantId }: { restaurantId?: string 
           </p>
         </div>
         <div className="rounded-3xl border border-line bg-layer1/60 p-5">
-          <p className="text-xs uppercase tracking-[0.18em] text-paper/45">Listos / entregados</p>
+          <p className="text-xs uppercase tracking-[0.18em] text-paper/45">Listos</p>
           <p className="mt-3 text-4xl font-semibold tracking-[-0.05em] text-gold">
-            {orders.filter((order) => order.status === "ready" || order.status === "delivered").length}
+            {orders.filter((order) => order.status === "ready").length}
+          </p>
+        </div>
+        <div className="rounded-3xl border border-line bg-layer1/60 p-5">
+          <p className="text-xs uppercase tracking-[0.18em] text-paper/45">Entregados</p>
+          <p className="mt-3 text-4xl font-semibold tracking-[-0.05em] text-gold">
+            {orders.filter((order) => order.status === "delivered").length}
           </p>
         </div>
       </div>

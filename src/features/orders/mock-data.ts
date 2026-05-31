@@ -11,11 +11,18 @@ const RID = {
   mesa:      "00000000-0000-0000-0000-000000000003",
 } as const;
 
+const BID = {
+  bistro:    "00000000-0000-0000-0000-000000000010",
+  casaNorte: "00000000-0000-0000-0000-000000000020",
+  mesa:      "00000000-0000-0000-0000-000000000030",
+} as const;
+
 // Pedidos demo en memoria (no persistidos). Filtrados por restaurant_id en demo-store.
 export const orders: Order[] = [
   {
     id: "ORD-1042",
     restaurant_id: RID.bistro,
+    branch_id: BID.bistro,
     table: "Mesa 7",
     status: "preparing",
     created_at: minutesAgo(12),
@@ -30,6 +37,7 @@ export const orders: Order[] = [
   {
     id: "ORD-1043",
     restaurant_id: RID.bistro,
+    branch_id: BID.bistro,
     table: "Mesa 11",
     status: "received",
     created_at: minutesAgo(4),
@@ -44,6 +52,7 @@ export const orders: Order[] = [
   {
     id: "ORD-1044",
     restaurant_id: RID.bistro,
+    branch_id: BID.bistro,
     table: "Mesa 3",
     status: "delivered",
     created_at: minutesAgo(35),
@@ -60,6 +69,7 @@ export const orders: Order[] = [
   {
     id: "ORD-2051",
     restaurant_id: RID.casaNorte,
+    branch_id: BID.casaNorte,
     table: "Mesa 5",
     status: "preparing",
     created_at: minutesAgo(9),
@@ -74,6 +84,7 @@ export const orders: Order[] = [
   {
     id: "ORD-2052",
     restaurant_id: RID.casaNorte,
+    branch_id: BID.casaNorte,
     table: "Mesa 2",
     status: "received",
     created_at: minutesAgo(3),
@@ -88,6 +99,7 @@ export const orders: Order[] = [
   {
     id: "ORD-3061",
     restaurant_id: RID.mesa,
+    branch_id: BID.mesa,
     table: "Mesa 9",
     status: "preparing",
     created_at: minutesAgo(15),
@@ -102,6 +114,7 @@ export const orders: Order[] = [
   {
     id: "ORD-3062",
     restaurant_id: RID.mesa,
+    branch_id: BID.mesa,
     table: "Mesa 1",
     status: "received",
     created_at: minutesAgo(6),

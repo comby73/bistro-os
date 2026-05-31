@@ -18,6 +18,7 @@ import {
 import { DashboardAlertList } from "./DashboardAlertList";
 import { DashboardOrdersTable } from "./DashboardOrdersTable";
 import { PublicityBanner } from "./PublicityBanner";
+import { formatArsFromUsd } from "@/lib/utils";
 
 const FALLBACK_NOW = Date.parse("2026-01-01T12:00:00Z");
 
@@ -112,10 +113,10 @@ export function DashboardWorkspace({
           />
 
           <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
-            <MetricCard accent="gold" label="Ventas hoy" value={`USD ${ownerAdminMetrics.revenueToday}`} hint="Total estimado del turno activo." />
+            <MetricCard accent="gold" label="Ventas hoy" value={formatArsFromUsd(ownerAdminMetrics.revenueToday)} hint="Total estimado del turno activo." />
             <MetricCard accent="sky" label="Pedidos activos" value={String(ownerAdminMetrics.activeOrders)} hint="Comandas vivas en salón y cocina." />
             <MetricCard accent="amber" label="Reservas pendientes" value={String(ownerAdminMetrics.pendingReservations)} hint="Requieren confirmación del salón." />
-            <MetricCard accent="muted" label="Ticket promedio" value={`USD ${ownerAdminMetrics.averageTicket}`} hint="Calculado sobre pedidos entregados." />
+            <MetricCard accent="muted" label="Ticket promedio" value={formatArsFromUsd(ownerAdminMetrics.averageTicket)} hint="Calculado sobre pedidos entregados." />
           </div>
 
           <div className="grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">

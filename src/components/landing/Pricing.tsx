@@ -3,16 +3,16 @@ import Link from "next/link";
 const plans = [
   {
     name: "Starter",
-    price: "$49",
-    setup: "Setup desde USD 149",
+    price: "$70.070",
+    setup: "Setup desde $213.070",
     description: "Para restaurantes que quieren ordenar reservas y pedidos.",
     features: ["1 local", "Pedidos básicos", "Dashboard inicial", "Hasta 3 usuarios"],
     highlighted: false
   },
   {
     name: "Pro",
-    price: "$129",
-    setup: "Setup desde USD 299",
+    price: "$184.470",
+    setup: "Setup desde $427.570",
     description: "Para restaurantes con operación constante y equipo activo.",
     features: [
       "Todo en Starter",

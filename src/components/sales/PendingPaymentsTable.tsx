@@ -1,4 +1,5 @@
 import type { SaleRecord } from "@/features/sales/types";
+import { formatArsFromUsd } from "@/lib/utils";
 
 export function PendingPaymentsTable({ pendingSales }: { pendingSales: SaleRecord[] }) {
   return (
@@ -24,8 +25,8 @@ export function PendingPaymentsTable({ pendingSales }: { pendingSales: SaleRecor
               <p className="text-paper/50">Medio sugerido</p>
             </div>
             <div className="text-right">
-              <p className="font-semibold text-gold">USD {sale.total}</p>
-              <p className="mt-1 text-paper/50">Propina estimada USD {sale.tip}</p>
+              <p className="font-semibold text-gold">{formatArsFromUsd(sale.total)}</p>
+              <p className="mt-1 text-paper/50">Propina estimada {formatArsFromUsd(sale.tip)}</p>
             </div>
           </div>
         ))}

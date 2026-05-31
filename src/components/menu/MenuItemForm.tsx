@@ -6,6 +6,7 @@ import type { KitchenStation } from "@/features/kitchen/types";
 import type { MenuCategory, MenuItem, MenuItemInput } from "@/features/menu/types";
 import { MenuImageUploader } from "./MenuImageUploader";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
+import { arsToUsd, usdToArs } from "@/lib/utils";
 
 const STATIONS: { value: KitchenStation; label: string }[] = [
   { value: "cold",  label: "Frío" },
@@ -38,7 +39,7 @@ export function MenuItemForm({
 }) {
   const [name, setName] = useState(item?.name ?? "");
   const [description, setDescription] = useState(item?.description ?? "");
-  const [price, setPrice] = useState<string>(item ? String(item.price) : "");
+  const [price, setPrice] = useState<string>(item ? String(usdToArs(item.price)) : "");
   const [categoryId, setCategoryId] = useState(item?.category_id ?? categories[0]?.id ?? "");
   const [station, setStation] = useState<KitchenStation>(item?.station ?? "hot");
   const [available, setAvailable] = useState(item?.available ?? true);
@@ -49,14 +50,14 @@ export function MenuItemForm({
 
   function submit() {
     if (!name.trim()) return setError("El nombre es obligatorio.");
-    const priceNum = Number(price);
-    if (!Number.isFinite(priceNum) || priceNum < 0) return setError("Precio inválido.");
+    const priceArs = Number(price);
+    if (!Number.isFinite(priceArs) || priceArs < 0) return setError("Precio inválido.");
     if (!categoryId) return setError("Elegí una categoría.");
     setError(null);
     onSubmit({
       name: name.trim(),
       description: description.trim(),
-      price: priceNum,
+      price: arsToUsd(priceArs),
       category_id: categoryId,
       station,
       available,
@@ -79,7 +80,7 @@ export function MenuItemForm({
 
       <div className="grid grid-cols-2 gap-3">
         <div className="flex flex-col gap-1.5">
-          <label className={LABEL}>Precio (USD)</label>
+          <label className={LABEL}>Precio (ARS)</label>
           <input className={INPUT} value={price} onChange={(e) => setPrice(e.target.value)} inputMode="decimal" placeholder="0" />
         </div>
         <div className="flex flex-col gap-1.5">

@@ -36,6 +36,7 @@ Implementado:
 - /menu como Carta operativa con gestión real y Storage
 - /sales como módulo de Ventas y caja operativo simulado
 - /finances como Análisis financiero demo con ventas, costos, inventario, mesas, gastos, nómina y exportación Excel
+- importes visibles en pesos argentinos con conversión demo fija 1 USD = $1430 ARS
 - tests de roles y cálculos de ventas
 
 Pendiente:

@@ -2,8 +2,7 @@ import Link from "next/link";
 
 export function FinalCTA() {
   return (
-    <section className="relative overflow-hidden border-t border-line py-24 md:py-32">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(232,184,99,0.16),transparent_45%)]" />
+    <section id="contact" className="relative overflow-hidden border-t border-line bg-layer1/35 py-24 md:py-32">
       <div className="bistro-container relative text-center">
         <h2 className="mx-auto max-w-4xl text-4xl font-semibold tracking-[-0.05em] md:text-7xl">
           El próximo servicio puede operar con más control.
@@ -15,8 +14,8 @@ export function FinalCTA() {
           <Link href="/demo" className="btn-gold">
             Solicitar demo
           </Link>
-          <Link href="/dashboard" className="btn-ghost">
-            Ver panel MVP
+          <Link href="/login" className="btn-ghost">
+            Entrar al sistema
           </Link>
         </div>
       </div>

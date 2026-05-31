@@ -5,6 +5,7 @@ import Image from "next/image";
 import { Star, ChevronDown } from "lucide-react";
 import type { MenuCategory, MenuItem } from "@/features/menu/types";
 import { HeroCarousel } from "./HeroCarousel";
+import { formatArsFromUsd } from "@/lib/utils";
 
 /* ─── Imagen de plato con localStorage (igual que MenuItemCard) ─── */
 function DishImage({ item }: { item: MenuItem }) {
@@ -23,8 +24,8 @@ function DishImage({ item }: { item: MenuItem }) {
     );
   }
 
-  if (src.startsWith("data:")) {
-    /* base64 guardada por el dueño */
+  if (src.startsWith("data:") || src.startsWith("http://") || src.startsWith("https://")) {
+    /* data URLs o imágenes remotas de Storage */
     // eslint-disable-next-line @next/next/no-img-element
     return <img src={src} alt={item.name} className="h-full w-full object-cover" />;
   }
@@ -66,7 +67,7 @@ function DishCard({ item, index }: { item: MenuItem; index: number }) {
         <div className="absolute bottom-4 right-4 rounded-2xl border border-gold/30 bg-ink/80 px-4 py-2 backdrop-blur-sm">
           <p className="text-[11px] uppercase tracking-[0.12em] text-paper/55">Precio</p>
           <p className="text-2xl font-bold leading-tight tracking-[-0.04em] text-gold">
-            USD {item.price}
+            {formatArsFromUsd(item.price)}
           </p>
         </div>
       </div>
@@ -191,7 +192,7 @@ export function CartaView({
           {restaurantName ?? "Bistró · Cuisine & Ambiance"} · Carta del día
         </p>
         <p className="mt-1 text-[12px] text-paper/28">
-          Precios expresados en USD · IVA incluido
+          Precios expresados en pesos argentinos · IVA incluido
         </p>
       </footer>
 

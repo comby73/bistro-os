@@ -37,7 +37,7 @@ describe("orders calculations", () => {
       [
         {
           id: "remote-item",
-          restaurant_id: "rest-bistro",
+          restaurant_id: "00000000-0000-0000-0000-000000000001",
           category_id: "remote-cat",
           name: "Spritz especial",
           description: "Cítrico",
@@ -58,12 +58,12 @@ describe("orders calculations", () => {
     expect(getNextOrderStatus("ready")).toBe("delivered");
     expect(getNextOrderStatus("delivered")).toBeNull();
 
-    // groupOrdersByStatus solo agrupa received | preparing | ready (sin delivered).
     // Derivamos los conteos esperados del mock (cubre los 3 restaurantes).
     const grouped = groupOrdersByStatus(orders);
     expect(grouped.received).toHaveLength(orders.filter((o) => o.status === "received").length);
     expect(grouped.preparing).toHaveLength(orders.filter((o) => o.status === "preparing").length);
     expect(grouped.ready).toHaveLength(orders.filter((o) => o.status === "ready").length);
+    expect(grouped.delivered).toHaveLength(orders.filter((o) => o.status === "delivered").length);
   });
 
   it("totaliza el pedido según cantidad y precio unitario", () => {

@@ -53,7 +53,8 @@ export function getOrderTotal(order: Order): number {
 
 export function buildOrderFromInput(
   input: CreateOrderInput,
-  menuItems: MenuItem[] = seedMenuItems
+  menuItems: MenuItem[] = seedMenuItems,
+  context: { restaurantId?: string; branchId?: string | null } = {}
 ): Order {
   const normalizedItems = input.items
     .map((selectedItem) => {
@@ -72,7 +73,9 @@ export function buildOrderFromInput(
     .filter((item) => item !== null);
 
   return {
-    id: `ORD-${Math.floor(Date.now() / 1000)}`,
+    id: createOrderId(),
+    restaurant_id: context.restaurantId,
+    branch_id: context.branchId ?? null,
     table: input.table.trim(),
     status: "received",
     created_at: new Date().toISOString(),
@@ -82,11 +85,21 @@ export function buildOrderFromInput(
   };
 }
 
-export function groupOrdersByStatus(orders: Order[]): Record<"received" | "preparing" | "ready", Order[]> {
+function createOrderId(): string {
+  const suffix =
+    typeof crypto !== "undefined" && "randomUUID" in crypto
+      ? crypto.randomUUID().slice(0, 8).toUpperCase()
+      : `${Date.now()}`.slice(-8);
+
+  return `ORD-${suffix}`;
+}
+
+export function groupOrdersByStatus(orders: Order[]): Record<"received" | "preparing" | "ready" | "delivered", Order[]> {
   return {
     received: orders.filter((order) => order.status === "received"),
     preparing: orders.filter((order) => order.status === "preparing"),
-    ready: orders.filter((order) => order.status === "ready")
+    ready: orders.filter((order) => order.status === "ready"),
+    delivered: orders.filter((order) => order.status === "delivered")
   };
 }
 

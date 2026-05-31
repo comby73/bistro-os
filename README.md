@@ -71,8 +71,12 @@ Slugs de carta pública: `bistro-palermo`, `casa-norte`, `la-mesa-dorada`.
 | Restaurantes, sucursales, perfiles, roles | Supabase | `features/restaurants/mock-data` |
 | Menú (categorías + items) | Supabase | `features/menu/catalog.json` |
 | Reservas | Supabase | `features/reservations/mock-data` |
-| Pedidos / cocina | Demo en memoria (aún no en Supabase) | — |
+| Pedidos / cocina | Demo operativo en `localStorage` por restaurante (aún no en Supabase) | seeds en `features/orders/mock-data.ts` |
 | Finanzas avanzadas | Demo analítica determinística por restaurante | `features/finance/mock-data.ts` |
+
+Los importes visibles en la app se muestran en **pesos argentinos (ARS)**. Para mantener estable la
+demo, los valores base históricos se convierten en UI/exportación con tasa fija:
+`1 USD = $1430 ARS`.
 
 El menú comparte una sola fuente: `src/features/menu/catalog.json`, consumido por la app
 (fallback) y por `scripts/seed-menu.mjs` (carga a Supabase). `/menu` y `/carta` leen del
@@ -112,6 +116,24 @@ pero permite demostrar gestión financiera interna:
 La información es demo determinística por restaurante (`src/features/finance/mock-data.ts`) hasta
 conectar pedidos, pagos, inventario y nómina reales en Supabase. Las altas rápidas se guardan en
 `localStorage` por restaurante para que la demo sea editable.
+
+## Pedidos y cocina demo
+
+`/orders` y `/kitchen` son operativos para los 3 restaurantes, pero todavía no escriben en
+Supabase. El store vive en `src/features/orders/demo-store.ts` y persiste en `localStorage`
+con una key por `restaurant_id`, por ejemplo `bistro-demo-orders-v2-...0001`.
+
+- Si la key de un restaurante está vacía, se inicializan los pedidos seed de
+  `src/features/orders/mock-data.ts`.
+- Si ya existe data local, no se sobreescribe.
+- Si existe la key vieja global (`bistro-demo-orders-v1`), se migra suavemente filtrando por
+  `restaurant_id`.
+- `/orders` consume el catálogo actual del restaurante activo; los productos archivados no
+  aparecen en la toma de pedidos.
+- `/kitchen` muestra `received`, `preparing`, `ready` y `delivered`, y permite avanzar el flujo
+  `received → preparing → ready → delivered`.
+
+La Fase 4D migrará esto a `placed_orders`, `order_items` y `kitchen_events`.
 
 ## Cómo probar
 

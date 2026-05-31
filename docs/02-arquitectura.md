@@ -146,6 +146,28 @@ y pasan `restaurantId` a cada workspace. Los stores demo (`menu`, `reservations`
 muestran todo (fallback compatible con el comportamiento previo). El `AppShell`
 muestra nombre del restaurante (con su `brand_color`), sucursal y un link "Cambiar".
 
+## Pedidos y cocina demo
+
+Pedidos/cocina todavía no están en Supabase. La experiencia operativa se resuelve con:
+
+- `src/features/orders/mock-data.ts`: seeds por restaurante usando UUIDs reales.
+- `src/features/orders/demo-store.ts`: store cliente con `localStorage` por `restaurant_id`.
+- `src/features/orders/calculations.ts`: creación de pedidos, totales, tiempos y transición de estados.
+- `src/components/orders/`: toma y seguimiento de pedidos.
+- `src/components/kitchen/`: tablero KDS.
+
+El store usa keys por restaurante (`bistro-demo-orders-v2-{restaurant_id}`), por lo que Bistró
+Palermo, Casa Norte y La Mesa Dorada no mezclan tickets. Si la key está vacía, se cargan 1-2
+pedidos seed del restaurante; si ya existe data local del usuario, no se pisa. La key vieja global
+`bistro-demo-orders-v1` se usa solo como migración suave, filtrando por `restaurant_id`.
+
+`/orders` recibe el catálogo resuelto del restaurante activo desde el mismo repository de carta.
+Esto permite que productos creados/editados en `/menu` aparezcan en la toma de pedidos, mientras
+los archivados quedan ocultos por el store de menú.
+
+`/kitchen` lee el mismo store de pedidos y agrupa por `received`, `preparing`, `ready` y
+`delivered`. Las acciones disponibles avanzan `received → preparing → ready → delivered`.
+
 > Branding: hoy `slug`, descripción y color viven en `metadata`; si se promueven a columnas,
 > seguir las propuestas comentadas en `supabase/schema.sql`.
 - **Menú** como catálogo jerárquico de productos, categorías y disponibilidad.

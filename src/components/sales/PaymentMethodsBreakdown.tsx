@@ -1,4 +1,5 @@
 import type { PaymentMethodTotal } from "@/features/sales/types";
+import { formatArsFromUsd } from "@/lib/utils";
 
 export function PaymentMethodsBreakdown({
   paymentMethods
@@ -21,7 +22,7 @@ export function PaymentMethodsBreakdown({
                 <p className="mt-1 text-sm text-paper/58">{item.ordersCount} operaciones cobradas</p>
               </div>
               <div className="text-right">
-                <p className="font-semibold text-gold">USD {item.amount}</p>
+                <p className="font-semibold text-gold">{formatArsFromUsd(item.amount)}</p>
                 <p className="mt-1 text-sm text-paper/58">{item.percentage.toFixed(0)}% del total</p>
               </div>
             </div>
