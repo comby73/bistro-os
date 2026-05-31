@@ -53,6 +53,7 @@ Hoy n8n **no** participa en:
 - notificaciones internas,
 - clasificación de leads,
 - resúmenes automáticos,
+- envío de resumen financiero diario,
 - eventos posteriores a persistencia real,
 - integraciones de backoffice.
 

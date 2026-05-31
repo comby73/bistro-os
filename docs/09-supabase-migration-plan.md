@@ -85,6 +85,17 @@ Depende de tener ya conectados: `menu` ✅, `reservations` ✅, `orders` ⏳, `k
 
 ---
 
+## Fase 4G — Conectar análisis financiero (PENDIENTE)
+
+**Estado actual:** `/finances` ya existe como tablero demo con gráficos, tabla de ventas,
+exportación Excel, medios de pago, costos por producto, faltantes de insumos, mesas, gastos
+y empleados.
+
+**Qué falta:** persistir esas fuentes en Supabase y derivarlas de módulos reales:
+`placed_orders`, `order_items`, `sales_payments`, `cash_closings`, inventario y nómina.
+
+---
+
 ## Fase 4F — RLS serio por tenant/rol (PENDIENTE)
 
 **Qué cubre:** fortalecer acceso por tenant, aislar por restaurante y sucursal desde RLS, y definir políticas por rol (owner, admin, manager, waiter, kitchen) además de los guards server-side actuales.

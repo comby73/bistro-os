@@ -13,8 +13,9 @@ Bistró OS es un SaaS operativo multi-restaurante para restaurantes, con foco en
 - Roles implementados: `owner`, `admin`, `manager`, `waiter`, `kitchen`.
 - `AppShell` interno con navegación por rol y contexto de restaurante/sucursal.
 - `/login` con Supabase Auth real (email + password).
-- Módulos activos: dashboard, pedidos, cocina, reservas, menú/carta, ventas/caja, usuarios, sucursales y restaurantes.
+- Módulos activos: dashboard, pedidos, cocina, reservas, menú/carta, ventas/caja, finanzas, usuarios, sucursales y restaurantes.
 - `/sales` no es facturación fiscal real.
+- `/finances` es Análisis financiero demo: ventas, pagos, costos, inventario, mesas, gastos, nómina y exportación Excel.
 - Supabase es persistencia activa para auth, restaurantes, sucursales, perfiles/roles, menú y reservas.
 - Pedidos y cocina siguen en demo-store/localStorage hasta Fase 4D.
 - n8n es opcional y no debe bloquear flujos.
@@ -73,7 +74,8 @@ Bistró OS es un SaaS operativo multi-restaurante para restaurantes, con foco en
 - `.card-premium` — glass morphism + hover con `-translate-y-[1px]` y shadow dorado.
 
 ### Navegación (AppShell)
-- Cada ítem tiene ícono Lucide: Dashboard→`LayoutDashboard`, Ventas→`TrendingUp`, Pedidos→`ClipboardList`, Reservas→`CalendarDays`, Cocina→`ChefHat`, Menú→`BookOpen`.
+- El sidebar se agrupa por secciones: General, Operación, Caja y análisis, Administración.
+- Cada ítem tiene ícono Lucide: Dashboard→`LayoutDashboard`, Análisis financiero→`BarChart3`, Ventas→`TrendingUp`, Pedidos→`ClipboardList`, Reservas→`CalendarDays`, Cocina→`ChefHat`, Carta→`BookOpen`.
 - El card de rol activo usa gradiente `from-gold/8 via-ink/60`.
 
 ### Reservas (ReservationCard)

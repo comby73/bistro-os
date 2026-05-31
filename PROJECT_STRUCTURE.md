@@ -14,8 +14,9 @@ bistro-os/
 │   │   ├── orders/           Pedidos operativos
 │   │   ├── kitchen/          Cocina / KDS
 │   │   ├── reservations/     Reservas
-│   │   ├── menu/             Gestión operativa de carta
+│   │   ├── menu/             Carta operativa
 │   │   ├── sales/            Ventas y caja simulada
+│   │   ├── finances/         Análisis financiero demo
 │   │   ├── users/            Gestión de usuarios
 │   │   ├── branches/         Gestión de sucursales
 │   │   ├── restaurants/      Gestión de restaurantes
@@ -31,6 +32,7 @@ bistro-os/
 │   │   ├── auth/             Roles, Supabase Auth, session helpers y acciones
 │   │   ├── restaurants/      Contexto multi-restaurante y acceso a datos
 │   │   ├── menu/             Catálogo, CRUD de carta, repository y fallback local
+│   │   ├── finance/          Datos/cálculos de análisis financiero demo
 │   │   ├── orders/           Tipos, cálculos y store demo compartida
 │   │   ├── sales/            Tipos, mocks y cálculos de ventas
 │   │   ├── leads/            Formulario comercial y automatización opcional

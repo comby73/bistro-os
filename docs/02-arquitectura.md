@@ -94,6 +94,8 @@ La misma lógica de negocio puede renderizar experiencias distintas por rol sin 
 - `reservations`: módulo operativo con Supabase, fallback local, filtros y acciones de estado.
 - `menu`: gestor de carta con CRUD, disponibilidad, destacados, baja lógica e imágenes en Storage.
 - `sales`: ventas y caja simulada.
+- `finance`: tablero analítico demo por restaurante con ventas, pagos, costos, inventario,
+  mesas, gastos, empleados y exportación Excel.
 - `leads`: formulario comercial con automatización opcional.
 
 ## Modelo operativo de referencia
@@ -117,6 +119,7 @@ Este modelo ayuda a ordenar el producto en módulos transaccionales claros:
 - **Pedidos** como núcleo de operación entre salón y cocina.
 - **KDS / cocina** como reflejo del avance del pedido en tiempo real.
 - **Ventas y caja** como cierre operativo del turno.
+- **Análisis financiero** como lectura analítica para owner: margen, faltantes, gastos y nómina.
 
 ## Contexto multi-restaurante
 

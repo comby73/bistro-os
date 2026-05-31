@@ -55,4 +55,5 @@ Demostrar que Bistró OS puede funcionar como sistema operativo de restaurante c
 - Menú/carta con CRUD real, baja lógica y Storage de imágenes.
 - Reservas persistidas por restaurante/sucursal.
 - Ventas y caja simulada sin facturación fiscal real.
+- Análisis financiero demo: ventas, pagos, costos, inventario, mesas, gastos, nómina y Excel.
 - n8n preparado como capa opcional posterior.

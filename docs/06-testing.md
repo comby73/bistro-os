@@ -31,6 +31,13 @@ La demo valida calidad con:
 - permisos por rol,
 - cálculos de ventas,
 - cálculos de pedidos.
+- **cálculos financieros demo** (`tests/finance-calculations.test.ts`):
+  - resumen de ventas/gastos/sueldos,
+  - ventas por día,
+  - medios de pago,
+  - margen por producto,
+  - faltantes de inventario,
+  - gastos por categoría.
 
 ## Comandos de calidad
 
@@ -41,7 +48,7 @@ npm run build
 ```
 
 Última validación reportada para este bloque: `npm run lint` sin errores,
-`npm test` con 58 tests verdes y `npm run build` OK.
+`npm test` con 62 tests verdes y `npm run build` OK.
 
 ## Qué garantizan hoy
 

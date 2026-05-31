@@ -80,6 +80,7 @@ Se mantiene por tres motivos:
 - `menu` y `reservations` leen y escriben en Supabase (con fallback local).
 - `orders` y `kitchen` viven en localStorage demo.
 - `/sales` sigue siendo cálculo mock.
+- `/finances` usa datos demo determinísticos por restaurante para análisis financiero.
 - `/dashboard` deriva información desde stores locales y cálculos reutilizables.
 
 ### Siguiente paso (Fase 4D)
@@ -307,6 +308,22 @@ Campos clave:
 - estado,
 - notas.
 
+### Análisis financiero demo
+
+El tablero `/finances` aún no escribe en Supabase. Usa `src/features/finance/mock-data.ts`
+para simular:
+
+- ventas por día y forma de pago,
+- costos y margen por producto,
+- insumos y faltantes,
+- estado de mesas,
+- gastos mensuales,
+- empleados y sueldos.
+- edición demo de gastos, stock y propinas en `localStorage` por restaurante.
+
+El objetivo es demostrar la experiencia financiera antes de conectar el origen real:
+`placed_orders`, `order_items`, `sales_payments`, `cash_closings`, inventario y nómina.
+
 ## Importante sobre `/sales`
 
 `/sales` **no representa facturación fiscal real**.
@@ -324,6 +341,7 @@ No cubre todavía:
 - integración AFIP,
 - POS real,
 - conciliación bancaria.
+- contabilidad real de gastos/sueldos.
 
 ### Eventos e IA
 

@@ -33,8 +33,9 @@ Implementado:
 - /orders
 - /reservations
 - /kitchen
-- /menu con gestión real de carta y Storage
+- /menu como Carta operativa con gestión real y Storage
 - /sales como módulo de Ventas y caja operativo simulado
+- /finances como Análisis financiero demo con ventas, costos, inventario, mesas, gastos, nómina y exportación Excel
 - tests de roles y cálculos de ventas
 
 Pendiente:
@@ -67,6 +68,7 @@ Pendiente:
 ## Decisiones de producto
 
 - /sales representa “Ventas y caja”, no facturación fiscal real.
+- /finances representa análisis financiero demo, no contabilidad ni facturación fiscal real.
 - n8n es una capa externa opcional y no debe bloquear la app.
 - Supabase es persistencia real para auth, tenant, menú y reservas.
 - La app debe poder demostrarse sin servicios externos.

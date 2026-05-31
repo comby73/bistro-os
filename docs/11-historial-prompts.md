@@ -150,6 +150,36 @@ manteniendo claro dónde vive el historial de prompts.
 - Riesgos vigentes documentados: RLS por tenant/rol pendiente, pedidos/cocina pendientes,
   y promoción futura de `image_url`/`storage_path` desde `metadata` a columnas reales.
 
+## 14. Análisis financiero demo
+
+**Pedido:** ampliar `/finances` para que no sea solo recaudación: gráficos de venta, tabla
+analizable, descarga Excel, formas de pago, costos de productos, faltantes de salón/cocina,
+mesas, gastos y pago de empleados.
+
+**Resultado:**
+- `src/features/finance/` con tipos, mock determinístico por restaurante y cálculos testeados.
+- `/finances` como tablero owner: ventas por día, medios de pago, tabla exportable,
+  rentabilidad por producto, inventario bajo mínimo, estado de mesas, gastos y nómina.
+- Carga rápida editable: gastos, stock/insumos y propinas, persistida en `localStorage`
+  por restaurante.
+- Exportación `.xlsx` desde el cliente.
+- Tests `finance-calculations.test.ts`; total actual: 62 tests verdes.
+- Decisión: sigue siendo demo analítica, no contabilidad/facturación fiscal real; la conexión
+  a Supabase queda para Fase 4G.
+
+## 15. Landing simplificada con video
+
+**Pedido:** agregar a la página principal un video de fondo (`public/Bistro.mp4`) arriba,
+con estética moderna, ágil y simple.
+
+**Resultado:**
+- Hero de `/` convertido a escena full-bleed con video de fondo, blur suave y overlays oscuros
+  para mantener legibilidad.
+- H1 simplificado a `Bistró OS` con propuesta de valor debajo.
+- Home recortada a flujo corto: hero, cómo funciona, plataforma y CTA final.
+- Navbar reducido a anclas activas (`Cómo funciona`, `Plataforma`, `Contacto`) para evitar
+  secciones muertas.
+
 ---
 
 ## Cómo mantener este registro

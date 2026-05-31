@@ -127,6 +127,8 @@ Objetivo:
 Debe incluir:
 
 - ventas del día,
+- medios de pago,
+- gastos/faltantes relevantes,
 - ticket promedio,
 - platos más pedidos,
 - reservas confirmadas y canceladas,

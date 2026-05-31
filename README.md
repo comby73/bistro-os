@@ -39,10 +39,10 @@ El panel de login incluye accesos rápidos que autocompletan estas credenciales.
 
 | Rol | Rutas |
 |---|---|
-| `owner` | dashboard, finanzas, ventas, pedidos, reservas, cocina, menú, usuarios, sucursales, restaurantes |
-| `admin` | dashboard, ventas, pedidos, reservas, cocina, menú |
-| `manager` | dashboard, ventas, reservas, pedidos, menú |
-| `waiter` | pedidos, menú |
+| `owner` | dashboard, análisis financiero, ventas, pedidos, reservas, cocina, carta, usuarios, sucursales, restaurantes |
+| `admin` | dashboard, ventas, pedidos, reservas, cocina, carta |
+| `manager` | dashboard, ventas, reservas, pedidos, carta |
+| `waiter` | pedidos, carta |
 | `kitchen` | cocina |
 
 ## Rutas principales
@@ -53,12 +53,12 @@ El panel de login incluye accesos rápidos que autocompletan estas credenciales.
 | `/login` | Login real (email + contraseña, Supabase Auth) |
 | `/select-branch` | Selector de restaurante/sucursal (owner/admin multi) |
 | `/dashboard` | Vista interna adaptada por rol |
-| `/menu` | Menú operativo — **lee de Supabase** por restaurante |
+| `/menu` | Carta operativa — **lee de Supabase** por restaurante |
 | `/carta/[slug]` | Carta pública por restaurante — **misma fuente que /menu** |
 | `/orders` | Pedidos activos + creación (demo en memoria por restaurante) |
 | `/kitchen` | KDS por restaurante (demo en memoria) |
 | `/reservations` | Reservas — **lee de Supabase** por restaurante/sucursal |
-| `/finances` | Recaudación consolidada (solo owner) |
+| `/finances` | Análisis financiero demo: ventas, pagos, costos, inventario, mesas, gastos y nómina (solo owner) |
 | `/users` `/branches` `/restaurants` | Altas/bajas (solo owner) |
 | `/demo` | Formulario comercial / lead (n8n lead-capture) |
 
@@ -72,6 +72,7 @@ Slugs de carta pública: `bistro-palermo`, `casa-norte`, `la-mesa-dorada`.
 | Menú (categorías + items) | Supabase | `features/menu/catalog.json` |
 | Reservas | Supabase | `features/reservations/mock-data` |
 | Pedidos / cocina | Demo en memoria (aún no en Supabase) | — |
+| Finanzas avanzadas | Demo analítica determinística por restaurante | `features/finance/mock-data.ts` |
 
 El menú comparte una sola fuente: `src/features/menu/catalog.json`, consumido por la app
 (fallback) y por `scripts/seed-menu.mjs` (carga a Supabase). `/menu` y `/carta` leen del
@@ -93,6 +94,25 @@ Todo se guarda en Supabase si está configurado; si no, cae a `localStorage`. `/
 `/carta/[slug]` reflejan los cambios porque leen el mismo repository.
 Permisos: owner/admin (rol `chef` → roadmap). manager/waiter solo lectura; kitchen no administra menú.
 
+## Análisis financiero demo
+
+`/finances` es un tablero analítico para owner. No reemplaza contabilidad ni facturación fiscal,
+pero permite demostrar gestión financiera interna:
+
+- gráficos de ventas por día,
+- desglose por forma de pago,
+- tabla de ventas exportable a Excel,
+- costos y margen por producto,
+- faltantes de insumos de salón/cocina/limpieza,
+- listado y estado de mesas,
+- gastos del mes,
+- pago estimado de empleados.
+- carga rápida local de gastos, stock/faltantes y propinas.
+
+La información es demo determinística por restaurante (`src/features/finance/mock-data.ts`) hasta
+conectar pedidos, pagos, inventario y nómina reales en Supabase. Las altas rápidas se guardan en
+`localStorage` por restaurante para que la demo sea editable.
+
 ## Cómo probar
 
 ```bash
@@ -107,6 +127,7 @@ npm run dev
 4. **Reservas** → `/reservations` → reservas del restaurante/sucursal activos.
 5. **Pedidos** → `/orders` → comandas demo del restaurante activo.
 6. **Cocina** → `/kitchen` → tickets demo del restaurante activo.
+7. **Análisis financiero** → `/finances` → tablero demo + exportación Excel.
 
 ## Seeds de Supabase
 
@@ -163,6 +184,7 @@ npm run build
 ## Roadmap
 
 1. Persistir pedidos/cocina en Supabase (`placed_orders` / `kitchen_events`).
-2. RLS por tenant (hoy `supabase/policies.sql` solo abre lectura pública de menú).
-3. Automatizaciones n8n: reserva confirmada → Telegram, pedido demorado → notificación.
-4. Promover `image_url`/`storage_path` desde `metadata` a columnas reales en la DB viva cuando se aplique la migración SQL.
+2. Conectar análisis financiero a ventas/pagos/gastos/inventario reales.
+3. RLS por tenant (hoy `supabase/policies.sql` solo abre lectura pública de menú).
+4. Automatizaciones n8n: reserva confirmada → Telegram, pedido demorado → notificación.
+5. Promover `image_url`/`storage_path` desde `metadata` a columnas reales en la DB viva cuando se aplique la migración SQL.

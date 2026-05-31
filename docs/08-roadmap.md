@@ -25,6 +25,8 @@
 - `/reservations` como módulo operativo con adaptador Supabase activo.
 - `/menu` como carta operativa con adaptador Supabase activo.
 - `/sales` como ventas y caja operativa simulada.
+- `/finances` como Análisis financiero demo: ventas, pagos, costos, inventario, mesas, gastos, empleados y Excel.
+- Carga rápida demo en `/finances`: nuevo gasto, actualización de stock/faltantes y propinas.
 - `/dashboard` alimentado por stores demo de pedidos y reservas.
 - **Supabase conectado** para `menu` y `reservations` (Fases 4B y 4C completadas).
 - Indicador de conexión Supabase visible en sidebar.
@@ -87,6 +89,13 @@ Riesgo: es el corazón operativo. Migrar escritura primero, luego lectura compar
 
 Depende de tener conectados: menu, reservations, orders, kitchen y parte de sales.
 
+## Fase 4G — Análisis financiero real
+
+- Conectar `/finances` a `placed_orders`, `sales_payments`, `cash_closings` y gastos reales.
+- Persistir inventario/insumos y alertas de faltantes.
+- Modelar empleados, turnos y pagos de nómina.
+- Mantener exportación Excel como salida operativa.
+
 ## Fase 4F — Auth real y RLS serio
 
 - Supabase Auth y resolución de perfil/rol ya están activos.
@@ -126,6 +135,7 @@ Pendiente para la fase 4F:
 - Stock e ingredientes.
 - Recetas y costeo.
 - Caja multi-turno.
+- Análisis financiero real con gastos, nómina e inventario persistidos.
 - APIs internas públicas.
 - Webhooks de eventos operativos.
 - Multi-sucursal.
