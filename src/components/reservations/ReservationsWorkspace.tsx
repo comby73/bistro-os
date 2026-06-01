@@ -1,6 +1,8 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect, useCallback } from "react";
+import { useRouter } from "next/navigation";
+import { RefreshCw } from "lucide-react";
 import type { RoleId } from "@/features/auth/roles";
 import { useDemoClock } from "@/features/orders/demo-clock";
 import {
@@ -59,8 +61,25 @@ export function ReservationsWorkspace({
       persistCancel,
       restaurantId
     });
-  const currentTime = useDemoClock();
+  const router = useRouter();
   const [activeFilter, setActiveFilter] = useState<ReservationFilter>("all");
+  const [lastRefresh, setLastRefresh] = useState<Date>(new Date());
+  const [refreshing, setRefreshing] = useState(false);
+  const currentTime = useDemoClock();
+
+  const handleRefresh = useCallback(() => {
+    setRefreshing(true);
+    router.refresh();
+    setLastRefresh(new Date());
+    setTimeout(() => setRefreshing(false), 800);
+  }, [router]);
+
+  // Auto-refresh cada 30 segundos si la fuente es Supabase
+  useEffect(() => {
+    if (dataSource !== "supabase") return;
+    const interval = setInterval(handleRefresh, 30_000);
+    return () => clearInterval(interval);
+  }, [dataSource, handleRefresh]);
   const canManage = roleId === "owner" || roleId === "admin" || roleId === "manager";
   const today = currentTime > 0 ? new Date(currentTime).toISOString().slice(0, 10) : "";
   const nowTime =
@@ -166,9 +185,25 @@ export function ReservationsWorkspace({
 
       <div className="flex flex-wrap items-center justify-between gap-4">
         <ReservationFilters activeFilter={activeFilter} onChange={setActiveFilter} counts={counts} />
-        <p className="text-sm text-paper/48">
-          {filteredReservations.length} reservas en esta vista
-        </p>
+        <div className="flex items-center gap-3">
+          {dataSource === "supabase" && (
+            <span className="text-xs text-paper/35">
+              Actualizado {lastRefresh.toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit" })}
+            </span>
+          )}
+          <button
+            onClick={handleRefresh}
+            disabled={refreshing}
+            className="flex items-center gap-1.5 rounded-xl border border-line px-3 py-2 text-xs font-medium text-paper/60 transition-all hover:border-gold/30 hover:text-gold disabled:opacity-40"
+            title="Actualizar reservas"
+          >
+            <RefreshCw size={13} className={refreshing ? "animate-spin" : ""} />
+            Actualizar
+          </button>
+          <p className="text-sm text-paper/48">
+            {filteredReservations.length} reservas
+          </p>
+        </div>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 2xl:grid-cols-3">
