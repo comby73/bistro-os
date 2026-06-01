@@ -133,7 +133,19 @@ export function CartaView({
           <p className="mt-4 text-[16px] text-paper/65">
             Ingredientes de estación · Cocina de autor
           </p>
-          <div className="mt-6 flex justify-center">
+          {/* Botón reservar */}
+          {restaurantSlug && (
+            <div className="mt-6 flex justify-center">
+              <a
+                href={`/reservar/${restaurantSlug}`}
+                className="inline-flex items-center gap-2 rounded-2xl px-7 py-3.5 text-[15px] font-bold text-ink transition-opacity hover:opacity-90"
+                style={{ backgroundColor: brandColor ?? "#E8B863" }}
+              >
+                Reservar mesa
+              </a>
+            </div>
+          )}
+          <div className="mt-4 flex justify-center">
             <ChevronDown size={22} className="animate-bounce text-gold/60" />
           </div>
         </div>
@@ -188,6 +200,17 @@ export function CartaView({
 
       {/* ── PIE ── */}
       <footer className="border-t border-line/50 py-10 text-center">
+        {restaurantSlug && (
+          <div className="mb-6">
+            <a
+              href={`/reservar/${restaurantSlug}`}
+              className="inline-flex items-center gap-2 rounded-2xl px-8 py-4 text-[15px] font-bold text-ink transition-opacity hover:opacity-90"
+              style={{ backgroundColor: brandColor ?? "#E8B863" }}
+            >
+              Reservar una mesa
+            </a>
+          </div>
+        )}
         <p className="text-[13px] text-paper/40">
           {restaurantName ?? "Bistró · Cuisine & Ambiance"} · Carta del día
         </p>

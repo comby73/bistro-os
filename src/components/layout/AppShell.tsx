@@ -12,7 +12,10 @@ import {
   MapPin,
   Store,
   BarChart3,
-  ChevronsUpDown
+  ChevronsUpDown,
+  Globe,
+  UtensilsCrossed,
+  CalendarPlus,
 } from "lucide-react";
 import { DemoSessionControls } from "@/components/auth/DemoSessionControls";
 import { LogoutButton } from "@/components/auth/LogoutButton";
@@ -159,6 +162,36 @@ export async function AppShell({ currentPath, children }: AppShellProps) {
                 );
               })}
             </nav>
+
+            {/* Sitio público del restaurante */}
+            {restaurant?.slug && (
+              <div className="mt-6 rounded-2xl border border-line bg-layer1/30 p-4">
+                <div className="mb-3 flex items-center gap-2">
+                  <Globe size={13} className="text-paper/40" />
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-paper/40">
+                    Sitio público
+                  </p>
+                </div>
+                <div className="space-y-1">
+                  <Link
+                    href={`/reservar/${restaurant.slug}`}
+                    target="_blank"
+                    className="flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-[13px] font-medium text-paper/70 transition-all hover:bg-layer2 hover:text-paper"
+                  >
+                    <CalendarPlus size={15} className="opacity-60" />
+                    Página de reservas
+                  </Link>
+                  <Link
+                    href={`/carta/${restaurant.slug}`}
+                    target="_blank"
+                    className="flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-[13px] font-medium text-paper/70 transition-all hover:bg-layer2 hover:text-paper"
+                  >
+                    <UtensilsCrossed size={15} className="opacity-60" />
+                    Ver carta pública
+                  </Link>
+                </div>
+              </div>
+            )}
 
             <div className="mt-auto space-y-3 pt-8">
               <SupabaseStatus />
