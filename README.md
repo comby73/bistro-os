@@ -208,5 +208,5 @@ npm run build
 1. Persistir pedidos/cocina en Supabase (`placed_orders` / `kitchen_events`).
 2. Conectar análisis financiero a ventas/pagos/gastos/inventario reales.
 3. RLS por tenant (hoy `supabase/policies.sql` solo abre lectura pública de menú).
-4. Automatizaciones n8n: reserva confirmada → Telegram, pedido demorado → notificación.
+4. Automatización opcional activa: reservas por Telegram vía n8n (audio + texto) → ver `docs/04-automatizaciones-n8n.md`.
 5. Promover `image_url`/`storage_path` desde `metadata` a columnas reales en la DB viva cuando se aplique la migración SQL.
