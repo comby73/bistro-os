@@ -1,6 +1,7 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
 import { createUserAction, type CreateUserState } from "@/features/auth/create-user-action";
 import { UserPlus } from "lucide-react";
 
@@ -14,17 +15,21 @@ const ROLES = [
 ];
 
 export function CreateUserForm({ onCreated }: { onCreated?: () => void }) {
-  const [state, action, pending] = useActionState(
-    async (prev: CreateUserState, fd: FormData) => {
-      const result = await createUserAction(prev, fd);
-      if (result.success && onCreated) onCreated();
-      return result;
-    },
-    initialState
-  );
+  const router = useRouter();
+  const formRef = useRef<HTMLFormElement>(null);
+  const [state, action, pending] = useActionState(createUserAction, initialState);
+
+  // Refresco automático de la lista y reset del form al crear exitosamente
+  useEffect(() => {
+    if (state.success) {
+      router.refresh();
+      formRef.current?.reset();
+      if (onCreated) onCreated();
+    }
+  }, [state.success, router, onCreated]);
 
   return (
-    <form action={action} className="grid gap-4">
+    <form ref={formRef} action={action} className="grid gap-4">
 
       {/* Nombre */}
       <div className="flex flex-col gap-1.5">

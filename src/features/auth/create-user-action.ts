@@ -1,5 +1,6 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { isValidRoleId } from "@/features/auth/roles";
 import { getActiveRestaurantSession } from "@/features/restaurants/session";
@@ -110,5 +111,6 @@ export async function createUserAction(
     return { error: `Error al guardar el perfil: ${profileError.message}` };
   }
 
+  revalidatePath("/users");
   return { success: `Usuario "${fullName}" creado correctamente.` };
 }

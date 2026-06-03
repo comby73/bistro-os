@@ -1,6 +1,7 @@
 import { cookies } from "next/headers";
 import { AppShell } from "@/components/layout/AppShell";
 import { CreateUserForm } from "@/components/users/CreateUserForm";
+import { UserCard } from "@/components/users/UserCard";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { getActiveRestaurantSession } from "@/features/restaurants/session";
 import { Users, Shield } from "lucide-react";
@@ -25,7 +26,6 @@ export default async function UsersPage() {
   const cookieStore = await cookies();
   const session = getActiveRestaurantSession(cookieStore);
 
-  // Traer usuarios del restaurante activo
   const sb = createServerSupabaseClient();
   const { data: profiles } = session?.restaurantId
     ? await sb
@@ -47,7 +47,7 @@ export default async function UsersPage() {
             Usuarios
           </h1>
           <p className="mt-2 text-[15px] text-paper/60">
-            Gestioná el equipo de tu restaurante. Solo el dueño puede crear y ver usuarios.
+            Gestioná el equipo de tu restaurante. La baja es lógica — no borra el historial.
           </p>
         </div>
 
@@ -56,40 +56,26 @@ export default async function UsersPage() {
           {/* Lista de usuarios */}
           <div className="space-y-3">
             <p className="text-[12px] font-semibold uppercase tracking-[0.16em] text-paper/45">
-              Equipo actual · {profiles?.length ?? 0} usuarios
+              Equipo activo · {profiles?.length ?? 0} usuarios
             </p>
+
             {profiles?.map((p) => {
-              const meta = (p.metadata ?? {}) as Record<string, string>;
-              const role = meta.demo_role ?? "waiter";
-              const color = meta.avatar_color ?? ROLE_COLORS[role] ?? "#E8B863";
+              const meta   = (p.metadata ?? {}) as Record<string, string>;
+              const role   = meta.demo_role ?? "waiter";
+              const color  = meta.avatar_color ?? ROLE_COLORS[role] ?? "#E8B863";
               const initials = meta.avatar_initials ?? p.full_name.slice(0, 2).toUpperCase();
               return (
-                <div
+                <UserCard
                   key={p.id}
-                  className="flex items-center gap-4 rounded-2xl border border-line bg-layer1/60 px-5 py-4"
-                >
-                  {/* Avatar */}
-                  <div
-                    className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-[13px] font-bold"
-                    style={{ backgroundColor: `${color}28`, color }}
-                  >
-                    {initials}
-                  </div>
-
-                  {/* Info */}
-                  <div className="min-w-0 flex-1">
-                    <p className="text-[15px] font-semibold text-paper">{p.full_name}</p>
-                    <p className="text-[13px] text-paper/50">{p.email}</p>
-                  </div>
-
-                  {/* Badge rol */}
-                  <span
-                    className="shrink-0 rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.12em]"
-                    style={{ backgroundColor: `${color}20`, color }}
-                  >
-                    {ROLE_LABELS[role] ?? role}
-                  </span>
-                </div>
+                  id={p.id}
+                  full_name={p.full_name}
+                  email={p.email ?? ""}
+                  role={role}
+                  roleLabel={ROLE_LABELS[role] ?? role}
+                  color={color}
+                  initials={initials}
+                  isOwner={role === "owner"}
+                />
               );
             })}
 
