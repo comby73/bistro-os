@@ -181,27 +181,28 @@ export function OrderComposer({
                     <p className="mt-2 text-sm leading-6 text-paper/55">{item.description}</p>
                   </div>
 
-                  <div className="flex items-end justify-between gap-3">
+                  <div className="space-y-3">
                     <div>
                       <p className="text-xs uppercase tracking-[0.18em] text-paper/42">Precio</p>
                       <p className="mt-1 text-xl font-semibold text-gold">{formatArsFromUsd(item.price)}</p>
                     </div>
 
-                    <div className="flex items-center gap-2 rounded-full border border-line bg-ink px-2 py-2">
+                    {/* Controles +/− a ancho completo — nunca se pisan con el precio */}
+                    <div className="flex items-center justify-between gap-2 rounded-full border border-line bg-ink px-3 py-2">
                       <button
                         type="button"
                         onClick={() => updateQuantity(item.id, -1)}
-                        className="h-10 w-10 rounded-full border border-line text-lg text-paper/70 transition hover:border-gold/35 hover:text-paper"
+                        className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-line text-lg text-paper/70 transition hover:border-gold/35 hover:text-paper"
                       >
-                        -
+                        −
                       </button>
-                      <span className="w-8 text-center text-base font-semibold">
+                      <span className="flex-1 text-center text-base font-semibold">
                         {quantities[item.id] ?? 0}
                       </span>
                       <button
                         type="button"
                         onClick={() => updateQuantity(item.id, 1)}
-                        className="h-10 w-10 rounded-full border border-line bg-gold/12 text-lg text-gold transition hover:border-gold/45"
+                        className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-line bg-gold/12 text-lg text-gold transition hover:border-gold/45"
                       >
                         +
                       </button>
