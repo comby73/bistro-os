@@ -1,10 +1,11 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { groupOrdersByStatus, getNextOrderStatus } from "@/features/orders/calculations";
 import { useDemoClock } from "@/features/orders/demo-clock";
-import { useDemoOrders } from "@/features/orders/demo-store";
+import { useDemoOrders, hydrateFromSupabase } from "@/features/orders/demo-store";
 import { syncOrderStatusUpdate } from "@/features/orders/order-actions";
+import type { Order } from "@/features/orders/types";
 import type { RoleId } from "@/features/auth/roles";
 import { KitchenTicketCard } from "./KitchenTicketCard";
 
@@ -47,14 +48,46 @@ const statusConfig = [
   }
 ] as const;
 
-export function KitchenBoard({ roleId, restaurantId }: { roleId: RoleId; restaurantId?: string }) {
+interface Props {
+  roleId: RoleId;
+  restaurantId?: string;
+  branchId?: string | null;
+  supabaseOrders?: Order[];
+}
+
+export function KitchenBoard({ roleId, restaurantId, branchId, supabaseOrders = [] }: Props) {
   const { orders, advanceOrderStatus } = useDemoOrders(restaurantId);
-  const currentTime = useDemoClock();
-  const groupedOrders = useMemo(
-    () => groupOrdersByStatus(orders),
-    [orders]
-  );
-  const canAdvance = roleId === "kitchen" || roleId === "owner" || roleId === "admin";
+  const currentTime   = useDemoClock();
+  const groupedOrders = useMemo(() => groupOrdersByStatus(orders), [orders]);
+  const canAdvance    = roleId === "kitchen" || roleId === "owner" || roleId === "admin";
+
+  // Hidratar desde Supabase si localStorage vacío
+  useEffect(() => {
+    if (restaurantId && supabaseOrders.length > 0) {
+      hydrateFromSupabase(restaurantId, supabaseOrders);
+    }
+  }, [restaurantId, supabaseOrders]);
+
+  function handleAdvance(order: Order) {
+    const fromStatus = order.status;
+    const nextStatus = getNextOrderStatus(order.status);
+
+    // 1. Actualizar localStorage inmediatamente (UX responsivo)
+    advanceOrderStatus(order.id);
+
+    // 2. Sync a Supabase en background con fromStatus para kitchen_events
+    if (nextStatus && restaurantId) {
+      syncOrderStatusUpdate(
+        order.id,
+        fromStatus,
+        nextStatus,
+        restaurantId,
+        branchId ?? null
+      ).catch(() => {
+        // fire-and-forget: localStorage es la fuente de verdad en caso de fallo
+      });
+    }
+  }
 
   return (
     <section className="space-y-6">
@@ -80,11 +113,17 @@ export function KitchenBoard({ roleId, restaurantId }: { roleId: RoleId; restaur
             key={column.status}
             className={`rounded-[28px] border p-4 ${column.border} bg-layer1/40`}
           >
-            <div className={`mb-4 flex items-center justify-between gap-3 border-b pb-4 ${column.headerBorder}`}>
-              <h3 className={`text-sm font-semibold uppercase tracking-[0.18em] ${column.labelColor}`}>
+            <div
+              className={`mb-4 flex items-center justify-between gap-3 border-b pb-4 ${column.headerBorder}`}
+            >
+              <h3
+                className={`text-sm font-semibold uppercase tracking-[0.18em] ${column.labelColor}`}
+              >
                 {column.label}
               </h3>
-              <span className={`rounded-full border px-3 py-1 text-xs ${column.border} ${column.countColor}/60`}>
+              <span
+                className={`rounded-full border px-3 py-1 text-xs ${column.border} ${column.countColor}/60`}
+              >
                 {groupedOrders[column.status].length}
               </span>
             </div>
@@ -95,14 +134,7 @@ export function KitchenBoard({ roleId, restaurantId }: { roleId: RoleId; restaur
                   order={order}
                   currentTime={currentTime}
                   canAdvance={canAdvance}
-                  onAdvance={() => {
-                    advanceOrderStatus(order.id);
-                    // Sync status a Supabase en background (fire-and-forget)
-                    const nextStatus = getNextOrderStatus(order.status);
-                    if (nextStatus && restaurantId) {
-                      syncOrderStatusUpdate(order.id, nextStatus, restaurantId).catch(() => {});
-                    }
-                  }}
+                  onAdvance={() => handleAdvance(order)}
                 />
               ))}
 

@@ -3,11 +3,22 @@ import { AppShell } from "@/components/layout/AppShell";
 import { KitchenBoard } from "@/components/kitchen/KitchenBoard";
 import { DEMO_ROLE_COOKIE, parseDemoRole } from "@/features/auth/demo-session";
 import { getActiveRestaurantSession } from "@/features/restaurants/session";
+import { getOrdersByRestaurant } from "@/features/orders/repository";
 
 export default async function KitchenPage() {
-  const cookieStore = await cookies();
-  const roleId = parseDemoRole(cookieStore.get(DEMO_ROLE_COOKIE)?.value);
+  const cookieStore       = await cookies();
+  const roleId            = parseDemoRole(cookieStore.get(DEMO_ROLE_COOKIE)?.value);
   const restaurantSession = getActiveRestaurantSession(cookieStore);
+  const restaurantId      = restaurantSession?.restaurantId;
+  const branchId          = restaurantSession?.branchId ?? null;
+
+  // Hidratar cocina desde Supabase (solo pedidos activos — sin delivered)
+  const { orders: supabaseOrders } = restaurantId
+    ? await getOrdersByRestaurant(restaurantId, branchId, {
+        includeDelivered: true,
+        limitHours: 16,
+      })
+    : { orders: [] };
 
   return (
     <AppShell currentPath="/kitchen">
@@ -20,7 +31,12 @@ export default async function KitchenPage() {
         </div>
 
         {roleId ? (
-          <KitchenBoard roleId={roleId} restaurantId={restaurantSession?.restaurantId} />
+          <KitchenBoard
+            roleId={roleId}
+            restaurantId={restaurantId}
+            branchId={branchId}
+            supabaseOrders={supabaseOrders}
+          />
         ) : (
           <div className="card-premium p-6 text-sm text-paper/60">
             Seleccioná un rol demo para entrar al KDS.

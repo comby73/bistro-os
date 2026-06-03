@@ -5,23 +5,29 @@ import { DEMO_ROLE_COOKIE, parseDemoRole } from "@/features/auth/demo-session";
 import { getRoleConfig } from "@/features/auth/roles";
 import { getMenuCatalog, getMenuCatalogForRestaurant } from "@/features/menu/repository";
 import { getActiveRestaurantSession } from "@/features/restaurants/session";
+import { getOrdersByRestaurant } from "@/features/orders/repository";
 
 export default async function OrdersPage() {
-  const cookieStore = await cookies();
-  const roleId = parseDemoRole(cookieStore.get(DEMO_ROLE_COOKIE)?.value);
-  const restaurantSession = getActiveRestaurantSession(cookieStore);
-  const role = roleId ? getRoleConfig(roleId) : null;
-  const restaurantId = restaurantSession?.restaurantId;
+  const cookieStore        = await cookies();
+  const roleId             = parseDemoRole(cookieStore.get(DEMO_ROLE_COOKIE)?.value);
+  const restaurantSession  = getActiveRestaurantSession(cookieStore);
+  const role               = roleId ? getRoleConfig(roleId) : null;
+  const restaurantId       = restaurantSession?.restaurantId;
+  const branchId           = restaurantSession?.branchId ?? null;
+
+  // Catálogo de menú (para el composer de pedidos)
   const menuCatalog = restaurantId
     ? await getMenuCatalogForRestaurant(restaurantId)
     : await getMenuCatalog();
   const initialMenuCatalog =
     menuCatalog.dataSource === "supabase"
-      ? {
-          categories: menuCatalog.categories,
-          items: menuCatalog.items
-        }
+      ? { categories: menuCatalog.categories, items: menuCatalog.items }
       : undefined;
+
+  // Pedidos del día desde Supabase (para hidratar localStorage si está vacío)
+  const { orders: supabaseOrders } = restaurantId
+    ? await getOrdersByRestaurant(restaurantId, branchId, { limitHours: 24 })
+    : { orders: [] };
 
   return (
     <AppShell currentPath="/orders">
@@ -38,8 +44,9 @@ export default async function OrdersPage() {
             roleId={roleId}
             roleLabel={role.label}
             initialMenuCatalog={initialMenuCatalog}
-            restaurantId={restaurantSession?.restaurantId}
-            branchId={restaurantSession?.branchId}
+            restaurantId={restaurantId}
+            branchId={branchId}
+            supabaseOrders={supabaseOrders}
           />
         ) : (
           <div className="card-premium p-6 text-sm text-paper/60">

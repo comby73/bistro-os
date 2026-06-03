@@ -117,6 +117,25 @@ function ensureRestaurantStorage(restaurantId: string) {
   writeOrdersForRestaurant(restaurantId, initialOrders);
 }
 
+/**
+ * Hidrata el localStorage con pedidos de Supabase.
+ * Solo escribe si el localStorage está vacío para este restaurante
+ * (es decir, no pisa datos del turno activo).
+ * Llamar desde un useEffect en el workspace después del primer render.
+ */
+export function hydrateFromSupabase(restaurantId: string, supabaseOrders: Order[]): void {
+  if (typeof window === "undefined") return;
+  if (!restaurantId || supabaseOrders.length === 0) return;
+
+  const key = storageKeyForRestaurant(restaurantId);
+  const existing = window.localStorage.getItem(key);
+
+  // Si ya hay datos locales, no pisamos nada
+  if (existing) return;
+
+  writeOrdersForRestaurant(restaurantId, supabaseOrders);
+}
+
 function subscribe(listener: () => void) {
   if (typeof window === "undefined") return () => undefined;
 

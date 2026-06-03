@@ -115,8 +115,9 @@ export function OrderComposer({
       }))
     });
 
-    // Sync a Supabase en background (fire-and-forget)
-    // Si falla, localStorage sigue siendo la fuente de verdad
+    // Sync a Supabase en background (fire-and-forget).
+    // syncOrderCreate() ahora devuelve el UUID de Supabase — lo ignoramos aquí
+    // porque la búsqueda por metadata.local_id alcanza para el sync de status.
     if (createdOrder && restaurantId) {
       syncOrderCreate(createdOrder, restaurantId, branchId ?? null).catch(() => {});
     }
