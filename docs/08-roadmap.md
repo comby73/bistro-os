@@ -1,139 +1,110 @@
 # 08 — Roadmap
 
-## Hecho — Gestión de carta (mayo 2026)
+## ✅ Completado — Gestión de carta (mayo 2026)
 
 - ✅ `/menu` como gestor real: crear/editar/precio/categoría/estación/disponibilidad/destacado.
 - ✅ Baja lógica (`status='archived'`), nunca DELETE físico.
 - ✅ Persistencia en Supabase (repository + server actions) con fallback localStorage.
-- ✅ `/menu`, `/orders`, `/carta/[slug]` con fuente única (sin doble verdad).
+- ✅ `/menu`, `/orders`, `/carta/[slug]` con fuente única.
 - ✅ Upload real de imágenes a Supabase Storage (bucket `menu-images`).
 - ✅ Permisos server-side: owner/admin.
 
-## Pendiente / roadmap de carta
+## ✅ Completado — Reservas multi-canal (junio 2026)
 
-- Rol `chef` (jefe de cocina) con subset: descripción, imagen, disponibilidad, destacado.
-- Reactivación de productos archivados desde la UI.
-- Promover `image_url`/`storage_path` de `metadata` a columnas reales (ALTER en schema.sql).
-- Reordenar categorías/productos (drag & drop) y posiciones persistidas.
+- ✅ Formulario público `/reservar/[slug]` — sin login, graba directo a Supabase.
+- ✅ Auto-refresh 30 segundos en `/reservations` + botón "Actualizar" manual.
+- ✅ Bot Telegram vía n8n (`1Twr5DBBHwtIrjy9`) con audio + texto conversacional.
+- ✅ Todos los canales usan los mismos IDs canónicos (`000...`) → visible al dueño.
+- ✅ Carta pública con botón "Reservar mesa" en hero y footer.
+- ✅ URLs públicas en sidebar con botón "Copiar" por restaurante.
+- ✅ `v_branch_capacity` y `available_tables_for_reservation()` en Supabase.
+- ✅ RLS abierto para reservas, eventos, mesas, restaurantes y sucursales.
 
-## Estado actual del MVP (mayo 2026)
+## ✅ Completado — Fixes Fase 1 feedback profesor (junio 2026)
 
-- App operativa con roles internos y Supabase Auth real.
-- `AppShell` interno y navegación contextual por rol.
-- `/orders` con modo servicio para mozo.
-- `/orders` y `/kitchen` como demo operativo por restaurante, persistido en `localStorage`.
-- `/kitchen` con tablero KDS con columnas color-coded por estado.
-- `/reservations` como módulo operativo con adaptador Supabase activo.
-- `/menu` como carta operativa con adaptador Supabase activo.
-- `/sales` como ventas y caja operativa simulada.
-- `/finances` como Análisis financiero demo: ventas, pagos, costos, inventario, mesas, gastos, empleados y Excel.
-- Carga rápida demo en `/finances`: nuevo gasto, actualización de stock/faltantes y propinas.
-- `/dashboard` alimentado por stores demo de pedidos y reservas.
-- **Supabase conectado** para `menu` y `reservations` (Fases 4B y 4C completadas).
-- Indicador de conexión Supabase visible en sidebar.
-- `localStorage` por `restaurant_id` como persistencia de pedidos y cocina (pendiente Fase 4D).
-- n8n opcional y no bloqueante.
+- ✅ Sidebar scroll con mouse wheel (`overflow-y-auto` + `h-screen sticky`).
+- ✅ Dashboard: texto "Received" → "Recibidos" (idioma consistente).
+- ✅ Dashboard: tipografía ajustada (`text-5xl lg` en vez de `text-6xl`) — mejor en tablets.
+- ✅ `currentPath="/users"` en UsersPage — guard de rol correcto.
+- ✅ `updateReservationTable`: merge de metadata existente (no pisa `source` ni otros campos).
+- ✅ IDs reservas unificados: `/reservar/[slug]` usa `000...` (mismo que panel interno).
 
-## Fase 3A — Flujo operativo ✅
+## Estado del MVP (junio 2026)
 
-- Consolidado Mozo → Pedido → Cocina.
-- KDS con estados color-coded (recibido/preparando/listo/entregado).
-- Visibilidad de tiempos y estados en tickets.
-- Seeds iniciales de pedidos para Bistró Palermo, Casa Norte y La Mesa Dorada sin mezclar tenants.
-- Sistema demostrable con Supabase configurado y fallback local para módulos no migrados.
+| Módulo | Estado | Persistencia |
+|---|---|---|
+| Auth + roles | ✅ Operativo | Supabase Auth |
+| Menú / carta | ✅ Operativo | Supabase |
+| Reservas web | ✅ Operativo | Supabase |
+| Reservas Telegram | ✅ Operativo (n8n) | Supabase |
+| Reservas manual | ✅ Operativo | Supabase |
+| Sucursales | ✅ Operativo | Supabase |
+| Usuarios | ✅ Operativo | Supabase Auth |
+| Pedidos / cocina | ⚠️ Demo operativo | localStorage |
+| Dashboard | ⚠️ Demo | localStorage + Supabase parcial |
+| Ventas / caja | ⚠️ Simulado | mock-data |
+| Finanzas | ⚠️ Demo analítica | mock-data determinístico |
+| Capacidad mesas | ✅ Vista SQL | Supabase |
+| Sitio público | ✅ Operativo | — |
 
-## Fase 3B — Reservas operativas ✅
+## Pendiente — Fase 2 (siguiente prioridad)
 
-- Reservas como flujo operativo por restaurante/sucursal.
-- Relación con mesas, turnos y estados.
-- Lectura operativa para manager y owner.
-- Adaptador Supabase con fallback a localStorage.
+### 2.1 Ventas conectada a datos reales
+- Derivar resumen de `useDemoOrders` (pedidos del demo-store) en vez de `mock-data` estático.
+- `/sales` mostraría ventas del día basadas en pedidos reales del restaurante activo.
+- Archivos: `features/sales/calculations.ts`, `sales/page.tsx`.
+- Complejidad: MEDIA.
 
-## Fase 3D — Menú operativo ✅
+### 2.2 WhatsApp — módulo "integración futura" profesional
+- Eliminar cualquier referencia a WhatsApp como feature activo si no existe.
+- Agregar sección en la app: "Canales adicionales" con WhatsApp documentado como próximo canal.
+- Documentar arquitectura: webhook entrante → n8n/Make → Supabase → app.
+- No simular mensajes ni mostrar números falsos.
+- Complejidad: BAJA.
 
-- `/menu` como carta operativa por rol.
-- Disponibilidad compartida entre menú y toma de pedidos.
-- Gestión real para owner/admin: crear, editar, archivar, disponibilidad, destacados e imagen.
-- Manager en modo supervisión, waiter en modo consulta rápida.
+### 2.3 Facturación simulada + ARCA futura
+- Generar "comprobante interno" al cerrar caja (PDF simple con datos del turno).
+- Sección informativa sobre integración ARCA: qué se necesita, qué NO hacer.
+- No hardcodear CUIT, certificados ni tokens fiscales.
+- Complejidad: MEDIA.
 
-## Fase 4A — Preparación backend ✅
+### 2.4 Espaciados y QR
+- Ajustar padding superior de algunas páginas donde el contenido "empieza muy arriba".
+- Corregir texto en QRPanel ("funciona sin internet" es incorrecto, el QR apunta a una URL web).
+- Complejidad: BAJA.
 
-- Esquema SQL alineado con el producto.
-- Seed coherente con la demo.
-- RLS inicial sin complejidad excesiva.
-- Documentación de migración.
+## Pendiente — Fase 3 (datos reales)
 
-## Fase 4B — Menú en Supabase ✅
+### 3.1 Persistir pedidos en Supabase (Fase 4D)
+- `placed_orders`, `order_items` → insertar desde el demo-store.
+- `kitchen_events` → registrar transiciones de estado.
+- Riesgo: es el corazón operativo. Migrar escritura primero, luego lectura compartida.
 
-- Categorías y productos leídos desde Supabase.
-- CRUD completo persistido server-side: crear, editar, archivar, disponibilidad y destacado.
-- Upload de imágenes a Supabase Storage (`menu-images`).
-- `/orders` consume el mismo catálogo resuelto.
-- Fallback a localStorage si las variables no están.
-
-## Fase 4C — Reservas en Supabase ✅
-
-- Lectura del listado desde Supabase.
-- Escrituras vía server actions.
-- Store local como capa de resiliencia.
-- Fallback a localStorage si las variables no están.
-
-## Fase 4D — Conectar `orders` y `kitchen`
-
-Estado previo listo: `/orders`, `/kitchen` y `/dashboard` ya consumen el demo-store por
-`restaurant_id`, con seeds iniciales y persistencia local sin pisar datos existentes.
-
-- Persistir pedidos reales.
-- Persistir items de pedido.
-- Persistir transición de estados.
-- Registrar `kitchen_events`.
-
-Riesgo: es el corazón operativo. Migrar escritura primero, luego lectura compartida.
-
-## Fase 4E — Dashboard con datos reales
-
-Depende de tener conectados: menu, reservations, orders, kitchen y parte de sales.
-
-## Fase 4G — Análisis financiero real
-
-- Conectar `/finances` a `placed_orders`, `sales_payments`, `cash_closings` y gastos reales.
+### 3.2 Dashboard financiero con datos reales (Fase 4G)
+- Conectar `/finances` a `placed_orders`, `sales_payments`, `cash_closings`.
 - Persistir inventario/insumos y alertas de faltantes.
-- Modelar empleados, turnos y pagos de nómina.
 - Mantener exportación Excel como salida operativa.
 
-## Fase 4F — Auth real y RLS serio
+### 3.3 RLS por tenant y rol (Fase 4F)
+- Supabase Auth ya activo.
+- Pendiente: endurecer políticas con `auth.uid()` + `profiles` + `role_assignments`.
+- Pendiente: aislar escrituras por tenant en DB además de guards server-side.
 
-- Supabase Auth y resolución de perfil/rol ya están activos.
-- Pendiente: endurecer RLS por tenant y sucursal para escrituras.
-- Pendiente: definir políticas por rol en DB además de los guards server-side.
+## Pendiente — Fase 4 (producto profesional)
 
-## Nota — Contexto multi-restaurante (hecho)
+### 4.1 Workflow Telegram: migrar a IDs `000...`
+- Actualizar `Buscar Restaurante` en n8n para no filtrar por `source=seed_demo`.
+- Usar slugs como filtro: `metadata->>slug=eq.{restaurant_slug}`.
+- Asegurar que `carta_url` esté en metadata de restaurantes `000...`.
 
-Se agregó una capa de Restaurant Context (`src/features/restaurants/`). Hoy:
+### 4.2 Refresco automático de usuarios
+- Después de crear un usuario, la lista se actualiza sin recarga manual.
+- Usar `router.refresh()` desde `CreateUserForm.tsx`.
 
-- 3 restaurantes con sucursal, menú y reservas propias.
-- Login real; las cookies guardan restaurante, sucursal, perfil y rol resueltos desde Supabase.
-- `menu`, `reservations`, `orders`, `kitchen` y `dashboard` filtran por `restaurant_id`
-  cuando hay sesión activa; sin sesión, fallback a mostrar todo.
-
-Pendiente para la fase 4F:
-
-- Aplicar las propuestas `ALTER TABLE restaurants` (branding) comentadas en `schema.sql`.
-- Filtrar por tenant también en RLS, no solo en el cliente.
-
-## Fase 5 — Automatización n8n opcional
-
-- Reintroducir n8n como capa externa secundaria.
-- Consumir eventos ya persistidos.
-- Webhooks opcionales para notificaciones y resúmenes.
-- No convertir n8n en dependencia crítica.
-
-## Fase 6 — Defensa final
-
-- Afinar documentación final.
-- Consolidar narrativa FOH / BOH.
-- Presentar modelo relacional.
-- Defender stock/costeo como roadmap futuro.
+### 4.3 Deuda técnica menor
+- Fijar versiones en `package.json` (actualmente usa `"latest"` en deps de producción).
+- Eliminar `features/kitchen/mock-data.ts` (código muerto, nunca se importa).
+- Agregar `"engines": { "node": ">=20" }` en `package.json`.
 
 ## Roadmap posterior sugerido
 
@@ -141,14 +112,17 @@ Pendiente para la fase 4F:
 - Recetas y costeo.
 - Caja multi-turno.
 - Análisis financiero real con gastos, nómina e inventario persistidos.
-- APIs internas públicas.
-- Webhooks de eventos operativos.
-- Multi-sucursal.
+- Multi-sucursal completo.
+- Delivery / integración Rappi / PedidosYa.
+- Pagos reales (Mercado Pago, Stripe).
+- ARCA (facturación fiscal) como integración oficial.
 
 ## Límites explícitos del estado actual
 
-- Pedidos y cocina aún en localStorage (Fase 4D pendiente).
-- Sin n8n conectado al núcleo operativo.
+- Pedidos y cocina en localStorage (Fase 4D pendiente).
+- Ventas/caja simuladas — no conectan con pedidos reales todavía.
+- n8n workflow Telegram usa IDs `111...` (seed_demo) — pendiente migrar a `000...`.
 - Sin facturación fiscal real.
 - Sin pagos reales.
 - Sin delivery.
+- RLS en Supabase es permisivo (demo) — Fase 4F endurecerá con auth.uid() por tenant.

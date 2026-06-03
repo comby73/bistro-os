@@ -1,8 +1,8 @@
 # Bistró OS
 
-**Bistró OS** es un SaaS multi-restaurante de administración gastronómica (Next.js 16 + Supabase).
+**Bistró OS** es un SaaS multi-restaurante de administración gastronómica (Next.js + Supabase).
 No es una landing: es el sistema operativo interno del restaurante — login real, roles, menú,
-reservas, pedidos, cocina, dashboard, finanzas y gestión multi-sucursal.
+reservas, pedidos, cocina, dashboard, finanzas, gestión multi-sucursal y canales de reserva externos.
 
 ## Qué es ahora
 
@@ -11,6 +11,9 @@ reservas, pedidos, cocina, dashboard, finanzas y gestión multi-sucursal.
 - `mock-data` queda solo como **fallback de desarrollo** cuando no hay variables de Supabase.
 - Aislamiento por `restaurant_id` y `branch_id` en datos y navegación.
 - Carta pública por restaurante con QR único.
+- Formulario público de reservas por restaurante (sin login).
+- Links a sitio público visibles en el sidebar del app para cada restaurante.
+- Reservas vía tres canales: web, Telegram (n8n) y carga manual del staff.
 
 ## Autenticación
 
@@ -47,22 +50,48 @@ El panel de login incluye accesos rápidos que autocompletan estas credenciales.
 
 ## Rutas principales
 
-| Ruta | Estado |
-|---|---|
-| `/` | Landing comercial pública |
-| `/login` | Login real (email + contraseña, Supabase Auth) |
-| `/select-branch` | Selector de restaurante/sucursal (owner/admin multi) |
-| `/dashboard` | Vista interna adaptada por rol |
-| `/menu` | Carta operativa — **lee de Supabase** por restaurante |
-| `/carta/[slug]` | Carta pública por restaurante — **misma fuente que /menu** |
-| `/orders` | Pedidos activos + creación (demo en memoria por restaurante) |
-| `/kitchen` | KDS por restaurante (demo en memoria) |
-| `/reservations` | Reservas — **lee de Supabase** por restaurante/sucursal |
-| `/finances` | Análisis financiero demo: ventas, pagos, costos, inventario, mesas, gastos y nómina (solo owner) |
-| `/users` `/branches` `/restaurants` | Altas/bajas (solo owner) |
-| `/demo` | Formulario comercial / lead (n8n lead-capture) |
+| Ruta | Estado | Descripción |
+|---|---|---|
+| `/` | ✅ Operativo | Landing comercial pública |
+| `/login` | ✅ Operativo | Login real (email + contraseña, Supabase Auth) |
+| `/select-branch` | ✅ Operativo | Selector de restaurante/sucursal (owner/admin multi) |
+| `/dashboard` | ✅ Operativo | Vista interna adaptada por rol |
+| `/menu` | ✅ Supabase | Carta operativa — lee/escribe en Supabase |
+| `/carta/[slug]` | ✅ Supabase | Carta pública por restaurante — mismo repo que /menu |
+| `/reservar/[slug]` | ✅ Supabase | Formulario público de reservas — sin login, graba directo a Supabase |
+| `/orders` | ⚠️ localStorage | Pedidos activos + creación (demo operativo por restaurante) |
+| `/kitchen` | ⚠️ localStorage | KDS por restaurante (demo operativo por restaurante) |
+| `/reservations` | ✅ Supabase | Reservas — lee de Supabase, auto-refresh 30s |
+| `/finances` | ⚠️ Demo | Análisis financiero demo (datos determinísticos, no reales) |
+| `/sales` | ⚠️ Demo | Ventas y caja simulada (no conecta con pedidos reales aún) |
+| `/users` | ✅ Supabase | Alta/baja de usuarios (solo owner) |
+| `/branches` | ✅ Supabase | Gestión de sucursales (solo owner/admin) |
+| `/restaurants` | ✅ Supabase | Gestión de restaurantes (solo owner) |
+| `/demo` | ✅ Operativo | Formulario comercial / lead; puede llamar a n8n |
 
-Slugs de carta pública: `bistro-palermo`, `casa-norte`, `la-mesa-dorada`.
+Slugs de carta pública y reservas: `bistro-palermo`, `casa-norte`, `la-mesa-dorada`.
+
+## Sitio público por restaurante
+
+Cada restaurante tiene dos páginas públicas (sin login):
+
+| URL | Descripción |
+|---|---|
+| `/carta/[slug]` | Carta pública con botón "Reservar mesa" |
+| `/reservar/[slug]` | Formulario de reservas (nombre, teléfono, fecha, hora, personas) |
+
+El staff ve estas URLs en el sidebar bajo **"🌐 Sitio público"** con botón para copiar y abrir.
+
+## Canales de reserva
+
+| Canal | Cómo llega | source en metadata |
+|---|---|---|
+| Formulario web `/reservar/[slug]` | Directo a Supabase vía Server Action | `web_form` |
+| Telegram (n8n) | Bot → n8n Cloud → Supabase | `telegram_audio` / `telegram_text` |
+| Staff manual | Desde `/reservations` en la app | `demo` |
+
+Todas las reservas usan los mismos IDs canónicos (`00000000-...-0001/002/003`)
+para que sean visibles al dueño logueado en `/reservations`.
 
 ## Fuente de datos
 
@@ -71,16 +100,26 @@ Slugs de carta pública: `bistro-palermo`, `casa-norte`, `la-mesa-dorada`.
 | Restaurantes, sucursales, perfiles, roles | Supabase | `features/restaurants/mock-data` |
 | Menú (categorías + items) | Supabase | `features/menu/catalog.json` |
 | Reservas | Supabase | `features/reservations/mock-data` |
-| Pedidos / cocina | Demo operativo en `localStorage` por restaurante (aún no en Supabase) | seeds en `features/orders/mock-data.ts` |
-| Finanzas avanzadas | Demo analítica determinística por restaurante | `features/finance/mock-data.ts` |
+| Pedidos / cocina | Demo operativo en `localStorage` por restaurante | seeds en `features/orders/mock-data.ts` |
+| Finanzas avanzadas | Demo determinístico por restaurante | `features/finance/mock-data.ts` |
+| Ventas/caja | Demo simulada | `features/sales/mock-data.ts` |
 
-Los importes visibles en la app se muestran en **pesos argentinos (ARS)**. Para mantener estable la
-demo, los valores base históricos se convierten en UI/exportación con tasa fija:
-`1 USD = $1430 ARS`.
+Los importes visibles se muestran en **pesos argentinos (ARS)**.
+Valores base históricos convertidos con tasa fija demo: `1 USD = $1430 ARS`.
 
-El menú comparte una sola fuente: `src/features/menu/catalog.json`, consumido por la app
-(fallback) y por `scripts/seed-menu.mjs` (carga a Supabase). `/menu` y `/carta` leen del
-**mismo repository**, eliminando la doble fuente de verdad anterior.
+## IDs canónicos de restaurantes en Supabase
+
+Todos los módulos (formulario web, n8n, panel interno) usan estos IDs:
+
+| Restaurante | restaurant_id | branch_id |
+|---|---|---|
+| Bistró Palermo | `00000000-0000-0000-0000-000000000001` | `00000000-0000-0000-0000-000000000010` |
+| Casa Norte | `00000000-0000-0000-0000-000000000002` | `00000000-0000-0000-0000-000000000020` |
+| La Mesa Dorada | `00000000-0000-0000-0000-000000000003` | `00000000-0000-0000-0000-000000000030` |
+
+> **Nota:** `supabase/seed_restaurants_demo.sql` crea un set alternativo (`11111111-...`)
+> con mesas para testing de n8n. No usar esos IDs en el código de la app.
+> El workflow n8n debe apuntar a los IDs `000...` de arriba.
 
 ## Gestión de carta desde la app
 
@@ -94,46 +133,27 @@ El menú comparte una sola fuente: `src/features/menu/catalog.json`, consumido p
 - **Imagen**: upload real a Supabase Storage (bucket `menu-images`,
   `restaurants/{restaurant_id}/menu/{item_id}/{filename}`) o URL directa como fallback.
 
-Todo se guarda en Supabase si está configurado; si no, cae a `localStorage`. `/orders` y
-`/carta/[slug]` reflejan los cambios porque leen el mismo repository.
-Permisos: owner/admin (rol `chef` → roadmap). manager/waiter solo lectura; kitchen no administra menú.
-
 ## Análisis financiero demo
 
-`/finances` es un tablero analítico para owner. No reemplaza contabilidad ni facturación fiscal,
-pero permite demostrar gestión financiera interna:
-
-- gráficos de ventas por día,
-- desglose por forma de pago,
-- tabla de ventas exportable a Excel,
-- costos y margen por producto,
-- faltantes de insumos de salón/cocina/limpieza,
-- listado y estado de mesas,
-- gastos del mes,
-- pago estimado de empleados.
-- carga rápida local de gastos, stock/faltantes y propinas.
-
-La información es demo determinística por restaurante (`src/features/finance/mock-data.ts`) hasta
-conectar pedidos, pagos, inventario y nómina reales en Supabase. Las altas rápidas se guardan en
-`localStorage` por restaurante para que la demo sea editable.
+`/finances` es un tablero analítico para owner. No reemplaza contabilidad ni facturación fiscal.
+Los datos son determinísticos por restaurante hasta que `placed_orders` y `sales_payments` estén conectados.
 
 ## Pedidos y cocina demo
 
-`/orders` y `/kitchen` son operativos para los 3 restaurantes, pero todavía no escriben en
-Supabase. El store vive en `src/features/orders/demo-store.ts` y persiste en `localStorage`
-con una key por `restaurant_id`, por ejemplo `bistro-demo-orders-v2-...0001`.
+`/orders` y `/kitchen` son operativos pero **aún no escriben en Supabase** (Fase 4D pendiente).
+El store persiste en `localStorage` con key `bistro-demo-orders-v2-{restaurant_id}`.
 
-- Si la key de un restaurante está vacía, se inicializan los pedidos seed de
-  `src/features/orders/mock-data.ts`.
-- Si ya existe data local, no se sobreescribe.
-- Si existe la key vieja global (`bistro-demo-orders-v1`), se migra suavemente filtrando por
-  `restaurant_id`.
-- `/orders` consume el catálogo actual del restaurante activo; los productos archivados no
-  aparecen en la toma de pedidos.
-- `/kitchen` muestra `received`, `preparing`, `ready` y `delivered`, y permite avanzar el flujo
-  `received → preparing → ready → delivered`.
+## Automatización Telegram (n8n)
 
-La Fase 4D migrará esto a `placed_orders`, `order_items` y `kitchen_events`.
+El bot de Telegram reserva por audio o texto. Ver `docs/04-automatizaciones-n8n.md` para detalles.
+
+Workflow activo: `Bistró OS — Telegram Audio Reservation` (`1Twr5DBBHwtIrjy9`)
+
+Bugs corregidos en el workflow (junio 2026):
+- `customer_contact` null → INSERT bloqueado silenciosamente (campo NOT NULL)
+- Lectura de mesas con `.all()` en vez de `.first()` (siempre asignaba `pending`)
+- Regex `mañana` no reconocía la ñ
+- `partyP` devolvía 1 por "una reserva" (falso positivo)
 
 ## Cómo probar
 
@@ -143,13 +163,15 @@ npm run dev
 ```
 
 1. **Login** → http://localhost:3000/login → entrar con cualquier usuario demo (`demo1234`).
-2. **Menú interno** → `/menu` → muestra los productos del restaurante activo (Casa Norte y
-   La Mesa Dorada ya no aparecen vacíos).
-3. **Carta pública** → `/carta/casa-norte`, `/carta/la-mesa-dorada`, `/carta/bistro-palermo`.
-4. **Reservas** → `/reservations` → reservas del restaurante/sucursal activos.
-5. **Pedidos** → `/orders` → comandas demo del restaurante activo.
-6. **Cocina** → `/kitchen` → tickets demo del restaurante activo.
-7. **Análisis financiero** → `/finances` → tablero demo + exportación Excel.
+2. **Menú interno** → `/menu` → muestra los productos del restaurante activo.
+3. **Carta pública** → `/carta/bistro-palermo` (con botón "Reservar mesa").
+4. **Formulario de reservas** → `/reservar/bistro-palermo` → llenarlo y enviar.
+5. **Verificar reserva** → loguearse como owner → `/reservations` → aparece la reserva web.
+6. **Reservas auto-refresh** → el panel se actualiza cada 30s, botón "Actualizar" manual.
+7. **Sitio público en sidebar** → el sidebar muestra las URLs públicas con botón "Copiar".
+8. **Pedidos** → `/orders` → comandas demo del restaurante activo.
+9. **Cocina** → `/kitchen` → tickets demo del restaurante activo.
+10. **Análisis financiero** → `/finances` → tablero demo + exportación Excel.
 
 ## Seeds de Supabase
 
@@ -161,18 +183,18 @@ npm run seed:reservations  # carga reservas demo por restaurante
 npm run seed:demo          # ambos
 ```
 
-Son **idempotentes** (UUID deterministas + upsert). El seed de menú archiva
-(`status='archived'`) los items que ya no estén en el catálogo.
+Son **idempotentes** (UUID deterministas + upsert).
 
-### Consultas de validación
+## Migraciones SQL
 
-```sql
-select restaurant_id, count(*) from menu_items
-where coalesce(status,'active')='active' group by restaurant_id order by restaurant_id;
--- esperado: 001→18, 002→13, 003→11
+Archivos en `supabase/`:
 
-select restaurant_id, count(*) from reservations group by restaurant_id order by restaurant_id;
-```
+| Archivo | Descripción |
+|---|---|
+| `schema.sql` | Schema completo de tablas y triggers |
+| `policies.sql` | RLS básico (lectura pública de menú + escritura de reservas) |
+| `seed_restaurants_demo.sql` | Restaurantes/sucursales/mesas demo para testing n8n |
+| `migration_capacity.sql` | Vista `v_branch_capacity` + función `available_tables_for_reservation()` |
 
 ## Variables de entorno
 
@@ -183,8 +205,8 @@ cp .env.example .env.local
 ```
 
 - `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY` → cliente / lectura pública.
-- `SUPABASE_SERVICE_ROLE_KEY` → **solo server-side** (seeds, escritura segura). Nunca exponer en cliente.
-- `N8N_LEAD_WEBHOOK_URL` → opcional (captura de leads).
+- `SUPABASE_SERVICE_ROLE_KEY` → **solo server-side**. Nunca exponer en cliente.
+- `N8N_LEAD_WEBHOOK_URL` → opcional (captura de leads desde `/demo`).
 
 > `.env.local` está en `.gitignore` y no debe commitearse.
 
@@ -199,14 +221,21 @@ npm run build
 ## Deploy (Vercel)
 
 - Build de producción: `npm run build` (verificado, sin errores).
-- Variables a configurar en Vercel: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`,
-  `SUPABASE_SERVICE_ROLE_KEY`.
-- **URL pública: _pendiente de completar con URL de Vercel_.**
+- Variables a configurar en Vercel: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`.
+- Install Command recomendado:
+  ```bash
+  npm install --omit=optional --no-audit --no-fund
+  ```
+- Motivo: `@vitejs/plugin-react` trae `rolldown` con bindings nativos por plataforma como opcionales.
+- **URL pública: https://bistro-os-phi.vercel.app**
 
 ## Roadmap
 
-1. Persistir pedidos/cocina en Supabase (`placed_orders` / `kitchen_events`).
-2. Conectar análisis financiero a ventas/pagos/gastos/inventario reales.
-3. RLS por tenant (hoy `supabase/policies.sql` solo abre lectura pública de menú).
-4. Automatización opcional activa: reservas por Telegram vía n8n (audio + texto) → ver `docs/04-automatizaciones-n8n.md`.
-5. Promover `image_url`/`storage_path` desde `metadata` a columnas reales en la DB viva cuando se aplique la migración SQL.
+Ver `docs/08-roadmap.md` para el detalle completo.
+
+Próximos pasos:
+1. Ventas/caja conectada a pedidos reales (`placed_orders`).
+2. Persistir pedidos y cocina en Supabase (Fase 4D).
+3. RLS por tenant y rol (Fase 4F).
+4. Dashboard financiero con datos reales (Fase 4G).
+5. Facturación simulada profesional + ARCA como integración futura documentada.
