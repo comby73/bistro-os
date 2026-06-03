@@ -226,12 +226,26 @@ export async function updateReservationTable(
   reservationId: string,
   tableAssigned: string
 ) {
-  return updateReservationFields(reservationId, {
-    metadata: {
-      source: "demo",
-      table_assigned_label: tableAssigned.trim() || null
-    }
-  });
+  if (resolveReservationsDataSource() !== "supabase") {
+    return { dataSource: "local" as const, updated: false };
+  }
+  try {
+    const supabase = createServerSupabaseClient();
+    // Leer metadata existente para no pisar source ni otros campos
+    const { data: existing } = await supabase
+      .from("reservations")
+      .select("metadata")
+      .eq("id", reservationId)
+      .single();
+    const prevMeta = (existing?.metadata ?? {}) as Record<string, unknown>;
+    const { error } = await supabase
+      .from("reservations")
+      .update({ metadata: { ...prevMeta, table_assigned_label: tableAssigned.trim() || null } })
+      .eq("id", reservationId);
+    return { dataSource: "supabase" as const, updated: !error };
+  } catch {
+    return { dataSource: "local" as const, updated: false };
+  }
 }
 
 export async function cancelReservation(reservationId: string) {

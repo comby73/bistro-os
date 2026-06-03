@@ -90,14 +90,14 @@ export function DashboardWorkspace({
   );
 
   return (
-    <section className="space-y-6">
+    <section className="space-y-8">
       <div>
-        <p className="eyebrow mb-3">Dashboard</p>
-        <h2 className="text-4xl font-bold tracking-[-0.05em] text-paper md:text-6xl">
+        <p className="eyebrow mb-2">Dashboard</p>
+        <h2 className="text-3xl font-bold tracking-[-0.04em] text-paper md:text-4xl lg:text-5xl">
           Vista interna para {roleLabel}.
         </h2>
         {restaurantName && (
-          <p className="mt-3 text-[15px] text-paper/65">
+          <p className="mt-2 text-[15px] text-paper/65">
             Operando en <span className="font-semibold text-gold">{restaurantName}</span>
           </p>
         )}
@@ -134,7 +134,7 @@ export function DashboardWorkspace({
           <div className="grid gap-6 lg:grid-cols-3">
             <QuickAccessCard
               title="Pedidos y cocina"
-              description={`Received ${kitchenCounts.received}, preparando ${kitchenCounts.preparing}, listos ${kitchenCounts.ready}.`}
+              description={`Recibidos ${kitchenCounts.received}, preparando ${kitchenCounts.preparing}, listos ${kitchenCounts.ready}.`}
               href="/orders"
               cta="Abrir pedidos"
             />
@@ -230,7 +230,7 @@ export function DashboardWorkspace({
         <div className="grid gap-6 lg:grid-cols-2">
           <QuickAccessCard
             title="Abrir cocina"
-            description={`Received ${kitchenCounts.received}, preparando ${kitchenCounts.preparing}, listos ${kitchenCounts.ready}.`}
+            description={`Recibidos ${kitchenCounts.received}, preparando ${kitchenCounts.preparing}, listos ${kitchenCounts.ready}.`}
             href="/kitchen"
             cta="Ir a cocina"
           />

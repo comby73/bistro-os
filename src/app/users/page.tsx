@@ -37,7 +37,7 @@ export default async function UsersPage() {
     : { data: [] };
 
   return (
-    <AppShell>
+    <AppShell currentPath="/users">
       <div className="mx-auto max-w-5xl space-y-8 p-6 md:p-8">
 
         {/* Header */}

@@ -83,8 +83,8 @@ export async function AppShell({ currentPath, children }: AppShellProps) {
   return (
     <div className="min-h-screen bg-ink text-paper">
       <div className="grid min-h-screen lg:grid-cols-[280px_1fr]">
-        <aside className="border-b border-line bg-layer1/50 lg:border-b-0 lg:border-r">
-          <div className="flex h-full flex-col p-6">
+        <aside className="border-b border-line bg-layer1/50 lg:border-b-0 lg:border-r lg:h-screen lg:sticky lg:top-0">
+          <div className="flex h-full flex-col p-6 overflow-y-auto">
             <Link href={getDefaultRouteForRole(roleId)} className="inline-flex items-center">
               <BrandLogo size="sm" />
             </Link>

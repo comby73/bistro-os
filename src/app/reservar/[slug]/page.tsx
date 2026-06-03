@@ -1,7 +1,9 @@
 import { notFound } from "next/navigation";
 import { ReservaForm } from "./ReservaForm";
 
-// Datos por restaurante: nombre, color, IDs de Supabase (seed_restaurants_demo.sql)
+// IDs canónicos del seed principal (scripts/seed-supabase.mjs).
+// Estos son los mismos IDs que usa la sesión del app (profiles.restaurant_id),
+// por eso las reservas del formulario web son visibles en /reservations.
 const RESTAURANTS: Record<string, {
   name: string;
   description: string;
@@ -15,24 +17,24 @@ const RESTAURANTS: Record<string, {
     description: "Cocina de autor en el corazón de Palermo. Producto de estación, brasa y coctelería.",
     brand_color: "#E8B863",
     slug: "bistro-palermo",
-    restaurant_id: "11111111-0000-0000-0000-000000000001",
-    branch_id: "11111111-0000-0000-0000-000000000010",
+    restaurant_id: "00000000-0000-0000-0000-000000000001",
+    branch_id: "00000000-0000-0000-0000-000000000010",
   },
   "casa-norte": {
     name: "Casa Norte",
     description: "Sabores del norte argentino en Recoleta. Empanadas, locro y platos de olla.",
     brand_color: "#4A9B7F",
     slug: "casa-norte",
-    restaurant_id: "22222222-0000-0000-0000-000000000001",
-    branch_id: "22222222-0000-0000-0000-000000000010",
+    restaurant_id: "00000000-0000-0000-0000-000000000002",
+    branch_id: "00000000-0000-0000-0000-000000000020",
   },
   "la-mesa-dorada": {
     name: "La Mesa Dorada",
     description: "Parrilla clásica de San Telmo. Cortes premium, achuras y vinos de guarda.",
     brand_color: "#C0732A",
     slug: "la-mesa-dorada",
-    restaurant_id: "33333333-0000-0000-0000-000000000001",
-    branch_id: "33333333-0000-0000-0000-000000000010",
+    restaurant_id: "00000000-0000-0000-0000-000000000003",
+    branch_id: "00000000-0000-0000-0000-000000000030",
   },
 };
 
