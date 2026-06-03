@@ -1,24 +1,16 @@
 import { cookies } from "next/headers";
 import { AppShell } from "@/components/layout/AppShell";
-import { CashClosingPanel } from "@/components/sales/CashClosingPanel";
-import { PaymentMethodsBreakdown } from "@/components/sales/PaymentMethodsBreakdown";
-import { PendingPaymentsTable } from "@/components/sales/PendingPaymentsTable";
-import { SalesReportActions } from "@/components/sales/SalesReportActions";
-import { SalesSummaryCards } from "@/components/sales/SalesSummaryCards";
+import { SalesWorkspace } from "@/components/sales/SalesWorkspace";
 import { DEMO_ROLE_COOKIE, parseDemoRole } from "@/features/auth/demo-session";
 import { getRoleConfig } from "@/features/auth/roles";
-import {
-  calculateCashClosingSnapshot,
-  calculatePaymentMethodTotals,
-  calculateSalesSummary,
-  getPendingSales
-} from "@/features/sales/calculations";
+import { getActiveRestaurantSession } from "@/features/restaurants/session";
 
 export default async function SalesPage() {
   const cookieStore = await cookies();
   const roleId = parseDemoRole(cookieStore.get(DEMO_ROLE_COOKIE)?.value);
   const role = roleId ? getRoleConfig(roleId) : null;
   const readOnly = role?.id === "manager";
+  const restaurantSession = getActiveRestaurantSession(cookieStore);
 
   return (
     <AppShell currentPath="/sales">
@@ -26,12 +18,12 @@ export default async function SalesPage() {
         <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div>
             <p className="eyebrow mb-3">Ventas y caja</p>
-            <h2 className="text-4xl font-semibold tracking-[-0.05em] md:text-5xl">
-              Facturación operativa simulada.
+            <h2 className="text-3xl font-bold tracking-[-0.04em] text-paper md:text-4xl">
+              Ventas del turno.
             </h2>
-            <p className="mt-4 max-w-2xl text-sm leading-7 text-paper/60">
-              Seguimiento de ventas cobradas, pendientes, medios de pago y cierre
-              diario sin facturación fiscal real.
+            <p className="mt-3 max-w-2xl text-sm leading-7 text-paper/60">
+              Basado en los pedidos reales del restaurante. Los entregados se toman
+              como cobrados; los abiertos como pendientes de cobro.
             </p>
           </div>
           {readOnly && (
@@ -41,17 +33,10 @@ export default async function SalesPage() {
           )}
         </div>
 
-        <SalesSummaryCards summary={calculateSalesSummary()} />
-
-        <div className="grid gap-6 xl:grid-cols-[1fr_0.95fr]">
-          <PaymentMethodsBreakdown paymentMethods={calculatePaymentMethodTotals()} />
-          <CashClosingPanel snapshot={calculateCashClosingSnapshot()} readOnly={readOnly} />
-        </div>
-
-        <div className="grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">
-          <PendingPaymentsTable pendingSales={getPendingSales()} />
-          <SalesReportActions readOnly={readOnly} />
-        </div>
+        <SalesWorkspace
+          readOnly={readOnly}
+          restaurantId={restaurantSession?.restaurantId}
+        />
       </section>
     </AppShell>
   );
