@@ -4,6 +4,46 @@
 No es una landing: es el sistema operativo interno del restaurante — login real, roles, menú,
 reservas, pedidos, cocina, dashboard, finanzas, gestión multi-sucursal y canales de reserva externos.
 
+---
+
+## Estado para defensa final
+
+### ✅ Operativo real (conectado a Supabase)
+
+| Módulo | Descripción |
+|---|---|
+| **Login + roles** | Supabase Auth real. Email/contraseña, roles por restaurante/sucursal |
+| **Multi-restaurante** | 3 restaurantes con sucursales, roles y datos aislados por tenant |
+| **Usuarios** | Alta (Supabase Auth), baja lógica (status=inactive), lista en tiempo real |
+| **Sucursales** | Alta, toggle activo/inactivo, aisladas por restaurante |
+| **Menú / carta** | CRUD completo desde la app, imágenes en Storage, disponibilidad y destacados |
+| **Carta pública** | `/carta/[slug]` pública sin login, con botón "Reservar mesa" |
+| **Reservas — web** | Formulario público `/reservar/[slug]` → INSERT directo a Supabase |
+| **Reservas — Telegram** | Bot con audio+texto vía n8n Cloud → INSERT a Supabase |
+| **Reservas — panel** | Vista interna con estados, asignación de mesa, auto-refresh 30s |
+| **Pedidos → Supabase** | Creación y cambios de estado se sincronizan a `placed_orders` en Supabase |
+
+### ⚠️ Demo operativo (localStorage + sync a Supabase)
+
+| Módulo | Descripción |
+|---|---|
+| **Pedidos / cocina** | Operativos en localStorage por restaurante. Se sincronizan a Supabase (`placed_orders`). Fallback local si Supabase no está configurado |
+| **Ventas del turno** | Derivadas de pedidos reales del restaurante activo. Cálculos en tiempo real |
+| **Caja** | Apertura, efectivo, salidas (demo) y total esperado al cierre |
+| **Dashboard financiero** | Análisis deterministico por restaurante — claramente etiquetado como demo en UI |
+
+### 🔮 Futuro preparado (arquitectura lista, integración pendiente)
+
+| Módulo | Descripción |
+|---|---|
+| **WhatsApp** | Integración vía webhook/n8n/Make preparada. Telegram activo como canal análogo |
+| **ARCA (facturación)** | Tablas `sales_payments` y `cash_closings` listas. Integración ARCA como módulo externo futuro |
+| **Finanzas reales** | Se conectará a `placed_orders` + `sales_payments` cuando pedidos estén 100% en Supabase |
+| **RLS por tenant** | Políticas de seguridad por rol/restaurante (Fase 4F) |
+| **Delivery / pagos** | Fuera del scope actual |
+
+---
+
 ## Qué es ahora
 
 - App operativa multi-restaurante con **autenticación real (Supabase Auth)**.

@@ -5,6 +5,7 @@ import { useDemoMenu } from "@/features/menu/demo-store";
 import type { MenuCatalog } from "@/features/menu/types";
 import { getOrderTotal } from "@/features/orders/calculations";
 import { useDemoOrders } from "@/features/orders/demo-store";
+import { syncOrderCreate } from "@/features/orders/order-actions";
 import type { Order } from "@/features/orders/types";
 import { formatArsFromUsd } from "@/lib/utils";
 
@@ -104,7 +105,7 @@ export function OrderComposer({
       return;
     }
 
-    createOrder({
+    const createdOrder = createOrder({
       table,
       waiter_name: waiterName,
       notes,
@@ -113,6 +114,12 @@ export function OrderComposer({
         quantity: item.quantity
       }))
     });
+
+    // Sync a Supabase en background (fire-and-forget)
+    // Si falla, localStorage sigue siendo la fuente de verdad
+    if (createdOrder && restaurantId) {
+      syncOrderCreate(createdOrder, restaurantId, branchId ?? null).catch(() => {});
+    }
 
     setTable("");
     setNotes("");

@@ -327,6 +327,17 @@ export function FinanceDashboard({ restaurants }: { restaurants: FinanceRestaura
           </p>
         </div>
 
+      {/* Banner: datos demo para presentación */}
+      <div className="flex items-center gap-3 rounded-2xl border border-amber-500/25 bg-amber-500/8 px-4 py-3 text-sm">
+        <AlertTriangle size={15} className="shrink-0 text-amber-400" />
+        <span className="text-amber-300/90">
+          <span className="font-semibold">Datos demo para presentación.</span>{" "}
+          Las métricas financieras son generadas deterministicamente por restaurante.
+          Se conectarán a datos reales cuando{" "}
+          <span className="font-medium">pedidos, caja y pagos</span> estén persistidos en Supabase (Fase 4D/4G).
+        </span>
+      </div>
+
         <div className="flex flex-wrap items-center gap-3">
           <select
             className="h-11 rounded-2xl border border-line bg-layer1 px-4 text-sm text-paper outline-none"
@@ -730,6 +741,41 @@ export function FinanceDashboard({ restaurants }: { restaurants: FinanceRestaura
           </div>
         </section>
       </div>
+
+      {/* Sección ARCA / Facturación futura */}
+      <section className="rounded-3xl border border-line bg-layer1/40 p-6">
+        <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+          <div className="max-w-2xl">
+            <p className="eyebrow mb-2">Facturación</p>
+            <h3 className="text-xl font-semibold text-paper">Integración ARCA — preparada como futura</h3>
+            <p className="mt-3 text-sm leading-7 text-paper/60">
+              Bistró OS no emite comprobantes fiscales reales. La arquitectura está preparada
+              para conectar con <strong className="text-paper/80">ARCA (ex-AFIP)</strong> cuando
+              el restaurante obtenga su certificado digital y clave fiscal.
+            </p>
+            <ul className="mt-4 space-y-2 text-sm text-paper/58">
+              <li className="flex items-start gap-2">
+                <span className="mt-1 text-gold">•</span>
+                <span>La tabla <code className="text-gold/80">sales_payments</code> ya existe en Supabase para registrar pagos.</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="mt-1 text-gold">•</span>
+                <span>El cierre de caja usa <code className="text-gold/80">cash_closings</code> con apertura, cierre y diferencia contada.</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="mt-1 text-gold">•</span>
+                <span>La integración ARCA se conectaría como webhook externo o módulo n8n — sin modificar la app interna.</span>
+              </li>
+            </ul>
+          </div>
+          <div className="shrink-0 rounded-2xl border border-line bg-layer1/60 px-5 py-4 text-center">
+            <p className="text-[11px] uppercase tracking-[0.16em] text-paper/40">Estado</p>
+            <p className="mt-2 font-semibold text-paper/70">Arquitectura lista</p>
+            <p className="mt-1 text-sm text-paper/45">Integración pendiente</p>
+          </div>
+        </div>
+      </section>
+
     </section>
   );
 }

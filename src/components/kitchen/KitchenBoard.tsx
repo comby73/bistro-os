@@ -1,9 +1,10 @@
 "use client";
 
 import { useMemo } from "react";
-import { groupOrdersByStatus } from "@/features/orders/calculations";
+import { groupOrdersByStatus, getNextOrderStatus } from "@/features/orders/calculations";
 import { useDemoClock } from "@/features/orders/demo-clock";
 import { useDemoOrders } from "@/features/orders/demo-store";
+import { syncOrderStatusUpdate } from "@/features/orders/order-actions";
 import type { RoleId } from "@/features/auth/roles";
 import { KitchenTicketCard } from "./KitchenTicketCard";
 
@@ -94,7 +95,14 @@ export function KitchenBoard({ roleId, restaurantId }: { roleId: RoleId; restaur
                   order={order}
                   currentTime={currentTime}
                   canAdvance={canAdvance}
-                  onAdvance={() => advanceOrderStatus(order.id)}
+                  onAdvance={() => {
+                    advanceOrderStatus(order.id);
+                    // Sync status a Supabase en background (fire-and-forget)
+                    const nextStatus = getNextOrderStatus(order.status);
+                    if (nextStatus && restaurantId) {
+                      syncOrderStatusUpdate(order.id, nextStatus, restaurantId).catch(() => {});
+                    }
+                  }}
                 />
               ))}
 

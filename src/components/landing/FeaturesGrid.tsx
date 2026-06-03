@@ -20,8 +20,8 @@ const features = [
   },
   {
     icon: MessageCircle,
-    title: "Agente WhatsApp",
-    description: "Reservas, consultas frecuentes y derivación a humano cuando corresponde."
+    title: "Canales externos",
+    description: "Reservas vía Telegram activo. Integración WhatsApp preparada para conexión futura vía webhook o n8n."
   },
   {
     icon: ChefHat,

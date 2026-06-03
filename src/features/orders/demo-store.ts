@@ -157,6 +157,7 @@ export function useDemoOrders(restaurantId?: string, branchId?: string | null) {
       const currentOrders = readOrdersForRestaurant(restaurantId);
 
       writeOrdersForRestaurant(restaurantId, [builtOrder, ...currentOrders]);
+      return builtOrder; // necesario para sync a Supabase desde OrderComposer
     },
     [branchId, restaurantId]
   );
